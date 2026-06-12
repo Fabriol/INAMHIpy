@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body p-4">
+                <h2 class="fw-bold mb-3" style="color: #003366;">Panel de Control Central</h2>
+                
+                <p class="lead">Bienvenido/a, <strong>{{ current_user.nombres }} {{ current_user.apellidos }}</strong>.</p>
+                <p>Tu rol en el sistema es: <span class="badge" style="background-color: #003366;">{{ current_user.rol.nombre }}</span></p>
+                
+                <hr class="my-4">
+                
+                <div class="row mt-4">
+                    {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white h-100 border-0 shadow-sm" style="background-color: #198754;">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold">Nueva Solicitud</h5>
+                                <p class="card-text text-light">Iniciar un nuevo proceso de Paz y Salvo para un Ex Funcionario.</p>
+                                <a href="/paz-salvo/nueva" class="btn btn-light mt-auto fw-bold">Crear Trámite</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if current_user.rol.nombre == 'Ex Funcionario' %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-dark h-100 border-0 shadow-sm" style="background-color: #ffc107;">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold">Completar Mis Datos</h5>
+                                <p class="card-text">Paso 1: Llena tu formulario de información personal para iniciar el flujo de aprobación.</p>
+                                <a href="/mis-datos" class="btn btn-dark mt-auto fw-bold">Ir al Formulario</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white h-100 border-0 shadow-sm" style="background-color: #0d6efd;">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold">Mis Tareas Pendientes</h5>
+                                <p class="card-text text-light">Procesos de Paz y Salvo que requieren validación de tu área.</p>
+                                <a href="#" class="btn btn-light mt-auto fw-bold">Revisar Tareas</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white h-100 border-0 shadow-sm" style="background-color: #6c757d;">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold">Historial y Documentos</h5>
+                                <p class="card-text text-light">PDFs generados y firmados con FirmaEC.</p>
+                                <a href="#" class="btn btn-light mt-auto fw-bold">Ver Archivo</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
