@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h2 class="fw-bold mb-4" style="color: #003366;">Mis Tareas Pendientes ({{ current_user.rol.nombre }})</h2>
+        <p class="text-muted">Seleccione una solicitud para responder a las validaciones designadas a su departamento.</p>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 rounded-3">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nro. Trámite</th>
+                        <th>Fecha de Inicio</th>
+                        <th>Estado Actual</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for solicitud in solicitudes %}
+                    <tr>
+                        <td class="fw-bold">#{{ solicitud.id }}</td>
+                        <td>{{ solicitud.fecha_creacion.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td><span class="badge bg-warning text-dark">{{ solicitud.estado }}</span></td>
+                        <td>
+                            <a href="/areas/responder/{{ solicitud.id }}" class="btn btn-primary btn-sm fw-bold">Validar Formulario</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">Su bandeja está limpia. No hay tareas pendientes para su área.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

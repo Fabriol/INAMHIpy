@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h2 class="fw-bold mb-4" style="color: #003366;">Gestión Dinámica de Formulario (Paz y Salvo)</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-dark text-white fw-bold">
+                Añadir Nueva Pregunta
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/admin/preguntas">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Enunciado (La pregunta)</label>
+                        <textarea class="form-control" name="enunciado" rows="3" placeholder="Ej: ¿Entregó el informe de fin de gestión?" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tipo de Respuesta</label>
+                        <select class="form-select" name="tipo_respuesta" required>
+                            <option value="SI_NO">Selección: SÍ / NO</option>
+                            <option value="TEXTO">Texto Libre</option>
+                            <option value="NUMERO">Valor Numérico (Ej: Valor a descontar)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Designar a Departamento (Rol)</label>
+                        <select class="form-select" name="rol_id" required>
+                            <option value="">Seleccione el área responsable...</option>
+                            {% for rol in roles %}
+                                <option value="{{ rol.id }}">{{ rol.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success w-100 fw-bold">Guardar Pregunta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body">
+                <h5 class="card-title fw-bold text-muted mb-3">Preguntas Configuradas en el Sistema</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Área Responsable</th>
+                                <th>Enunciado del Formulario</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in preguntas %}
+                            <tr>
+                                <td>{{ p.id }}</td>
+                                <td><span class="badge bg-secondary">{{ p.rol_asignado_id }}</span> </td>
+                                <td>{{ p.enunciado }}</td>
+                                <td>{{ p.tipo_respuesta }}</td>
+                                <td><span class="badge bg-success">Activa</span></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No hay preguntas configuradas. Comienza a agregar las del PDF.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

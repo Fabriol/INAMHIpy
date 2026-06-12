@@ -34,6 +34,14 @@ def create_app():
     # --- NUEVO: Registramos la ruta del Ex Funcionario ---
     from app.routes.ex_funcionario import ex_funcionario_bp
     app.register_blueprint(ex_funcionario_bp)
+
+    # --- NUEVO: Registramos la ruta del Constructor Dinámico ---
+    from app.routes.admin_preguntas import admin_preguntas_bp
+    app.register_blueprint(admin_preguntas_bp)
+
+    # --- NUEVO: Registramos la ruta de las Áreas Resolutivas ---
+    from app.routes.areas import areas_bp
+    app.register_blueprint(areas_bp)
     
     @app.route('/')
     def index():

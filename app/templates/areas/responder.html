@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-4 justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-dark text-white pt-3 pb-2 border-0">
+                <h4 class="fw-bold">Validación de Trámite #{{ solicitud.id }}</h4>
+            </div>
+            <div class="card-body p-4">
+                
+                <form method="POST" action="/areas/responder/{{ solicitud.id }}">
+                    
+                    <h5 class="fw-bold text-muted mb-4 border-bottom pb-2">Sección: {{ current_user.rol.nombre }}</h5>
+
+                    {% for pregunta in preguntas %}
+                    <div class="row mb-4 bg-light p-3 rounded mx-1 shadow-sm">
+                        <div class="col-md-6 border-end">
+                            <label class="form-label fw-bold">{{ pregunta.enunciado }}</label>
+                            
+                            {% if pregunta.tipo_respuesta == 'SI_NO' %}
+                                <select class="form-select border-primary" name="pregunta_{{ pregunta.id }}" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="SI">SÍ</option>
+                                    <option value="NO">NO</option>
+                                </select>
+                            {% elif pregunta.tipo_respuesta == 'NUMERO' %}
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" step="0.01" class="form-control border-primary" name="pregunta_{{ pregunta.id }}" required>
+                                </div>
+                            {% else %}
+                                <input type="text" class="form-control border-primary" name="pregunta_{{ pregunta.id }}" required>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Observación / Detalle (Opcional)</label>
+                            <input type="text" class="form-control" name="observacion_{{ pregunta.id }}" placeholder="Ej: No entregó credencial...">
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">No hay preguntas configuradas para su área. Consulte con el Administrador.</div>
+                    {% endfor %}
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="/areas/tareas" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success fw-bold px-5">Guardar y Finalizar mi Revisión</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
