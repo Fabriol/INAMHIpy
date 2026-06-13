@@ -2,6 +2,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 from app.models.base import db, Usuario, Rol, SolicitudPazSalvo
+import os
+from flask import send_file
+from app.models.base import Respuesta
+from app.services.pdf_service import generar_documento_paz_salvo
 
 paz_salvo_bp = Blueprint('paz_salvo', __name__)
 
@@ -52,3 +56,51 @@ def nueva_solicitud():
         return redirect(url_for('dashboard.index'))
 
     return render_template('paz_salvo/crear.html')
+
+@paz_salvo_bp.route('/paz-salvo/descargar-pdf/<int:solicitud_id>')
+@login_required
+def descargar_pdf(solicitud_id):
+    solicitud = SolicitudPazSalvo.query.get_or_404(solicitud_id)
+    ex_funcionario = Usuario.query.get(solicitud.ex_funcionario_id)
+    
+    # Extraemos todas las respuestas vinculadas a esta solicitud
+    respuestas_db = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
+    
+    # Agrupamos las respuestas por el Área que las respondió (Ej: TICs, Financiera)
+    # usando una comprensión de diccionarios
+    respuestas_por_area = {}
+    
+    for r in respuestas_db:
+        pregunta = r.pregunta # Relación SQLAlchemy
+        nombre_area = pregunta.rol.nombre # Nombre del departamento
+        
+        if nombre_area not in respuestas_por_area:
+            respuestas_por_area[nombre_area] = []
+            
+        respuestas_por_area[nombre_area].append({
+            'pregunta': pregunta.enunciado,
+            'valor': r.valor_respuesta,
+            'observacion': r.observacion
+        })
+
+    # Aseguramos que exista una carpeta temporal para guardar el PDF
+    directorio_temp = os.path.join('app', 'static', 'temp')
+    os.makedirs(directorio_temp, exist_ok=True)
+    
+    # Nombre del archivo final
+    ruta_pdf = os.path.join(directorio_temp, f'PazSalvo_{ex_funcionario.cedula}_{solicitud.id}.pdf')
+    
+    # Llamamos a nuestro motor ReportLab
+    generar_documento_paz_salvo(solicitud, ex_funcionario, respuestas_por_area, ruta_pdf)
+    
+    # Guardamos la ruta en la base de datos por historial
+    solicitud.pdf_generado_path = ruta_pdf
+    db.session.commit()
+
+    # Le enviamos el archivo al navegador del usuario para que lo descargue
+    return send_file(
+        f"../{ruta_pdf}", 
+        as_attachment=True, 
+        download_name=f"Formulario_Paz_Salvo_{ex_funcionario.cedula}.pdf",
+        mimetype='application/pdf'
+    )

@@ -35,6 +35,17 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card text-white h-100 border-0 shadow-sm" style="background-color: #dc3545;">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold">Descargar y Firmar</h5>
+                                <p class="card-text text-light">Paso 2: Si las áreas ya validaron tu trámite, descarga el PDF y fírmalo con FirmaEC.</p>
+                                
+                                <a href="/paz-salvo/descargar-pdf/1" class="btn btn-light mt-auto fw-bold">Descargar PDF Original</a>
+                            </div>
+                        </div>
+                    </div>
                     {% endif %}
 
                     {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
