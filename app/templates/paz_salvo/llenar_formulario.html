@@ -2,67 +2,186 @@
 
 {% block content %}
 <style>
-    .espejo-container {
-        height: 85vh;
-        overflow-y: auto;
-    }
-    .seccion-header {
-        background-color: #25449c; /* Azul del INAMHI de tu imagen */
-        color: white;
-        padding: 10px;
-        font-weight: bold;
-        border-radius: 5px 5px 0 0;
-    }
-    .form-control { background-color: #f4f6fb; }
+    .split-container { height: calc(100vh - 120px); overflow: hidden; }
+    .scroll-pane { height: 100%; overflow-y: auto; padding-right: 15px; }
+    .seccion-titulo { background: linear-gradient(135deg, #1e3a8a, #0f172a); color: white; padding: 12px 20px; font-weight: 700; border-radius: 12px; margin-bottom: 20px; font-size: 0.95rem; letter-spacing: 0.5px; }
+    .form-label { font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 6px; }
+    .form-control, .form-select { border-radius: 10px; background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 10px 14px; font-size: 0.85rem; font-weight: 600; }
+    .form-control:focus, .form-select:focus { background-color: white; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+    .card-ingreso { background: white; border-radius: 20px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.02); padding: 25px; margin-bottom: 25px; }
+    .req { color: #dc2626; margin-left: 2px; }
+    
+    /* Contenedor de la Hoja de Previsualización */
+    .preview-pane { background-color: #e2e8f0; border-radius: 24px; padding: 30px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); }
+    .documento-físico { background: white; padding: 50px 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); min-height: 1100px; border-radius: 4px; }
 </style>
 
-<div class="row mt-3">
-    <div class="col-md-5 espejo-container pe-4 border-end">
-        <div class="seccion-header mb-3">
-            <i class="bi bi-person-fill"></i> 1. DATOS PERSONALES
+<div class="row split-container g-4">
+    <div class="col-lg-5 scroll-pane">
+        <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded-4 shadow-sm">
+            <div>
+                <h4 class="fw-bold m-0" style="color: #0f172a; letter-spacing: -0.5px;">Formulario Digital</h4>
+                <p class="text-muted small m-0">Llene los campos para actualizar la Hoja Espejo.</p>
+            </div>
+            <a href="/dashboard" class="btn btn-sm btn-outline-secondary fw-bold shadow-sm" style="border-radius: 8px;">← Panel</a>
         </div>
-        
-        <form id="form-datos" hx-post="/actualizar-espejo" hx-trigger="keyup delay:500ms from:input, change from:select" hx-target="#vista-espejo">
+
+        <form id="form-paz-salvo" hx-post="/actualizar-espejo" hx-trigger="keyup delay:300ms from:input, change from:select" hx-target="#vista-espejo">
             
-            <div class="mb-3">
-                <label class="form-label text-muted fw-bold small">NOMBRES Y APELLIDOS <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="nombres" value="{{ current_user.nombres }} {{ current_user.apellidos }}">
+            <div class="card-ingreso">
+                <div class="seccion-titulo"><i class="bi bi-person-fill me-2"></i>01. DATOS PERSONALES</div>
+                <div class="mb-3">
+                    <label class="form-label">Nombres y Apellidos Completos <span class="req">*</span></label>
+                    <input type="text" class="form-control" name="nombres" value="{{ current_user.nombres }} {{ current_user.apellidos }}" oninput="this.value = this.value.toUpperCase()">
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Cédula / Pasaporte <span class="req">*</span></label>
+                        <input type="text" class="form-control" name="cedula" value="{{ current_user.cedula }}" maxlength="10">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Modalidad Laboral <span class="req">*</span></label>
+                        <select class="form-select" name="modalidad">
+                            <option value="NOMBRAMIENTO PERMANENTE">Nombramiento Permanente</option>
+                            <option value="NOMBRAMIENTO PROVISIONAL">Nombramiento Provisional</option>
+                            <option value="CONTRATO OCASIONAL">Contrato Ocasional</option>
+                            <option value="CONTRATO DE TRABAJO" selected>Contrato de Trabajo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Fecha de Ingreso <span class="req">*</span></label>
+                        <input type="date" class="form-control" name="fecha_ingreso" value="2025-02-19">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Fecha de Salida <span class="req">*</span></label>
+                        <input type="date" class="form-control" name="fecha_salida" value="2026-06-11">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Dirección Domiciliaria <span class="req">*</span></label>
+                    <input type="text" class="form-control" name="direccion" value="LA BRETAÑA 154-S47B" oninput="this.value = this.value.toUpperCase()">
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Número de Domicilio</label>
+                        <input type="text" class="form-control" name="num_domicilio" value="021245784" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Celular <span class="req">*</span></label>
+                        <input type="text" class="form-control" name="celular" value="0978811606" maxlength="10">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contacto de Emergencia</label>
+                    <input type="text" class="form-control" name="contacto_emergencia" value="0975213131">
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Email Principal <span class="req">*</span></label>
+                        <input type="email" class="form-control" name="email1" value="alex@gmail.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email Secundario</label>
+                        <input type="email" class="form-control" name="email2" value="alex21@gmail.com">
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Provincia <span class="req">*</span></label>
+                        <input type="text" class="form-control" name="provincia" value="PICHINCHA" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Cantón <span class="req">*</span></label>
+                        <input type="text" class="form-control" name="canton" value="QUITO" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label text-muted fw-bold small">MODALIDAD LABORAL <span class="text-danger">*</span></label>
-                    <select class="form-select" name="modalidad">
-                        <option value="Contrato de Trabajo">Contrato de Trabajo</option>
-                        <option value="Nombramiento">Nombramiento Permanente</option>
+            <div class="card-ingreso">
+                <div class="seccion-titulo"><i class="bi bi-building me-2"></i>02. UNIDAD QUE PRESTÓ SERVICIOS</div>
+                <div class="mb-3">
+                    <label class="form-label">Lugar de Trabajo</label>
+                    <select class="form-select" name="lugar_trabajo">
+                        <option value="PLANTA CENTRAL" selected>Planta Central</option>
+                        <option value="PROCESOS DESCONCENTRADOS">Procesos Desconcentrados</option>
                     </select>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label text-muted fw-bold small">CÉDULA / PASAPORTE <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="cedula" value="{{ current_user.cedula }}">
+                <div class="mb-3">
+                    <label class="form-label">Dirección / Unidad <span class="req">*</span></label>
+                    <input type="text" class="form-control" name="unidad" value="CLIMATOLOGIA" oninput="this.value = this.value.toUpperCase()">
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Cargo Desempeñado <span class="req">*</span></label>
+                        <input type="text" class="form-control" name="cargo" value="ANALISIS EN INFORMATICA" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Grupo Ocupacional</label>
+                        <input type="text" class="form-control" name="grupo_ocupacional" value="SRVS" oninput="this.value = this.value.toUpperCase()">
+                    </div>
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label text-muted fw-bold small">DIRECCIÓN DOMICILIARIA <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="direccion" placeholder="Ej: La Bretaña 154-S47B">
+            <div class="card-ingreso">
+                <div class="seccion-titulo"><i class="bi bi-check2-square me-2"></i>03. GESTIÓN DOCUMENTAL Y ÁREAS</div>
+                <p class="text-muted small">Campos que responden los jefes departamentales y responsables de control técnico:</p>
+                
+                <div class="row g-3 mb-3">
+                    <div class="col-8"><label class="form-label">Informe fin de gestión entregado</label></div>
+                    <div class="col-4"><select class="form-select form-select-sm" name="inf_gestion"><option value="SI">SI</option><option value="NO">NO</option></select></div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-8"><label class="form-label">QUIPUX bandeja en cero</label></div>
+                    <div class="col-4"><select class="form-select form-select-sm" name="quipux_cero"><option value="SI">SI</option><option value="NO">NO</option></select></div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-8"><label class="form-label">Acta entrega de claves realizada</label></div>
+                    <div class="col-4"><select class="form-select form-select-sm" name="acta_claves"><option value="SI">SI</option><option value="NO">NO</option></select></div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-8"><label class="form-label">Entrega de bienes y equipos (Adm. Financiera)</label></div>
+                    <div class="col-4"><select class="form-select form-select-sm" name="bienes_financiera"><option value="SI">SI</option><option value="NO">NO</option></select></div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-8"><label class="form-label">Verificación de Equipo Informático (TICs)</label></div>
+                    <div class="col-4"><select class="form-select form-select-sm" name="verif_tics"><option value="SI">SI</option><option value="NO">NO</option></select></div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-8"><label class="form-label">Cierre de cuenta Correo y Sistemas (TICs)</label></div>
+                    <div class="col-4"><select class="form-select form-select-sm" name="cierre_correo"><option value="SI">SI</option><option value="NO">NO</option></select></div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-8"><label class="form-label">Verificación de Información Digital (EGSI)</label></div>
+                    <div class="col-4"><select class="form-select form-select-sm" name="egsi_digital"><option value="SI">SI</option><option value="NO">NO</option></select></div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-8"><label class="form-label">Devengo de capacitaciones (RRHH)</label></div>
+                    <div class="col-4"><select class="form-select form-select-sm" name="devengo_rrhh"><option value="SI">SI</option><option value="NO">NO</option></select></div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-8"><label class="form-label">Entrega credencial y porta colgante</label></div>
+                    <div class="col-4"><select class="form-select form-select-sm" name="credencial_rrhh"><option value="SI">SI</option><option value="NO">NO</option></select></div>
+                </div>
             </div>
 
-            <hr>
-            <button type="submit" class="btn btn-primary w-100 fw-bold mt-2" style="background-color: #25449c;">Guardar y Continuar</button>
+            <div class="mb-5">
+                <button type="submit" class="btn btn-primary w-100 p-3 fw-bold shadow" style="border-radius: 14px; background: linear-gradient(135deg, #2563eb, #1d4ed8);">Enviar Trámite a Validación</button>
+            </div>
         </form>
     </div>
 
-    <div class="col-md-7 espejo-container bg-light p-4" style="border-radius: 10px;">
-        <div class="d-flex justify-content-between mb-3 align-items-center">
-            <span class="text-success fw-bold"><i class="bi bi-circle-fill small"></i> Vista Previa en Tiempo Real</span>
+    <div class="col-lg-7 preview-pane scroll-pane">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3 py-2 fw-bold"><i class="bi bi-eye-fill me-1"></i> Previsualización Espejo Criptográfica</span>
             <div>
-                <button class="btn btn-sm btn-outline-secondary">🖨 Imprimir</button>
-                <button class="btn btn-sm btn-outline-danger">⬇ PDF</button>
+                <button class="btn btn-sm btn-white bg-white border fw-bold shadow-sm" style="border-radius:8px;">🖨 Imprimir</button>
+                <button class="btn btn-sm btn-white bg-white border fw-bold text-danger shadow-sm" style="border-radius:8px;"> <i class="bi bi-file-earmark-pdf-fill"></i> Exportar</button>
             </div>
         </div>
-        
-        <div id="vista-espejo" class="bg-white p-4 shadow-sm border" style="min-height: 800px;">
+
+        <div id="vista-espejo" class="documento-físico">
             {% include 'paz_salvo/partials/hoja_espejo.html' %}
         </div>
     </div>

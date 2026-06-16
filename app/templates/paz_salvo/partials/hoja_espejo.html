@@ -1,54 +1,199 @@
 <style>
-    .tabla-espejo { width: 100%; border-collapse: collapse; font-size: 0.8rem; font-family: Arial, sans-serif; }
-    .tabla-espejo th, .tabla-espejo td { border: 1px solid #333; padding: 6px; }
-    .bg-inamhi-title { background-color: #25449c; color: white; font-weight: bold; }
-    .bg-inamhi-sub { background-color: #e9ecef; color: #25449c; font-weight: bold; width: 25%; }
+    .pdf-table { width: 100%; border-collapse: collapse; font-family: 'Arial', sans-serif; font-size: 11px; color: #000; margin-bottom: 12px; }
+    .pdf-table th, .pdf-table td { border: 1.5px solid #000; padding: 5px 8px; vertical-align: middle; }
+    .pdf-header-title { font-size: 13px; font-weight: 900; text-align: center; line-height: 1.3; }
+    .section-banner { background-color: #000; color: #fff; font-weight: 900; text-transform: uppercase; font-size: 11px; text-align: left; padding: 4px 8px; }
+    .cell-label { font-weight: 900; background-color: #f2f2f2; width: 22%; font-size: 10px; }
+    .cell-value { font-size: 11px; }
+    .text-center { text-align: center; }
+    .fw-bold { font-weight: bold; }
+    .firma-box { min-height: 55px; border: 1px dashed #666; border-radius: 4px; display: flex; align-items: center; justify-content: center; background-color: #fafafa; }
 </style>
 
-<div class="text-center mb-3">
-    <h6 class="fw-bold mb-0" style="color: #25449c;">INSTITUTO NACIONAL DE METEOROLOGÍA E HIDROLOGÍA</h6>
-    <span style="font-size: 0.7rem;">DIRECCIÓN DE ADMINISTRACIÓN DE RECURSOS HUMANOS</span><br>
-    <span class="fw-bold" style="font-size: 0.85rem; color: #25449c;">FORMULARIO PAZ Y SALVO — LIQUIDACIÓN DE HABERES</span>
+<table class="pdf-table" style="border-bottom: 3px solid #000;">
+    <tr>
+        <td width="25%" class="text-center" style="padding: 10px;">
+            <div style="font-weight: 900; font-size: 16px; letter-spacing: -1px; color: #1e3a8a;">INAMHI</div>
+            <div style="font-size: 8px; font-weight: bold; color: #555;">TIEMPO, CLIMA Y AGUA</div>
+        </td>
+        <td width="75%" class="pdf-header-title">
+            INSTITUTO NACIONAL DE METEOROLOGÍA E HIDROLOGÍA<br>
+            <span style="font-size: 11px; font-weight: 700;">DIRECCIÓN DE ADMINISTRACIÓN DE RECURSOS HUMANOS</span><br>
+            <span style="font-size: 11px; font-weight: 900;">FORMULARIO PAZ Y SALVO PARA EL PAGO DE LIQUIDACIÓN DE HABERES</span>
+        </td>
+    </tr>
+</table>
+
+<table class="pdf-table">
+    <tr>
+        <td colspan="4" class="section-banner">DATOS PERSONALES</td>
+    </tr>
+    <tr>
+        <td class="cell-label">NOMBRES Y APELLIDOS:</td>
+        <td colspan="3" class="cell-value fw-bold text-uppercase">{{ datos.nombres if datos else (current_user.nombres ~ ' ' ~ current_user.apellidos if current_user else 'OLIVER JOSTIN VELASQUE QUITO') }}</td>
+    </tr>
+    <tr>
+        <td class="cell-label">MODALIDAD LABORAL:</td>
+        <td class="cell-value text-uppercase">{{ datos.modalidad if datos else 'CONTRATO DE TRABAJO' }}</td>
+        <td class="cell-label" style="width: 18%;">CÉDULA / PASAPORTE:</td>
+        <td class="cell-value fw-bold">{{ datos.cedula if datos else (current_user.cedula if current_user else '1723929160') }}</td>
+    </tr>
+    <tr>
+        <td class="cell-label">FECHA INGRESO:</td>
+        <td class="cell-value">{{ datos.fecha_ingreso if datos else '2025-02-19' }}</td>
+        <td class="cell-label">FECHA SALIDA:</td>
+        <td class="cell-value">{{ datos.fecha_salida if datos else '2026-06-11' }}</td>
+    </tr>
+    <tr>
+        <td class="cell-label">DIRECCIÓN DOMICILIARIA:</td>
+        <td colspan="3" class="cell-value text-uppercase">{{ datos.direccion if datos else 'LA BRETAÑA 154-S47B' }}</td>
+    </tr>
+    <tr>
+        <td class="cell-label">NUMERO DOMICILIO:</td>
+        <td class="cell-value">{{ datos.num_domicilio if datos else '021245784' }}</td>
+        <td class="cell-label">NUMERO CELULAR:</td>
+        <td class="cell-value">{{ datos.celular if datos else '0978811606' }}</td>
+    </tr>
+    <tr>
+        <td class="cell-label">CONTACTO EMERGENCIA:</td>
+        <td class="cell-value">{{ datos.contacto_emergencia if datos else '0975213131' }}</td>
+        <td class="cell-label">EMAIL PRINCIPAL:</td>
+        <td class="cell-value">{{ datos.email1 if datos else 'alex@gmail.com' }}</td>
+    </tr>
+    <tr>
+        <td class="cell-label">EMAIL SECUNDARIO:</td>
+        <td class="cell-value">{{ datos.email2 if datos else 'alex21@gmail.com' }}</td>
+        <td class="cell-label">PROVINCIA / CANTÓN:</td>
+        <td class="cell-value text-uppercase">{{ datos.provincia if datos else 'PICHINCHA' }} / {{ datos.canton if datos else 'QUITO' }}</td>
+    </tr>
+</table>
+
+<table class="pdf-table">
+    <tr>
+        <td colspan="4" class="section-banner">DATOS DE LA DIRECCIÓN / UNIDAD QUE PRESTÓ SUS SERVICIOS</td>
+    </tr>
+    <tr>
+        <td class="cell-label">LUGAR DE TRABAJO:</td>
+        <td class="cell-value text-uppercase" style="width:30%;">{{ datos.lugar_trabajo if datos else 'PLANTA CENTRAL' }}</td>
+        <td class="cell-label" style="width:20%;">DIRECCIÓN / UNIDAD:</td>
+        <td class="cell-value text-uppercase">{{ datos.unidad if datos else 'CLIMATOLOGIA' }}</td>
+    </tr>
+    <tr>
+        <td class="cell-label">CARGO DESEMPEÑADO:</td>
+        <td class="cell-value text-uppercase">{{ datos.cargo if datos else 'ANALISIS EN INFORMATICA' }}</td>
+        <td class="cell-label">GRUPO OCUPACIONAL:</td>
+        <td class="cell-value text-uppercase">{{ datos.grupo_ocupacional if datos else 'SRVS' }}</td>
+    </tr>
+</table>
+
+<table class="pdf-table">
+    <tr>
+        <td colspan="6" class="section-banner">ENTREGA / GESTIÓN DOCUMENTAL Y DE TRÁMITES</td>
+    </tr>
+    <tr style="background-color: #f2f2f2; font-weight: bold;" class="text-center">
+        <td width="35%">DETALLE</td>
+        <td width="6%">SI</td>
+        <td width="6%">NO</td>
+        <td width="23%">NOMBRE RESPONSABLE</td>
+        <td width="30%">FIRMA ELECTRÓNICA</td>
+    </tr>
+    <tr>
+        <td>Entrega informe de fin de gestión con actividades ejecutadas</td>
+        <td class="text-center fw-bold text-success">{% if datos and datos.inf_gestion == 'SI' %}SI{% else %}—{% endif %}</td>
+        <td class="text-center fw-bold text-danger">{% if datos and datos.inf_gestion == 'NO' %}NO{% else %}—{% endif %}</td>
+        <td class="text-uppercase text-center">Marcelo Quito</td>
+        <td><div class="firma-box"><span style="color:#22c55e; font-size:8px;">[FirmaEC Digital]</span></div></td>
+    </tr>
+    <tr>
+        <td>Trámites asignados en sistema QUIPUX (Bandeja en cero)</td>
+        <td class="text-center fw-bold text-success">{% if datos and datos.quipux_cero == 'SI' %}SI{% else %}—{% endif %}</td>
+        <td class="text-center fw-bold text-danger">{% if datos and datos.quipux_cero == 'NO' %}NO{% else %}—{% endif %}</td>
+        <td class="text-uppercase text-center">Orlando Gómez</td>
+        <td><div class="firma-box"><span style="color:#22c55e; font-size:8px;">[FirmaEC Digital]</span></div></td>
+    </tr>
+    <tr>
+        <td>Realizó acta entrega de claves de su unidad</td>
+        <td class="text-center fw-bold text-success">{% if datos and datos.acta_claves == 'SI' %}SI{% else %}—{% endif %}</td>
+        <td class="text-center fw-bold text-danger">{% if datos and datos.acta_claves == 'NO' %}NO{% else %}—{% endif %}</td>
+        <td class="text-uppercase text-center">Orlando Gómez</td>
+        <td><div class="firma-box"><span style="color:#22c55e; font-size:8px;">[FirmaEC Digital]</span></div></td>
+    </tr>
+</table>
+
+<table class="pdf-table">
+    <tr>
+        <td colspan="6" class="section-banner">DIRECCIÓN ADMINISTRATIVA FINANCIERA - GESTIÓN ADMINISTRATIVA</td>
+    </tr>
+    <tr style="background-color: #f2f2f2; font-weight: bold;" class="text-center">
+        <td width="35%">DETALLE</td>
+        <td width="6%">SI</td>
+        <td width="6%">NO</td>
+        <td>NÚMERO ACTA / VALOR DEDUCIBLE</td>
+        <td width="23%">RESPONSABLE</td>
+        <td width="30%">FIRMA</td>
+    </tr>
+    <tr>
+        <td>¿Entregó bienes muebles y equipos de oficina?</td>
+        <td class="text-center fw-bold text-success">{% if datos and datos.bienes_financiera == 'SI' %}SI{% else %}—{% endif %}</td>
+        <td class="text-center fw-bold text-danger">{% if datos and datos.bienes_financiera == 'NO' %}NO{% else %}—{% endif %}</td>
+        <td class="text-center">Acta Nro. DAF-2026-042</td>
+        <td class="text-center text-uppercase">Ing. Verónica Zapata</td>
+        <td><div class="firma-box"></div></td>
+    </tr>
+</table>
+
+<table class="pdf-table">
+    <tr>
+        <td colspan="6" class="section-banner">GESTIÓN DE TECNOLOGÍAS DE LA INFORMACIÓN Y COMUNICACIÓN (TICs)</td>
+    </tr>
+    <tr>
+        <td class="cell-label">Verificación Equipo Informático:</td>
+        <td class="text-center fw-bold">{% if datos and datos.verif_tics == 'SI' %}SI{% else %}NO{% endif %}</td>
+        <td class="cell-label">Liberación de Cuentas / Backup:</td>
+        <td class="text-center fw-bold">{% if datos and datos.cierre_correo == 'SI' %}COMPLETO{% else %}PENDIENTE{% endif %}</td>
+        <td class="cell-label">Responsable TICs:</td>
+        <td class="text-center text-uppercase">Soporte TICs</td>
+    </tr>
+</table>
+
+<table class="pdf-table">
+    <tr>
+        <td colspan="4" class="section-banner">SEGURIDAD DE LA INFORMACIÓN (EGSI — ACUERDO MINISTERIAL 166)</td>
+    </tr>
+    <tr>
+        <td class="cell-label">Verificación Archivos Digitales/Físicos:</td>
+        <td class="cell-value">{% if datos and datos.egsi_digital == 'SI' %}VALIDADO EN SISTEMA{% else %}PENDIENTE DE REVISIÓN{% endif %}</td>
+        <td class="cell-label">Oficial de Seguridad:</td>
+        <td class="cell-value text-center text-uppercase">Oficial EGSI</td>
+    </tr>
+</table>
+
+<table class="pdf-table">
+    <tr>
+        <td colspan="4" class="section-banner">DIRECCIÓN DE ADMINISTRACIÓN DE RECURSOS HUMANOS</td>
+    </tr>
+    <tr>
+        <td class="cell-label">Devengo Cursos / Capacitaciones:</td>
+        <td class="cell-value">{% if datos and datos.devengo_rrhh == 'SI' %}NO ADEUDA VALORES (CERTIFICADO){% else %}EN VERIFICACIÓN{% endif %}</td>
+        <td class="cell-label">Entrega de Credencial y Colgante:</td>
+        <td class="cell-value">{% if datos and datos.credencial_rrhh == 'SI' %}ENTREGADO COMPLETO{% else %}NO ENTREGADO{% endif %}</td>
+    </tr>
+</table>
+
+<table class="pdf-table" style="margin-top: 15px;">
+    <tr>
+        <td class="section-banner">AUTORIZACIÓN</td>
+    </tr>
+    <tr>
+        <td style="font-size: 9px; line-height: 1.4; text-align: justify; padding: 8px;">
+            Conforme lo establecido en el artículo 110 del Reglamento General a la Ley Orgánica de Servicio Público (LOSEP), quien suscribe el presente formulario de "Paz y Salvo para la liquidación de haberes que me corresponde", <strong>AUTORIZO</strong> a la DIRECCIÓN ADMINISTRATIVA FINANCIERA del INAMHI, para que efectúe los descuentos detallados en el presente documento por reintegro y/o recuperación de valores, bienes y/o especies que se hayan encontrado a mi cargo y no hayan sido devueltos en las condiciones recibidas, los mismos que serán DESCONTADOS a través de mi liquidación definitiva de haberes.
+        </td>
+    </tr>
+</table>
+
+<div style="margin-top: 25px; text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;">
+    <div style="width: 320px; border-bottom: 1.5px solid #000; margin-bottom: 5px;"></div>
+    <div style="font-size: 10px; font-weight: 900; text-transform: uppercase;">FIRMA DEL SERVIDOR SALIENTE: {{ datos.nombres if datos else (current_user.nombres ~ ' ' ~ current_user.apellidos if current_user else 'OLIVER JOSTIN VELASQUE QUITO') }}</div>
+    <div style="font-size: 10px; font-weight: 700;">C.C: {{ datos.cedula if datos else (current_user.cedula if current_user else '1723929160') }}</div>
+    <div style="font-size: 8px; color: #555; margin-top: 2px;">(Este documento electrónico debe ser firmado usando la llave estándar .p12 mediante FirmaEC)</div>
 </div>
-
-<table class="tabla-espejo">
-    <tr>
-        <td colspan="4" class="bg-inamhi-title">01 DATOS PERSONALES</td>
-    </tr>
-    <tr>
-        <td class="bg-inamhi-sub">NOMBRES Y APELLIDOS</td>
-        <td colspan="3" class="fw-bold text-uppercase">{{ datos.nombres if datos else usuario.nombres ~ ' ' ~ usuario.apellidos }}</td>
-    </tr>
-    <tr>
-        <td class="bg-inamhi-sub">CÉDULA / PASAPORTE</td>
-        <td>{{ datos.cedula if datos else usuario.cedula }}</td>
-        <td class="bg-inamhi-sub">MODALIDAD LABORAL</td>
-        <td class="text-uppercase">{{ datos.modalidad if datos else '' }}</td>
-    </tr>
-    <tr>
-        <td class="bg-inamhi-sub">DIRECCIÓN DOMICILIARIA</td>
-        <td colspan="3" class="text-uppercase">{{ datos.direccion if datos else '' }}</td>
-    </tr>
-</table>
-
-<table class="tabla-espejo mt-3">
-    <tr>
-        <td colspan="6" class="bg-inamhi-title">03 ENTREGA / GESTIÓN DOCUMENTAL Y DE TRÁMITES</td>
-    </tr>
-    <tr class="bg-inamhi-sub text-center">
-        <td>DESCRIPCIÓN</td>
-        <td width="5%">SI/NO</td>
-        <td>DESCRIPCIÓN</td>
-        <td width="5%">SI/NO</td>
-        <td>NOMBRE RESPONSABLE</td>
-        <td>FIRMA ELECTRÓNICA</td>
-    </tr>
-    <tr>
-        <td>Informe fin de gestión</td>
-        <td class="text-center text-success fw-bold">SI</td>
-        <td>QUIPUX bandeja en cero</td>
-        <td class="text-center text-success fw-bold">SI</td>
-        <td class="text-uppercase text-primary fw-bold">ORLANDO GOMEZ</td> 
-        <td class="text-center text-muted" style="font-size: 0.6rem;">[Espacio FirmaEC]</td>
-    </tr>
-</table>
