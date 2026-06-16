@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding: 28px; border-radius: 30px; background: rgba(255,255,255,.75); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 24px 55px rgba(15,23,42,.10); }
+    .badge-custom { display: inline-flex; padding: 7px 14px; border-radius: 999px; background: linear-gradient(135deg,#2563eb,#0ea5e9); color: white; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+    h1 { margin: 12px 0 6px; font-size: 38px; font-weight: 900; color: #0f172a; letter-spacing: -1px;}
+    .btn-secondary-custom { border: none; padding: 12px 18px; border-radius: 14px; background: linear-gradient(135deg,#64748b,#475569); color: white; font-size: 13px; font-weight: 900; text-decoration: none; }
+    
+    .main-card { background: white; border-radius: 24px; padding: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); border-top: 5px solid #10b981;}
+    .filter-box { background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; gap: 15px; align-items: end; margin-bottom: 25px;}
+    .filter-box div { flex: 1; }
+    .filter-box input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #cbd5e1; font-weight: 600; outline: none; }
+    
+    .btn-export-excel { background: #22c55e; color: white; padding: 10px 20px; border-radius: 10px; font-weight: 700; border: none; }
+    .btn-export-pdf { background: #ef4444; color: white; padding: 10px 20px; border-radius: 10px; font-weight: 700; border: none; margin-left: 10px;}
+    
+    .table-custom { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .table-custom th { background: #1e293b; padding: 15px; font-size: 0.75rem; color: white; text-transform: uppercase; text-align: center; }
+    .table-custom th:first-child { border-top-left-radius: 15px; }
+    .table-custom th:last-child { border-top-right-radius: 15px; }
+    .table-custom td { padding: 15px; border-bottom: 1px solid #e2e8f0; font-size: 0.85rem; font-weight: 600; text-align: center; vertical-align: middle; color: #334155; }
+    .badge-action { background: #dcfce7; color: #15803d; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; }
+</style>
+
+<div class="page-header">
+    <div>
+        <span class="badge-custom">Auditoría</span>
+        <h1>Auditoría del Sistema</h1>
+        <p class="text-muted m-0">Consulta acciones, usuarios, módulos y fechas registradas.</p>
+    </div>
+    <a href="/dashboard" class="btn-secondary-custom">← Volver</a>
+</div>
+
+<div class="main-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold m-0 text-dark">Registros de auditoría</h3>
+            <span class="text-muted small fw-bold">Total: 5</span>
+        </div>
+        <button class="btn btn-light fw-bold" style="border-radius: 12px; border: 1px solid #e2e8f0;">Actualizar</button>
+    </div>
+
+    <div class="filter-box">
+        <div style="flex: 2;">
+            <input type="text" placeholder="Buscar por usuario...">
+            <span class="small text-muted mt-1 d-block">Filtro por usuario</span>
+        </div>
+        <div>
+            <input type="date">
+            <span class="small text-muted mt-1 d-block">Fecha inicio</span>
+        </div>
+        <div>
+            <input type="date">
+            <span class="small text-muted mt-1 d-block">Fecha fin</span>
+        </div>
+        <div style="flex: 0;">
+            <button class="btn btn-secondary" style="border-radius: 12px; padding: 12px 20px; font-weight: bold; background: #475569;">Limpiar filtros</button>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a href="/admin/exportar-excel" class="btn-export-excel text-decoration-none">Exportar Excel</a>
+        <button class="btn-export-pdf">Exportar PDF</button>
+    </div>
+
+    <table class="table-custom">
+        <thead><tr><th>ID</th><th>USUARIO</th><th>ROL</th><th>MÓDULO</th><th>ACCIÓN</th><th style="width: 35%;">DETALLE</th><th>FECHA</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>#547</td><td><strong>admin</strong></td>
+                <td><span class="badge bg-info bg-opacity-10 text-info px-3 py-2" style="border-radius: 10px;">ADMINISTRADOR</span></td>
+                <td>Reportes</td><td><span class="badge-action">RECORDATORIO ENVIADO</span></td>
+                <td style="text-align: left;">Recordatorio a Erick Analuisa (ID 5) por formulario 67 — 3 pendientes</td><td>6/12/26, 8:04 AM</td>
+            </tr>
+            <tr>
+                <td>#546</td><td><strong>erick</strong></td>
+                <td><span class="badge bg-info bg-opacity-10 text-info px-3 py-2" style="border-radius: 10px;">ADMINISTRATIVA</span></td>
+                <td>Formularios</td><td><span class="badge-action">FIRMA DIGITAL EC</span></td>
+                <td style="text-align: left;">Firmó celda 'servidor_saliente' del formulario 67 como 'BRYAN ALEJANDRO CUENCA'</td><td>6/12/26, 8:01 AM</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

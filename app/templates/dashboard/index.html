@@ -1,100 +1,201 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-body p-4">
-                <h2 class="fw-bold mb-3" style="color: #003366;">Panel de Control Central</h2>
-                
-                <p class="lead">Bienvenido/a, <strong>{{ current_user.nombres }} {{ current_user.apellidos }}</strong>.</p>
-                <p>Tu rol en el sistema es: <span class="badge" style="background-color: #003366;">{{ current_user.rol.nombre }}</span></p>
-                
-                <hr class="my-4">
-                
-                <div class="row mt-4">
-                    {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
-                    <div class="col-md-4 mb-3">
-                        <div class="card text-white h-100 border-0 shadow-sm" style="background-color: #198754;">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title fw-bold">Nueva Solicitud</h5>
-                                <p class="card-text text-light">Iniciar un nuevo proceso de Paz y Salvo para un Ex Funcionario.</p>
-                                <a href="/paz-salvo/nueva" class="btn btn-light mt-auto fw-bold">Crear Trámite</a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
+<style>
+/* ANIMACIONES DEL DASHBOARD */
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-26px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes cardUp { from { opacity: 0; transform: translateY(34px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes iconFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes pulseRing { 0%, 100% { transform: scale(1); opacity: .55; } 50% { transform: scale(1.14); opacity: .85; } }
+@keyframes rotateCircle { to { transform: rotate(360deg); } }
 
-                    {% if current_user.rol.nombre == 'Ex Funcionario' %}
-                    <div class="col-md-4 mb-3">
-                        <div class="card text-dark h-100 border-0 shadow-sm" style="background-color: #ffc107;">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title fw-bold">Completar Mis Datos</h5>
-                                <p class="card-text">Paso 1: Llena tu formulario de información personal para iniciar el flujo de aprobación.</p>
-                                <a href="/mis-datos" class="btn btn-dark mt-auto fw-bold">Ir al Formulario</a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4 mb-3">
-                        <div class="card text-white h-100 border-0 shadow-sm" style="background-color: #dc3545;">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title fw-bold">Descargar y Firmar</h5>
-                                <p class="card-text text-light">Paso 2: Si las áreas ya validaron tu trámite, descarga el PDF y fírmalo con FirmaEC.</p>
-                                
-                                <a href="/paz-salvo/descargar-pdf/1" class="btn btn-light mt-auto fw-bold">Descargar PDF Original</a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
+/* HERO SECTION */
+.hero { position: relative; overflow: hidden; min-height: 330px; display: grid; grid-template-columns: 1fr 340px; gap: 28px; align-items: center; padding: 42px; border-radius: 34px; background: linear-gradient(135deg, rgba(15, 23, 42, .92), rgba(30, 64, 175, .88)), radial-gradient(circle at top right, rgba(14, 165, 233, .6), transparent 38%); color: white; box-shadow: 0 30px 80px rgba(15, 23, 42, .22); animation: fadeDown .75s ease both; margin-bottom: 30px; }
+.hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle at 15% 20%, rgba(96, 165, 250, .28), transparent 28%), radial-gradient(circle at 80% 70%, rgba(34, 197, 94, .22), transparent 30%); pointer-events: none; }
+.hero-content, .hero-right { position: relative; z-index: 2; }
+.badge-hero { display: inline-flex; width: fit-content; padding: 8px 15px; border-radius: 999px; background: linear-gradient(135deg, #2563eb, #0ea5e9); color: white; font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 10px 24px rgba(37, 99, 235, .35); }
+.hero h1 { margin: 18px 0 12px; font-size: clamp(34px, 5vw, 58px); font-weight: 900; line-height: 1.02; letter-spacing: -.06em; color: white; }
+.hero p { max-width: 720px; margin: 0; color: #dbeafe; font-size: 16px; line-height: 1.65; font-weight: 500; }
+.hero-info { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+.hero-item { min-width: 150px; padding: 16px; border-radius: 20px; background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .18); backdrop-filter: blur(14px); }
+.hero-item strong { display: block; font-size: 24px; font-weight: 900; color: white; }
+.hero-item span { color: #bfdbfe; font-size: 12px; font-weight: 700; text-transform: uppercase; }
 
-                    {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
-                    <div class="col-md-4 mb-3">
-                        <div class="card text-white h-100 border-0 shadow-sm" style="background-color: #198754;">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title fw-bold">Nueva Solicitud</h5>
-                                <p class="card-text text-light">Iniciar un nuevo proceso de Paz y Salvo para un Ex Funcionario.</p>
-                                <a href="/paz-salvo/nueva" class="btn btn-light mt-auto fw-bold">Crear Trámite</a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
+.hero-right { display: flex; flex-direction: column; align-items: stretch; gap: 18px; }
+.weather-card { position: relative; overflow: hidden; padding: 28px; min-height: 230px; border-radius: 30px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .22); backdrop-filter: blur(18px); text-align: center; }
+.weather-logo-wrap { width: 110px; height: 80px; margin: 0 auto 14px; border-radius: 20px; overflow: hidden; background: rgba(255,255,255,.92); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0,0,0,.18); animation: iconFloat 3s ease-in-out infinite; font-size: 18px; font-weight: 900; color: #1e3a8a; }
+.weather-card h2 { margin: 0; font-size: 32px; font-weight: 900; color: white; }
+.weather-card p { margin-top: 8px; font-size: 13px; color: #dbeafe; }
+.pulse-ring { position: absolute; width: 120px; height: 120px; right: -35px; bottom: -35px; border-radius: 50%; border: 18px solid rgba(34, 197, 94, .18); animation: pulseRing 2.5s ease-in-out infinite; }
+.logout { border: none; min-height: 48px; padding: 13px 20px; border-radius: 16px; background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; font-size: 13px; font-weight: 900; cursor: pointer; transition: .25s ease; text-align: center; text-decoration: none;}
+.logout:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 14px 30px rgba(239, 68, 68, .32); color: white;}
 
-                    {% if current_user.rol.nombre == 'Administrador' %}
-                    <div class="col-md-4 mb-3">
-                        <div class="card text-white h-100 border-0 shadow-sm" style="background-color: #d63384;">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title fw-bold">Diseñador de Formulario</h5>
-                                <p class="card-text text-light">Configura las preguntas dinámicas y asígnalas a los departamentos.</p>
-                                <a href="/admin/preguntas" class="btn btn-light mt-auto fw-bold">Configurar Preguntas</a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="col-md-4 mb-3">
-                        <div class="card text-white h-100 border-0 shadow-sm" style="background-color: #0d6efd;">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title fw-bold">Mis Tareas Pendientes</h5>
-                                <p class="card-text text-light">Procesos de Paz y Salvo que requieren validación de tu área.</p>
-                                <a href="/areas/tareas" class="btn btn-light mt-auto fw-bold">Revisar Tareas</a>    
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4 mb-3">
-                        <div class="card text-white h-100 border-0 shadow-sm" style="background-color: #6c757d;">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title fw-bold">Historial y Documentos</h5>
-                                <p class="card-text text-light">PDFs generados y firmados con FirmaEC.</p>
-                                <a href="#" class="btn btn-light mt-auto fw-bold">Ver Archivo</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+/* TARJETAS GRID */
+.dashboard-grid { margin-top: 30px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin-bottom: 30px;}
+.info-card { position: relative; overflow: hidden; display: flex; align-items: flex-start; gap: 18px; min-height: 170px; padding: 26px; background: rgba(255, 255, 255, .88); border: 1px solid rgba(255, 255, 255, .74); backdrop-filter: blur(18px); border-radius: 30px; box-shadow: 0 24px 55px rgba(15, 23, 42, .10); animation: cardUp .75s ease both; transition: .25s ease; text-decoration: none;}
+.info-card:hover { transform: translateY(-6px); box-shadow: 0 30px 70px rgba(15, 23, 42, .16); }
+.info-card::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: linear-gradient(90deg, #2563eb, #0ea5e9); }
+.card-icon { width: 64px; height: 64px; display: grid; place-items: center; flex-shrink: 0; border-radius: 22px; font-size: 31px; animation: iconFloat 3s ease-in-out infinite; }
+.info-card h3 { margin: 0; color: #0f172a; font-size: 20px; font-weight: 900; }
+.info-card p { margin: 8px 0 0; color: #64748b; font-size: 13px; font-weight: 600; line-height: 1.55; }
+.info-card.blue .card-icon { background: #dbeafe; } .info-card.green .card-icon { background: #dcfce7; }
+.info-card.purple .card-icon { background: #ede9fe; } .info-card.orange .card-icon { background: #fef3c7; }
+.info-card.green::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.info-card.purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.info-card.orange::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
 
+/* PANEL INSTITUCIONAL Y FOOTER */
+.institution-panel { margin-top: 30px; display: grid; grid-template-columns: 1.3fr .7fr; gap: 24px; margin-bottom: 30px;}
+.institution-panel .panel-left, .institution-panel .panel-right { position: relative; overflow: hidden; padding: 34px; border-radius: 30px; background: rgba(255, 255, 255, .88); border: 1px solid rgba(255, 255, 255, .74); backdrop-filter: blur(18px); box-shadow: 0 24px 55px rgba(15, 23, 42, .10); animation: cardUp .75s ease both; }
+.panel-badge { display: inline-flex; width: fit-content; padding: 7px 14px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.panel-left h2 { margin: 16px 0 12px; font-size: clamp(26px, 4vw, 42px); font-weight: 900; letter-spacing: -.04em; }
+.panel-left p { color: #64748b; line-height: 1.65; font-weight: 600; }
+.panel-features { margin-top: 26px; display: grid; gap: 14px; }
+.feature { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 20px; background: #f8fafc; border: 1px solid #e2e8f0; }
+.feature span { width: 30px; height: 30px; display: grid; place-items: center; flex-shrink: 0; border-radius: 50%; background: #dcfce7; color: #15803d; font-weight: 900; }
+.feature p { margin: 0; color: #64748b; font-size: 13px; font-weight: 600; }
+.panel-right { min-height: 340px; display: grid; place-items: center; background: radial-gradient(circle at center, rgba(14, 165, 233, .18), transparent 36%), rgba(255, 255, 255, .88); }
+.center-icon { position: relative; z-index: 4; width: 120px; height: 120px; border-radius: 40px; display: grid; place-items: center; font-size: 64px; background: linear-gradient(135deg, #2563eb, #0ea5e9); box-shadow: 0 24px 55px rgba(37, 99, 235, .35); animation: iconFloat 3s ease-in-out infinite; color: white;}
+.circle { position: absolute; border-radius: 50%; border: 2px dashed rgba(37, 99, 235, .35); animation: rotateCircle 12s linear infinite; }
+.circle-1 { width: 250px; height: 250px; } .circle-2 { width: 185px; height: 185px; animation-duration: 9s; animation-direction: reverse; } .circle-3 { width: 310px; height: 310px; animation-duration: 16s; }
+
+.footer-inamhi { padding: 64px 32px 32px; border-radius: 40px; background: radial-gradient(circle at top left, rgba(14, 165, 233, .22), transparent 30%), linear-gradient(180deg, #002855 0%, #001b3f 100%); color: white; box-shadow: 0 -20px 50px -20px rgba(0, 40, 85, .5); margin-bottom: 20px;}
+.footer-grid { display: grid; grid-template-columns: 380px 1fr; gap: 48px; align-items: center; margin-bottom: 56px; }
+.footer-logo-box { width: fit-content; padding: 22px; border-radius: 40px; background: white; box-shadow: 0 18px 45px rgba(0, 0, 0, .22); font-size: 24px; font-weight: 900; color: #1e3a8a;}
+.footer-brand h3 { margin: 24px 0 0; color: #bfdbfe; font-size: 26px; font-weight: 900; font-style: italic; }
+.footer-brand p { margin: 12px 0 0; color: rgba(219, 234, 254, .80); font-size: 14px; line-height: 1.7; font-weight: 500; }
+.footer-sites { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.footer-card { min-height: 245px; padding: 24px; border-radius: 38px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .10); backdrop-filter: blur(14px); transition: .25s ease; }
+.footer-card:hover { transform: translateY(-6px); background: rgba(255, 255, 255, .10); }
+.footer-card-icon { width: 52px; height: 52px; margin-bottom: 18px; display: grid; place-items: center; border-radius: 18px; font-size: 24px; }
+.blue-icon { background: rgba(59, 130, 246, .20); } .green-icon { background: rgba(16, 185, 129, .20); } .purple-icon { background: rgba(139, 92, 246, .20); }
+.footer-card h4 { margin: 0 0 12px; font-size: 19px; font-weight: 900; }
+.footer-card p { margin: 0; color: rgba(219, 234, 254, .72); font-size: 12px; line-height: 1.7; font-weight: 500; }
+.footer-bottom { padding-top: 28px; border-top: 1px solid rgba(255, 255, 255, .10); display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.footer-bottom p { margin: 0; color: rgba(191, 219, 254, .50); font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
+.footer-bottom span { display: block; margin-top: 6px; color: rgba(191, 219, 254, .45); font-size: 12px; font-weight: 600; }
+</style>
+
+<section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <span class="badge-hero">Plataforma Oficial INAMHI</span>
+        <h1>Centro de Gestión Institucional</h1>
+        <p>Sistema moderno para la administración de documentos, formularios, reportes y procesos institucionales del Instituto Nacional de Meteorología e Hidrología.</p>
+        <div class="hero-info">
+            <div class="hero-item">
+                <strong>{{ total_usuarios | default(0) }}</strong>
+                <span>Usuarios activos</span>
+            </div>
+            <div class="hero-item">
+                <strong>{{ total_documentos | default(0) }}</strong>
+                <span>Documentos registrados</span>
+            </div>
+            <div class="hero-item">
+                <strong style="font-size: 18px; margin-top: 5px;">{{ current_user.rol.nombre }}</strong>
+                <span>Rol institucional</span>
             </div>
         </div>
     </div>
-</div>
+    <div class="hero-right">
+        <div class="weather-card">
+            <div class="weather-logo-wrap">INAMHI</div>
+            <h2>INAMHI</h2>
+            <p>Tecnología, monitoreo y gestión institucional al servicio del Ecuador.</p>
+            <div class="pulse-ring"></div>
+        </div>
+        <a href="/logout" class="logout">Cerrar sesión</a>
+    </div>
+</section>
+
+<section class="dashboard-grid">
+    <a href="/areas/tareas" class="info-card blue">
+        <div class="card-icon">📄</div>
+        <div>
+            <h3>Gestión documental</h3>
+            <p>Control y almacenamiento seguro de archivos institucionales.</p>
+        </div>
+    </a>
+    <a href="/reportes" class="info-card green">
+        <div class="card-icon">📊</div>
+        <div>
+            <h3>Reportes dinámicos</h3>
+            <p>Visualización estadística y análisis institucional.</p>
+        </div>
+    </a>
+    {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
+    <a href="/admin/preguntas" class="info-card purple">
+        <div class="card-icon">🧾</div>
+        <div>
+            <h3>Formularios inteligentes</h3>
+            <p>Procesos automatizados para solicitudes y registros.</p>
+        </div>
+    </a>
+    <a href="/usuarios" class="info-card orange">
+        <div class="card-icon">🛡️</div>
+        <div>
+            <h3>Seguridad institucional</h3>
+            <p>Acceso controlado mediante roles y permisos del sistema.</p>
+        </div>
+    </a>
+    {% endif %}
+</section>
+
+<section class="institution-panel">
+    <div class="panel-left">
+        <span class="panel-badge">INAMHI ECUADOR</span>
+        <h2>Innovación tecnológica para la gestión institucional</h2>
+        <p>Esta plataforma fortalece la organización administrativa, optimiza procesos internos y mejora la trazabilidad documental dentro del entorno institucional del INAMHI.</p>
+        <div class="panel-features">
+            <div class="feature"><span>✔</span><p>Control centralizado de información</p></div>
+            <div class="feature"><span>✔</span><p>Procesos digitales más eficientes</p></div>
+            <div class="feature"><span>✔</span><p>Administración segura y moderna</p></div>
+        </div>
+    </div>
+    <div class="panel-right">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+        <div class="center-icon">🌎</div>
+    </div>
+</section>
+
+<footer class="footer-inamhi">
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <div class="footer-logo-box">INAMHI</div>
+            <div>
+                <h3>Tiempo, Clima y Agua</h3>
+                <p>Comprometidos con la generación de datos precisos para la prevención de riesgos y el desarrollo sostenible del Ecuador.</p>
+            </div>
+        </div>
+        <div class="footer-sites">
+            <div class="footer-card">
+                <div class="footer-card-icon blue-icon">🚢</div>
+                <h4>Sede Guayas</h4>
+                <p>Ubicada en el Campus Gustavo Galindo de la ESPOL. Especializada en ingeniería marítima y ciencias del mar.</p>
+            </div>
+            <div class="footer-card">
+                <div class="footer-card-icon green-icon">🍃</div>
+                <h4>Sede Pastaza</h4>
+                <p>Centro neurálgico en la Amazonía, operando desde la ESPOCH con estaciones meteorológicas de última generación.</p>
+            </div>
+            <div class="footer-card">
+                <div class="footer-card-icon purple-icon">⛰️</div>
+                <h4>Sede Loja</h4>
+                <p>Situada en el Edificio del Gobierno Zonal 7. Encargada de la coordinación técnica para la cuenca del Jubones.</p>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div>
+            <p>© 2026 Instituto Nacional de Meteorología e Hidrología</p>
+            <span>Dirección Matriz: Corea N36-14 y Iñaquito, Quito - Ecuador</span>
+        </div>
+        <div style="text-align: right;">
+            <span style="color: #60a5fa; font-size: 10px; font-weight: 900; text-transform: uppercase;">Contacto Nacional</span>
+            <strong style="display: block; color: white; font-size: 15px;">593-2 397-1100</strong>
+        </div>
+    </div>
+</footer>
 {% endblock %}

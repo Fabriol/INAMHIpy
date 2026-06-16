@@ -49,3 +49,15 @@ def api_cantones():
         html_options += f'<option value="{canton}">{canton}</option>'
     
     return html_options
+
+# --- Agregar esto al final de app/routes/ex_funcionario.py ---
+
+@ex_funcionario_bp.route('/actualizar-espejo', methods=['POST'])
+@login_required
+def actualizar_espejo():
+    # Recibimos TODO lo que el usuario está escribiendo en el formulario izquierdo en tiempo real
+    datos_en_vivo = request.form.to_dict()
+    
+    # Renderizamos ÚNICAMENTE la plantilla de la hoja espejo (el lado derecho)
+    # inyectándole los datos que está tipeando ahora mismo.
+    return render_template('paz_salvo/partials/hoja_espejo.html', datos=datos_en_vivo, usuario=current_user)

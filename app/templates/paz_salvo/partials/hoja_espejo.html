@@ -1,0 +1,54 @@
+<style>
+    .tabla-espejo { width: 100%; border-collapse: collapse; font-size: 0.8rem; font-family: Arial, sans-serif; }
+    .tabla-espejo th, .tabla-espejo td { border: 1px solid #333; padding: 6px; }
+    .bg-inamhi-title { background-color: #25449c; color: white; font-weight: bold; }
+    .bg-inamhi-sub { background-color: #e9ecef; color: #25449c; font-weight: bold; width: 25%; }
+</style>
+
+<div class="text-center mb-3">
+    <h6 class="fw-bold mb-0" style="color: #25449c;">INSTITUTO NACIONAL DE METEOROLOGÍA E HIDROLOGÍA</h6>
+    <span style="font-size: 0.7rem;">DIRECCIÓN DE ADMINISTRACIÓN DE RECURSOS HUMANOS</span><br>
+    <span class="fw-bold" style="font-size: 0.85rem; color: #25449c;">FORMULARIO PAZ Y SALVO — LIQUIDACIÓN DE HABERES</span>
+</div>
+
+<table class="tabla-espejo">
+    <tr>
+        <td colspan="4" class="bg-inamhi-title">01 DATOS PERSONALES</td>
+    </tr>
+    <tr>
+        <td class="bg-inamhi-sub">NOMBRES Y APELLIDOS</td>
+        <td colspan="3" class="fw-bold text-uppercase">{{ datos.nombres if datos else usuario.nombres ~ ' ' ~ usuario.apellidos }}</td>
+    </tr>
+    <tr>
+        <td class="bg-inamhi-sub">CÉDULA / PASAPORTE</td>
+        <td>{{ datos.cedula if datos else usuario.cedula }}</td>
+        <td class="bg-inamhi-sub">MODALIDAD LABORAL</td>
+        <td class="text-uppercase">{{ datos.modalidad if datos else '' }}</td>
+    </tr>
+    <tr>
+        <td class="bg-inamhi-sub">DIRECCIÓN DOMICILIARIA</td>
+        <td colspan="3" class="text-uppercase">{{ datos.direccion if datos else '' }}</td>
+    </tr>
+</table>
+
+<table class="tabla-espejo mt-3">
+    <tr>
+        <td colspan="6" class="bg-inamhi-title">03 ENTREGA / GESTIÓN DOCUMENTAL Y DE TRÁMITES</td>
+    </tr>
+    <tr class="bg-inamhi-sub text-center">
+        <td>DESCRIPCIÓN</td>
+        <td width="5%">SI/NO</td>
+        <td>DESCRIPCIÓN</td>
+        <td width="5%">SI/NO</td>
+        <td>NOMBRE RESPONSABLE</td>
+        <td>FIRMA ELECTRÓNICA</td>
+    </tr>
+    <tr>
+        <td>Informe fin de gestión</td>
+        <td class="text-center text-success fw-bold">SI</td>
+        <td>QUIPUX bandeja en cero</td>
+        <td class="text-center text-success fw-bold">SI</td>
+        <td class="text-uppercase text-primary fw-bold">ORLANDO GOMEZ</td> 
+        <td class="text-center text-muted" style="font-size: 0.6rem;">[Espacio FirmaEC]</td>
+    </tr>
+</table>

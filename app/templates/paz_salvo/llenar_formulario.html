@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .espejo-container {
+        height: 85vh;
+        overflow-y: auto;
+    }
+    .seccion-header {
+        background-color: #25449c; /* Azul del INAMHI de tu imagen */
+        color: white;
+        padding: 10px;
+        font-weight: bold;
+        border-radius: 5px 5px 0 0;
+    }
+    .form-control { background-color: #f4f6fb; }
+</style>
+
+<div class="row mt-3">
+    <div class="col-md-5 espejo-container pe-4 border-end">
+        <div class="seccion-header mb-3">
+            <i class="bi bi-person-fill"></i> 1. DATOS PERSONALES
+        </div>
+        
+        <form id="form-datos" hx-post="/actualizar-espejo" hx-trigger="keyup delay:500ms from:input, change from:select" hx-target="#vista-espejo">
+            
+            <div class="mb-3">
+                <label class="form-label text-muted fw-bold small">NOMBRES Y APELLIDOS <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="nombres" value="{{ current_user.nombres }} {{ current_user.apellidos }}">
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label text-muted fw-bold small">MODALIDAD LABORAL <span class="text-danger">*</span></label>
+                    <select class="form-select" name="modalidad">
+                        <option value="Contrato de Trabajo">Contrato de Trabajo</option>
+                        <option value="Nombramiento">Nombramiento Permanente</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label text-muted fw-bold small">CÉDULA / PASAPORTE <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="cedula" value="{{ current_user.cedula }}">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-muted fw-bold small">DIRECCIÓN DOMICILIARIA <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="direccion" placeholder="Ej: La Bretaña 154-S47B">
+            </div>
+
+            <hr>
+            <button type="submit" class="btn btn-primary w-100 fw-bold mt-2" style="background-color: #25449c;">Guardar y Continuar</button>
+        </form>
+    </div>
+
+    <div class="col-md-7 espejo-container bg-light p-4" style="border-radius: 10px;">
+        <div class="d-flex justify-content-between mb-3 align-items-center">
+            <span class="text-success fw-bold"><i class="bi bi-circle-fill small"></i> Vista Previa en Tiempo Real</span>
+            <div>
+                <button class="btn btn-sm btn-outline-secondary">🖨 Imprimir</button>
+                <button class="btn btn-sm btn-outline-danger">⬇ PDF</button>
+            </div>
+        </div>
+        
+        <div id="vista-espejo" class="bg-white p-4 shadow-sm border" style="min-height: 800px;">
+            {% include 'paz_salvo/partials/hoja_espejo.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

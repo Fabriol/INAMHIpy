@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+/* =========================================
+   ESTILOS GENERALES Y TARJETAS
+   ========================================= */
+.page { min-height: 100vh; padding: 34px; font-family: 'Inter', sans-serif; color: #0f172a; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding: 28px; border-radius: 30px; background: rgba(255,255,255,.75); border: 1px solid rgba(255,255,255,.7); backdrop-filter: blur(18px); box-shadow: 0 24px 55px rgba(15,23,42,.10); }
+.badge-custom { display: inline-flex; align-items: center; padding: 7px 14px; border-radius: 999px; background: linear-gradient(135deg,#2563eb,#0ea5e9); color: white; font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+h1 { margin: 12px 0 6px; font-size: clamp(30px, 4vw, 44px); font-weight: 900; letter-spacing: -.04em; color: #0f172a; }
+.card-custom { position: relative; margin-bottom: 26px; padding: 28px; border-radius: 30px; background: rgba(255,255,255,.86); border: 1px solid rgba(255,255,255,.7); backdrop-filter: blur(18px); box-shadow: 0 24px 55px rgba(15,23,42,.10); }
+.card-custom::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #2563eb, #0ea5e9, #22c55e); }
+
+/* =========================================
+   MEJORA DE ALERTAS (Estilo de tu imagen)
+   ========================================= */
+.alert {
+    border-radius: 12px !important;
+    padding: 16px 20px !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+    display: flex;
+    align-items: center;
+    border: 1px solid transparent !important;
+}
+.alert-success {
+    background-color: #d1fae5 !important; /* Verde claro */
+    color: #065f46 !important; /* Verde oscuro */
+    border-color: #a7f3d0 !important;
+}
+.alert-danger {
+    background-color: #fee2e2 !important; /* Rojo claro */
+    color: #991b1b !important; /* Rojo oscuro */
+    border-color: #fecaca !important;
+}
+.btn-close { padding: 1rem !important; }
+
+/* FORMULARIOS */
+.form-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; }
+.field { display: flex; flex-direction: column; gap: 8px; }
+label { color: #334155; font-size: 13px; font-weight: 800; }
+input, select { width: 100%; min-height: 50px; padding: 14px 16px; border-radius: 16px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 14px; font-weight: 600; outline: none; transition: .25s ease; }
+input:focus, select:focus { background: white; border-color: #2563eb; box-shadow: 0 0 0 5px rgba(37,99,235,.12); }
+.req { color: #dc2626; margin-left: 2px; }
+
+/* Input Group personalizado para el correo */
+.input-group-text { border-top-right-radius: 16px; border-bottom-right-radius: 16px; background: linear-gradient(135deg,#2563eb,#1d4ed8); color: white; font-weight: bold; border: none; }
+.input-group input { border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none;}
+
+/* BOTONES */
+.btn-primary-custom { border: none; min-height: 44px; padding: 12px 18px; border-radius: 14px; background: linear-gradient(135deg,#2563eb,#1d4ed8); color: white; font-size: 13px; font-weight: 900; cursor: pointer; transition: .25s ease; text-decoration: none;}
+.btn-secondary-custom { border: none; min-height: 44px; padding: 12px 18px; border-radius: 14px; background: linear-gradient(135deg,#64748b,#475569); color: white; font-size: 13px; font-weight: 900; cursor: pointer; text-decoration: none;}
+.actions { display: flex; gap: 12px; margin-top: 22px; }
+
+/* TABLA Y ESTADOS */
+table { width: 100%; border-collapse: collapse; text-align: center; }
+th { padding: 16px 14px; background: linear-gradient(135deg,#0f172a,#1e3a8a); color: white; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+td { padding: 16px 14px; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 600; }
+.status.activo { color: #16a34a; font-weight: 900; }
+.status.inactivo { color: #dc2626; font-weight: 900; }
+
+.btn-accion { border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; font-size: 12px; }
+.btn-editar { background: linear-gradient(135deg,#2563eb,#1d4ed8); color: white; }
+.btn-inhabilitar { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+.btn-eliminar { background: linear-gradient(135deg,#ef4444,#b91c1c); color: white; }
+.acciones { display: flex; gap: 8px; justify-content: center; }
+
+/* MODAL */
+.modal-backdrop-custom { position: fixed; inset: 0; z-index: 999; display: none; align-items: center; justify-content: center; background: rgba(15,23,42,.75); backdrop-filter: blur(8px); }
+.modal-content-custom { width: 760px; padding: 30px; border-radius: 28px; background: white; box-shadow: 0 35px 90px rgba(0,0,0,.35); }
+.modal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.close { background: #ef4444; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;}
+</style>
+
+<div class="page">
+    
+    <div class="page-header">
+        <div>
+            <span class="badge-custom">Administración</span>
+            <h1>Gestión de Usuarios</h1>
+            <p>Control de usuarios, roles y estados del sistema.</p>
+        </div>
+        <a href="/dashboard" class="btn-secondary-custom">← Volver</a>
+    </div>
+
+    <section class="card-custom">
+        <div class="card-title d-flex justify-content-between mb-4">
+            <h2 class="mb-0 fw-bold">Crear usuario</h2>
+            <span class="text-muted small">Nuevo registro</span>
+        </div>
+
+        <form method="POST" action="/usuarios">
+            <div class="form-grid">
+                
+                <div class="field">
+                    <label>Cédula <span class="req">*</span></label>
+                    <input type="text" name="cedula" placeholder="10 dígitos numéricos" required 
+                           pattern="\d{10}" maxlength="10" title="Debe ingresar exactamente 10 números"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                </div>
+                
+                <div class="field">
+                    <label>Nombres <span class="req">*</span></label>
+                    <input type="text" id="in_nombres" name="nombres" placeholder="Ej: Juan Carlos" required 
+                           pattern="^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+$" title="Solo se permiten letras"
+                           oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, ''); generarUsuario()">
+                </div>
+                
+                <div class="field">
+                    <label>Apellidos <span class="req">*</span></label>
+                    <input type="text" id="in_apellidos" name="apellidos" placeholder="Ej: Pérez Romero" required 
+                           pattern="^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+$" title="Solo se permiten letras"
+                           oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, ''); generarUsuario()">
+                </div>
+                
+                <div class="field">
+                    <label>Usuario Institucional <span class="req">*</span></label>
+                    <div class="input-group">
+                        <input type="text" id="in_usuario" name="usuario" class="form-control" placeholder="Autogenerado" readonly required style="background-color: #e2e8f0; cursor: not-allowed;">
+                        <span class="input-group-text">@inamhi.gob.ec</span>
+                    </div>
+                </div>
+                
+                <div class="field">
+                    <label>Contraseña temporal <span class="req">*</span></label>
+                    <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                </div>
+                
+                <div class="field">
+                    <label>Rol <span class="req">*</span></label>
+                    <select name="rol_id" required>
+                        <option value="">— Seleccione un rol —</option>
+                        {% for r in roles %}
+                            <option value="{{ r.id }}">{{ r.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn-primary-custom">Crear usuario</button>
+                <button type="reset" class="btn-secondary-custom">Limpiar</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="card-custom">
+        <div class="d-flex justify-content-between mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Lista de usuarios</h2>
+                <p class="text-muted m-0">Total registrados: {{ usuarios|length }}</p>
+            </div>
+        </div>
+
+        <div class="table-wrapper" style="border-radius: 20px; overflow: hidden; border: 1px solid #e2e8f0;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="border-top-left-radius: 20px;">ID</th>
+                        <th>Nombre completo</th>
+                        <th>Usuario (Correo)</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th style="border-top-right-radius: 20px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in usuarios %}
+                    <tr>
+                        <td class="text-muted">#{{ u.id }}</td>
+                        <td><strong>{{ u.nombres }} {{ u.apellidos }}</strong></td>
+                        <td>{{ u.email }}</td>
+                        <td>{{ u.rol.nombre }}</td>
+                        <td>
+                            <span class="status {% if u.activo %}activo{% else %}inactivo{% endif %}">
+                                {% if u.activo %}ACTIVO{% else %}INHABILITADO{% endif %}
+                            </span>
+                        </td>
+                        <td class="acciones">
+                            <button type="button" class="btn-accion btn-editar btn-abrir-modal" 
+                                data-id="{{ u.id }}" 
+                                data-nombres="{{ u.nombres }}" 
+                                data-apellidos="{{ u.apellidos }}" 
+                                data-rol="{{ u.rol_id }}" 
+                                data-estado="{% if u.activo %}ACTIVO{% else %}INHABILITADO{% endif %}">
+                                Editar
+                            </button>
+                            
+                            <a href="/usuarios/estado/{{ u.id }}" class="btn-accion btn-inhabilitar">
+                                {% if u.activo %}Inhabilitar{% else %}Activar{% endif %}
+                            </a>
+                            
+                            <a href="/usuarios/eliminar/{{ u.id }}" class="btn-accion btn-eliminar" onclick="return confirm('¿Seguro que deseas eliminar a este usuario?')">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+<div class="modal-backdrop-custom" id="modalEditar">
+    <div class="modal-content-custom">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold m-0" style="color: #172554;">Editar usuario</h3>
+            <button class="close" onclick="cerrarModal()">×</button>
+        </div>
+
+        <form id="formEditar" method="POST">
+            <div class="modal-grid">
+                <div class="field">
+                    <label>Nombres <span class="req">*</span></label>
+                    <input type="text" id="mod_nombres" name="nombres" required pattern="^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+$" oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')">
+                </div>
+                <div class="field">
+                    <label>Apellidos <span class="req">*</span></label>
+                    <input type="text" id="mod_apellidos" name="apellidos" required pattern="^[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+$" oninput="this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '')">
+                </div>
+                <div class="field">
+                    <label>Nueva contraseña <span class="text-muted fw-normal" style="font-size: 11px;">(opcional)</span></label>
+                    <input type="password" name="password" placeholder="Dejar en blanco para no cambiar">
+                </div>
+                <div class="field">
+                    <label>Rol <span class="req">*</span></label>
+                    <select id="mod_rol" name="rol_id" required>
+                        {% for r in roles %}
+                            <option value="{{ r.id }}">{{ r.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Estado</label>
+                    <select id="mod_estado" name="estado">
+                        <option value="ACTIVO">ACTIVO</option>
+                        <option value="INHABILITADO">INHABILITADO</option>
+                    </select>
+                </div>
+            </div>
+            <div class="actions mt-4">
+                <button type="submit" class="btn-primary-custom" style="background: linear-gradient(135deg,#22c55e,#16a34a);">Guardar cambios</button>
+                <button type="button" class="btn-secondary-custom" onclick="cerrarModal()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Lógica para generar el Usuario automáticamente
+    function generarUsuario() {
+        let nombres = document.getElementById('in_nombres').value.trim().toLowerCase();
+        let apellidos = document.getElementById('in_apellidos').value.trim().toLowerCase();
+
+        nombres = nombres.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        apellidos = apellidos.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        let primerNombre = nombres.split(' ')[0];
+        let primerApellido = apellidos.split(' ')[0];
+
+        if(primerNombre && primerApellido) {
+            let usuarioGenerado = primerNombre.charAt(0) + primerApellido;
+            document.getElementById('in_usuario').value = usuarioGenerado;
+        } else {
+            document.getElementById('in_usuario').value = "";
+        }
+    }
+
+    // Funciones del Modal
+    function abrirModal(id, nombres, apellidos, rol_id, estado) {
+        document.getElementById('mod_nombres').value = nombres;
+        document.getElementById('mod_apellidos').value = apellidos;
+        document.getElementById('mod_rol').value = rol_id;
+        document.getElementById('mod_estado').value = estado;
+        document.getElementById('formEditar').action = "/usuarios/editar/" + id;
+        document.getElementById('modalEditar').style.display = 'flex';
+    }
+
+    function cerrarModal() {
+        document.getElementById('modalEditar').style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const botonesEditar = document.querySelectorAll('.btn-abrir-modal');
+        botonesEditar.forEach(function(boton) {
+            boton.addEventListener('click', function() {
+                abrirModal(
+                    this.getAttribute('data-id'),
+                    this.getAttribute('data-nombres'),
+                    this.getAttribute('data-apellidos'),
+                    this.getAttribute('data-rol'),
+                    this.getAttribute('data-estado')
+                );
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,32 +1,270 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema Institucional INAMHI</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            /* Fondo azul oscuro con animación */
+            background: linear-gradient(-45deg, #020617, #0f172a, #1e3a8a, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
 
-{% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card shadow border-0 rounded-lg mt-5">
-            <div class="card-header text-center bg-white border-0 pt-4">
-                <h3 class="font-weight-light my-2 fw-bold" style="color: #003366;">Sistema Paz y Salvo</h3>
-                <p class="text-muted">Acceso Restringido</p>
-            </div>
-            <div class="card-body px-5 pb-5">
-                <form method="POST" action="/login">
-                    
-                    <div class="form-floating mb-3">
-                        <input class="form-control" id="email" name="email" type="email" placeholder="name@example.com" required />
-                        <label for="email">Correo Institucional</label>
-                    </div>
-                    
-                    <div class="form-floating mb-4">
-                        <input class="form-control" id="password" name="password" type="password" placeholder="Contraseña" required />
-                        <label for="password">Contraseña</label>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-primary btn-lg" style="background-color: #003366; border: none;" type="submit">Ingresar al Sistema</button>
-                    </div>
-                </form>
+        /* Animación del fondo */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Luces flotantes de fondo (Efecto chévere) */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            z-index: 0;
+            animation: floatOrb 10s ease-in-out infinite alternate;
+        }
+        .orb-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #3b82f6; }
+        .orb-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: #0ea5e9; animation-delay: -5s; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        .container { position: relative; z-index: 1; }
+
+        /* Animaciones de entrada de los elementos */
+        .fade-in-left { animation: fadeInLeft 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .fade-in-right { animation: fadeInRight 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Lado Izquierdo */
+        .badge-inamhi {
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .main-title { font-size: 4rem; font-weight: 900; line-height: 1.1; letter-spacing: -0.05em; margin-bottom: 20px;}
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 20px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+        .feature-item:hover { transform: translateX(10px); background-color: rgba(255,255,255,0.1); }
+        .feature-item i { color: #10b981; font-size: 1.2rem; margin-right: 15px; }
+
+        /* Tarjeta de Login */
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 45px 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            color: #0f172a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Borde de colores superior en la tarjeta */
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 6px;
+            background: linear-gradient(90deg, #2563eb, #0ea5e9, #10b981);
+        }
+
+        .logo-box {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            display: inline-block;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .form-label { font-size: 0.85rem; font-weight: 800; color: #334155; margin-bottom: 8px;}
+        
+        .form-control {
+            border-radius: 16px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 14px 18px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #0f172a;
+            transition: 0.3s;
+        }
+        .form-control:focus {
+            background-color: white;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 5px rgba(37,99,235,0.1);
+        }
+
+        .btn-ingresar {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 14px;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(37,99,235,0.3);
+        }
+        .btn-ingresar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(37,99,235,0.4);
+            color: white;
+        }
+
+        /* Alertas de error en el login */
+        .alert-custom {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        .alert-custom i { font-size: 1.2rem; margin-right: 10px; color: #ef4444;}
+    </style>
+</head>
+<body>
+
+<div class="glow-orb orb-1"></div>
+<div class="glow-orb orb-2"></div>
+
+<div class="container">
+    <div class="row align-items-center justify-content-between">
+        
+        <div class="col-lg-6 mb-5 mb-lg-0 fade-in-left">
+            <span class="badge-inamhi mb-4 d-inline-block">PLATAFORMA OFICIAL INAMHI</span>
+            
+            <h1 class="main-title text-white">Sistema de<br>Paz y Salvo</h1>
+            
+            <p class="lead mb-5 text-light" style="font-size: 1.15rem; font-weight: 400; opacity: 0.85; max-width: 90%;">
+                Plataforma institucional del INAMHI para la gestión documental, validaciones interdepartamentales y control administrativo.
+            </p>
+            
+            <div class="d-flex flex-column gap-2" style="max-width: 450px;">
+                <div class="feature-item">
+                    <i class="bi bi-check-circle-fill"></i> Gestión centralizada de solicitudes
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-check-circle-fill"></i> Validación por áreas institucionales
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-check-circle-fill"></i> Control y seguimiento en tiempo real
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-check-circle-fill"></i> Auditoría y trazabilidad completa
+                </div>
             </div>
         </div>
+
+        <div class="col-lg-5 fade-in-right" style="animation-delay: 0.2s;">
+            <div class="login-card">
+                
+                <div class="text-center mb-4">
+                    <div class="logo-box">
+                        <h2 class="fw-bold m-0" style="color: #1e3a8a; letter-spacing: -1px;">
+                            <i class="bi bi-cloud-sun-fill text-warning me-1"></i>INAMHI
+                        </h2>
+                    </div>
+                    <p class="text-muted small fw-bold text-uppercase tracking-wide">Acceso al sistema institucional</p>
+                </div>
+                
+                <form method="POST" action="/login">
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert-custom mb-4 shadow-sm">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    <div>{{ message }}</div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="mb-4">
+                        <label class="form-label">Usuario (Correo Institucional)</label>
+                        <input type="email" name="email" class="form-control" 
+                               placeholder="Ej: admin@inamhi.gob.ec" required
+                               oninput="this.value = this.value.replace(/\s/g, '')"
+                               title="Ingrese un correo electrónico válido">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" name="password" class="form-control" 
+                               placeholder="Ingrese su contraseña" required>
+                    </div>
+                    
+                    <div class="d-grid mt-2">
+                        <button type="submit" class="btn btn-ingresar">Ingresar al sistema</button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-5">
+                    <p class="text-muted" style="font-size: 0.8rem; font-weight: 500;">
+                        Si olvidó sus credenciales, contacte al<br>administrador del sistema.<br><br>
+                        <span class="fw-bold">© 2026 INAMHI</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
-{% endblock %}
+
+</body>
+</html>

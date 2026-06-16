@@ -3,43 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paz y Salvo - INAMHI</title>
+    <title>Sistema Institucional - INAMHI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>
-        body { background-color: #f4f6f9; }
-        .navbar-inamhi { background-color: #003366; } /* Azul institucional */
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; color: #0f172a; }
+        
+        .dashboard-layout {
+            min-height: 100vh;
+            display: flex;
+            background: 
+                radial-gradient(circle at top left, rgba(37, 99, 235, .24), transparent 35%),
+                radial-gradient(circle at bottom right, rgba(14, 165, 233, .18), transparent 35%),
+                linear-gradient(135deg, #eef2ff 0%, #f8fafc 48%, #dbeafe 100%);
+            background-size: 140% 140%;
+            animation: bgMove 15s ease infinite;
+        }
+
+        .sidebar { width: 286px; min-height: 100vh; padding: 32px 24px; background: radial-gradient(circle at top left, rgba(37, 99, 235, .22), transparent 35%), linear-gradient(180deg, #020617 0%, #0f172a 48%, #111827 100%); color: white; display: flex; flex-direction: column; box-shadow: 12px 0 35px rgba(15, 23, 42, .26); }
+        .brand { display: flex; align-items: center; gap: 14px; margin-bottom: 42px; padding-bottom: 24px; border-bottom: 1px solid rgba(255, 255, 255, .10); }
+        .logo-circle { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; background: linear-gradient(135deg, #2563eb, #0ea5e9); box-shadow: 0 14px 28px rgba(37, 99, 235, .35); font-size: 18px; font-weight: 900; color: white; animation: iconFloat 3s ease-in-out infinite; }
+        .brand h2 { margin: 0; font-size: 30px; font-weight: 900; letter-spacing: -.04em; color: #fff; }
+        .brand span { display: block; margin-top: 6px; color: #94a3b8; font-size: 12px; font-weight: 600; }
+        .sidebar nav { display: flex; flex-direction: column; gap: 14px; }
+        .sidebar a { position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: #cbd5e1; padding: 15px 18px; border-radius: 18px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .06); font-size: 14px; font-weight: 800; transition: .25s ease; }
+        .sidebar a::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 4px; background: linear-gradient(180deg, #2563eb, #0ea5e9); transform: scaleY(0); transition: .25s ease; }
+        .sidebar a:hover { color: white; background: rgba(37, 99, 235, .22); transform: translateX(8px); }
+        .sidebar a:hover::before, .sidebar a.active::before { transform: scaleY(1); }
+        .sidebar a.active { color: white; background: linear-gradient(135deg, #2563eb, #0ea5e9); box-shadow: 0 14px 32px rgba(37, 99, 235, .42); }
+        .main-content { flex: 1; padding: 34px; overflow-x: hidden; height: 100vh; overflow-y: auto;}
+
+        @keyframes bgMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes iconFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+        
+        /* =========================================
+           ALERTAS MODERNAS (TOAST STYLE)
+           ========================================= */
+        .toast-container-custom {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .alert-toast {
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            border: none;
+            position: relative;
+            animation: slideInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            margin: 0; /* Removemos márgenes de Bootstrap */
+        }
+
+        .alert-toast .bi {
+            font-size: 1.4rem;
+            margin-right: 14px;
+        }
+
+        /* Variante Éxito */
+        .alert-toast.alert-success { 
+            background-color: #ecfdf5; 
+            color: #065f46; 
+            border-left: 6px solid #10b981; 
+        }
+        /* Variante Error */
+        .alert-toast.alert-danger { 
+            background-color: #fef2f2; 
+            color: #991b1b; 
+            border-left: 6px solid #ef4444; 
+        }
+        /* Variante Advertencia */
+        .alert-toast.alert-warning { 
+            background-color: #fffbeb; 
+            color: #92400e; 
+            border-left: 6px solid #f59e0b; 
+        }
+
+        /* Botón de cerrar integrado elegantemente */
+        .alert-toast .btn-close {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0;
+            margin: 0;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            transition: 0.2s;
+        }
+        .alert-toast .btn-close:hover { opacity: 1; }
+
+        @keyframes slideInDown {
+            from { transform: translateY(-20px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
-
     {% if current_user.is_authenticated %}
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-inamhi shadow-sm mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/dashboard">INAMHI - Paz y Salvo</a>
-            <div class="d-flex align-items-center">
-                <span class="text-white me-3">Hola, {{ current_user.nombres }} ({{ current_user.rol.nombre }})</span>
-                <a href="/logout" class="btn btn-outline-light btn-sm">Cerrar Sesión</a>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-circle">IN</div>
+                <div><h2>INAMHI</h2><span>Sistema Institucional</span></div>
             </div>
-        </div>
-    </nav>
-    {% endif %}
+            <nav>
+                <a href="/dashboard" class="{% if request.path == '/dashboard' %}active{% endif %}"><span>Dashboard</span></a>
+                <a href="/areas/tareas" class="{% if 'areas' in request.path %}active{% endif %}"><span>Documentos</span></a>
+                
+                {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
+                <a href="/admin/preguntas" class="{% if 'preguntas' in request.path %}active{% endif %}"><span>Formularios</span></a>
+                <a href="/usuarios" class="{% if 'usuarios' in request.path %}active{% endif %}"><span>Usuarios</span></a>
+                <a href="/admin/exportar-excel"><span>Reportes</span></a>
+                {% endif %}
+            </nav>
+        </aside>
 
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="toast-container-custom w-100">
+                    {% for category, message in messages %}
+                        {% set icon = 'bi-check-circle-fill' %}
+                        {% if category == 'danger' %}{% set icon = 'bi-exclamation-octagon-fill' %}{% endif %}
+                        {% if category == 'warning' %}{% set icon = 'bi-exclamation-triangle-fill' %}{% endif %}
+                        
+                        <div class="alert alert-toast alert-{{ category }} alert-dismissible fade show" role="alert">
+                            <i class="bi {{ icon }}"></i>
+                            <span>{{ message }}</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+                {% endif %}
+            {% endwith %}
 
-        {% block content %}{% endblock %}
+            {% block content %}{% endblock %}
+        </main>
     </div>
-
+    {% else %}
+        {% block login_content %}
+            {% block content_login %}{% endblock %}
+        {% endblock %}
+    {% endif %}
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

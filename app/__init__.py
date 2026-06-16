@@ -42,6 +42,18 @@ def create_app():
     # --- NUEVO: Registramos la ruta de las Áreas Resolutivas ---
     from app.routes.areas import areas_bp
     app.register_blueprint(areas_bp)
+
+    # --- NUEVO: Registramos la ruta de Firma Electrónica ---
+    from app.routes.firma import firma_bp
+    app.register_blueprint(firma_bp)
+
+    # --- NUEVO: Registramos la ruta de Reportes Excel ---
+    from app.routes.reportes import reportes_bp
+    app.register_blueprint(reportes_bp)
+
+    # --- NUEVO: Rutas de Usuarios ---
+    from app.routes.usuarios import usuarios_bp
+    app.register_blueprint(usuarios_bp)
     
     @app.route('/')
     def index():
