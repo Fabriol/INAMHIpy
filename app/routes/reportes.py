@@ -1,14 +1,11 @@
 import os
-import os
 from flask import Blueprint, send_file, flash, redirect, url_for, render_template
 from flask_login import login_required, current_user
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
+
+# Asegúrate de importar los modelos que usas
 from app.models.base import db, SolicitudPazSalvo, Usuario
-
-
-
-
 
 reportes_bp = Blueprint('reportes', __name__)
 
@@ -17,10 +14,12 @@ reportes_bp = Blueprint('reportes', __name__)
 def vista_reportes():
     return render_template('admin/reportes.html')
 
-@reportes_bp.route('/auditoria')
+# 1. AUMENTO/CORRECCIÓN: Se cambió a /admin/auditoria para coincidir con el menú lateral
+@reportes_bp.route('/admin/auditoria')
 @login_required
 def vista_auditoria():
-    return render_template('admin/auditoria.html')
+    # Mandamos una lista de logs vacía (o real si ya tienes el modelo) para que la vista renderice
+    return render_template('admin/auditoria.html', logs=[])
 
 
 @reportes_bp.route('/admin/exportar-excel')
@@ -64,15 +63,20 @@ def exportar_excel():
     ws.column_dimensions['F'].width = 20
     ws.column_dimensions['H'].width = 40
 
-    # 5. Traemos los datos de la Base de Datos (Join entre Solicitud y Usuario)
+    # 5. Traemos los datos de la Base de Datos
     solicitudes = SolicitudPazSalvo.query.all()
     
     for sol in solicitudes:
         ex_func = Usuario.query.get(sol.ex_funcionario_id)
         
-        fecha_creacion = sol.fecha_creacion.strftime('%Y-%m-%d %H:%M') if sol.fecha_creacion else 'N/A'
-        fecha_cierre = sol.fecha_cierre.strftime('%Y-%m-%d %H:%M') if sol.fecha_cierre else 'Pendiente'
-        validez_firma = "VÁLIDA (FirmaEC)" if sol.certificado_valido else "Pendiente / Sin validar"
+        # AUMENTO: Seguridad (getattr) por si la BD aún no tiene estos campos llenos
+        fecha_cre = getattr(sol, 'fecha_creacion', None)
+        fecha_creacion = fecha_cre.strftime('%Y-%m-%d %H:%M') if fecha_cre else 'N/A'
+        
+        fecha_cie = getattr(sol, 'fecha_cierre', None)
+        fecha_cierre = fecha_cie.strftime('%Y-%m-%d %H:%M') if fecha_cie else 'Pendiente'
+        
+        validez_firma = "VÁLIDA (FirmaEC)" if getattr(sol, 'certificado_valido', False) else "Pendiente / Sin validar"
 
         fila = [
             sol.id,
@@ -93,9 +97,9 @@ def exportar_excel():
     ruta_excel = os.path.join(directorio_temp, 'Reporte_General_Paz_Salvo.xlsx')
     wb.save(ruta_excel)
 
-    # 7. Enviamos el archivo al navegador
+    # 7. CORRECCIÓN VITAL: Uso de os.path.abspath para evitar error 500 FileNotFoundError
     return send_file(
-        f"../{ruta_excel}", 
+        os.path.abspath(ruta_excel), 
         as_attachment=True, 
         download_name="Reporte_Paz_Salvo_INAMHI.xlsx",
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'

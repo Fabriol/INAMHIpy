@@ -1,89 +1,228 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="dashboard-container">
+<style>
+    /* =========================================
+       ESTILOS DEL DASHBOARD MODERNO (INAMHI)
+       ========================================= */
+    .main-dashboard { animation: fadeIn .8s ease both; overflow-x: hidden; padding-bottom: 40px; }
+    
+    /* HERO SECTION */
+    .hero { position: relative; overflow: hidden; min-height: 330px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 28px; align-items: center; padding: 42px; border-radius: 34px; background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 64, 175, .90)), radial-gradient(circle at top right, rgba(14, 165, 233, .5), transparent 40%); color: white; box-shadow: 0 20px 50px rgba(15, 23, 42, .15); animation: fadeDown .75s ease both; }
+    .hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle at 15% 20%, rgba(96, 165, 250, .28), transparent 28%), radial-gradient(circle at 80% 70%, rgba(34, 197, 94, .22), transparent 30%); pointer-events: none; }
+    .hero-content, .hero-right { position: relative; z-index: 2; }
+    
+    .badge-oficial { display: inline-flex; width: fit-content; padding: 8px 15px; border-radius: 999px; background: linear-gradient(135deg, #2563eb, #0ea5e9); color: white; font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 10px 24px rgba(37, 99, 235, .35); }
+    .hero h1 { margin: 18px 0 12px; font-size: clamp(30px, 4vw, 48px); font-weight: 900; line-height: 1.05; letter-spacing: -.04em; color: white; }
+    .hero p { max-width: 600px; margin: 0; color: #dbeafe; font-size: 15px; line-height: 1.6; font-weight: 500; }
+    
+    .hero-info { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; margin-bottom: 25px; }
+    .hero-item { min-width: 140px; padding: 16px; border-radius: 20px; background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .18); backdrop-filter: blur(14px); }
+    .hero-item strong { display: block; font-size: 22px; font-weight: 900; color: white; }
+    .hero-item span { color: #bfdbfe; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+
+    /* WEATHER CARD (DERECHA) */
+    .hero-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; height: 100%; }
+    .weather-card { position: relative; overflow: hidden; padding: 28px; min-height: 230px; width: 100%; max-width: 320px; border-radius: 30px; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .22); backdrop-filter: blur(18px); text-align: center; }
+    .weather-logo-wrap { width: 90px; height: 70px; margin: 0 auto 14px; border-radius: 20px; background: rgba(255,255,255,.95); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0,0,0,.18); animation: iconFloat 3s ease-in-out infinite; }
+    .weather-logo-fb { font-size: 20px; font-weight: 900; color: #1e3a8a; }
+    .weather-card h2 { margin: 0; font-size: 28px; font-weight: 900; color: white; }
+    .weather-card p { margin-top: 8px; font-size: 12px; color: #dbeafe; }
+    .pulse-ring { position: absolute; width: 100px; height: 100px; right: -30px; bottom: -30px; border-radius: 50%; border: 15px solid rgba(34, 197, 94, .25); animation: pulseRing 2.5s ease-in-out infinite; }
+
+    /* TARJETAS DE INFORMACIÓN (SIN ENLACES) */
+    .dashboard-grid { margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+    .info-card { position: relative; overflow: hidden; display: flex; align-items: flex-start; gap: 18px; padding: 26px; background: white; border: 1px solid #e2e8f0; border-radius: 30px; box-shadow: 0 10px 30px rgba(15, 23, 42, .03); animation: cardUp .75s ease both; transition: .25s ease; }
+    .info-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(15, 23, 42, .08); }
+    .info-card::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: linear-gradient(90deg, #2563eb, #0ea5e9); }
+    .card-icon { width: 56px; height: 56px; display: grid; place-items: center; flex-shrink: 0; border-radius: 18px; font-size: 28px; }
+    .info-card h3 { margin: 0; color: #0f172a; font-size: 18px; font-weight: 900; }
+    .info-card p { margin: 8px 0 0; color: #64748b; font-size: 13px; font-weight: 600; line-height: 1.5; }
+    
+    .info-card.blue .card-icon { background: #dbeafe; }
+    .info-card.green .card-icon { background: #dcfce7; }
+    .info-card.purple .card-icon { background: #ede9fe; }
+    .info-card.orange .card-icon { background: #fef3c7; }
+    .info-card.green::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
+    .info-card.purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .info-card.orange::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+    /* PANEL INSTITUCIONAL */
+    .institution-panel { margin-top: 30px; display: grid; grid-template-columns: 1.3fr .7fr; gap: 24px; }
+    .panel-left, .panel-right { position: relative; overflow: hidden; padding: 34px; border-radius: 30px; background: white; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(15, 23, 42, .03); animation: cardUp .75s ease both; }
+    .panel-badge { display: inline-flex; padding: 7px 14px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .panel-left h2 { margin: 16px 0 12px; font-size: 28px; font-weight: 900; letter-spacing: -.03em; color: #0f172a; }
+    .panel-left p { color: #64748b; line-height: 1.6; font-size: 14px; font-weight: 500; }
+    .panel-features { margin-top: 26px; display: grid; gap: 14px; }
+    .feature { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 20px; background: #f8fafc; border: 1px solid #f1f5f9; }
+    .feature span { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: #dcfce7; color: #15803d; font-weight: 900; font-size: 14px; }
+    .feature p { margin: 0; color: #475569; font-size: 13px; font-weight: 700; }
+
+    .panel-right { min-height: 300px; display: grid; place-items: center; background: radial-gradient(circle at center, rgba(14, 165, 233, .1), transparent 50%), white; }
+    .center-icon { position: relative; z-index: 4; width: 100px; height: 100px; border-radius: 35px; display: grid; place-items: center; font-size: 48px; background: linear-gradient(135deg, #2563eb, #0ea5e9); box-shadow: 0 20px 40px rgba(37, 99, 235, .3); animation: iconFloat 3s ease-in-out infinite; }
+    .circle { position: absolute; border-radius: 50%; border: 2px dashed rgba(37, 99, 235, .25); animation: rotateCircle 12s linear infinite; }
+    .circle-1 { width: 220px; height: 220px; }
+    .circle-2 { width: 160px; height: 160px; animation-duration: 9s; animation-direction: reverse; }
+    .circle-3 { width: 280px; height: 280px; animation-duration: 16s; }
+
+    /* FOOTER */
+    .footer-inamhi { margin-top: 50px; padding: 40px; border-radius: 40px; background: linear-gradient(180deg, #0f172a 0%, #020617 100%); color: white; }
+    .footer-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; margin-bottom: 30px; }
+    .footer-brand h3 { color: #bfdbfe; font-size: 22px; font-weight: 900; margin: 0 0 10px; }
+    .footer-brand p { color: #94a3b8; font-size: 13px; line-height: 1.6; margin: 0; }
+    .footer-sites { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .footer-card { padding: 20px; border-radius: 24px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); }
+    .footer-card h4 { font-size: 16px; font-weight: bold; margin: 0 0 8px; }
+    .footer-card p { font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.5; }
+    .footer-bottom { padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1); display: flex; justify-content: space-between; font-size: 12px; color: #64748b; font-weight: bold; }
+
+    /* ANIMACIONES */
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes cardUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes iconFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    @keyframes pulseRing { 0%, 100% { transform: scale(1); opacity: .5; } 50% { transform: scale(1.1); opacity: .8; } }
+    @keyframes rotateCircle { to { transform: rotate(360deg); } }
+
+    @media (max-width: 1100px) { .hero, .institution-panel, .footer-grid { grid-template-columns: 1fr; } .hero-right { align-items: flex-start; margin-top: 20px; } }
+</style>
+
+<div class="main-dashboard container-fluid px-0">
     <section class="hero">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <span class="badge-hero">Plataforma Oficial INAMHI</span>
+            <span class="badge-oficial">Plataforma Oficial INAMHI</span>
             <h1>Centro de Gestión Institucional</h1>
-            <p>Sistema moderno para la administración de documentos, formularios, reportes y procesos institucionales del Instituto Nacional de Meteorología e Hidrología.</p>
+            <p>
+                Sistema moderno para la administración de documentos, formularios, reportes y procesos institucionales.
+            </p>
+
             <div class="hero-info">
                 <div class="hero-item">
-                    <strong>{{ stats.usuarios_activos }}</strong>
-                    <span>Usuarios activos</span>
+                    <strong>{{ current_user.rol.nombre }}</strong>
+                    <span>Tu Rol Actual</span>
                 </div>
                 <div class="hero-item">
-                    <strong>{{ stats.doc_registrados }}</strong>
-                    <span>Documentos registrados</span>
+                    <strong>Activo</strong>
+                    <span>Estado del Sistema</span>
                 </div>
                 <div class="hero-item">
-                    <strong style="font-size: 1.1rem; margin-top: 0.5rem;">{{ current_user.rol.nombre }}</strong>
-                    <span>Rol institucional</span>
+                    <strong>Paz y Salvo</strong>
+                    <span>Módulo Principal</span>
                 </div>
             </div>
+
+            <form action="/paz-salvo/nueva" method="POST" style="margin-top: 10px;">
+                <input type="hidden" name="cedula" value="9999999999">
+                <button type="submit" class="btn btn-light fw-bold shadow-lg" style="border-radius: 14px; padding: 14px 28px; color: #1e40af; font-size: 15px;">
+                    <i class="bi bi-file-earmark-plus-fill me-2"></i> Iniciar Trámite Paz y Salvo
+                </button>
+            </form>
         </div>
+
         <div class="hero-right">
             <div class="weather-card">
-                <div class="weather-logo-wrap">INAMHI</div>
+                <div class="weather-logo-wrap">
+                    <div class="weather-logo-fb">IN</div>
+                </div>
                 <h2>INAMHI</h2>
-                <p>Tecnología, monitoreo y gestión institucional al servicio del Ecuador.</p>
+                <p>Tecnología y gestión institucional al servicio del Ecuador.</p>
                 <div class="pulse-ring"></div>
             </div>
-            <a href="/logout" class="logout"><i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión</a>
         </div>
     </section>
 
     <section class="dashboard-grid">
-        <a href="/documentos" class="info-card blue">
-            <div class="card-icon">📄</div>
+        <div class="info-card blue">
+            <div class="card-icon text-primary">📄</div>
             <div>
                 <h3>Gestión documental</h3>
                 <p>Control y almacenamiento seguro de archivos institucionales.</p>
             </div>
-        </a>
-        <a href="/reportes" class="info-card green">
-            <div class="card-icon">📊</div>
+        </div>
+
+        <div class="info-card green">
+            <div class="card-icon text-success">📊</div>
             <div>
                 <h3>Reportes dinámicos</h3>
-                <p>Visualización estadística y análisis institucional.</p>
+                <p>Visualización estadística y análisis de datos en tiempo real.</p>
             </div>
-        </a>
-        {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
-        <a href="/admin/preguntas" class="info-card purple">
-            <div class="card-icon">🧾</div>
+        </div>
+
+        <div class="info-card purple">
+            <div class="card-icon" style="color: #8b5cf6;">🧾</div>
             <div>
                 <h3>Formularios inteligentes</h3>
-                <p>Procesos automatizados para solicitudes y registros.</p>
+                <p>Procesos automatizados y validación mediante firma electrónica.</p>
             </div>
-        </a>
-        <a href="/usuarios" class="info-card orange">
-            <div class="card-icon">🛡️</div>
+        </div>
+
+        <div class="info-card orange">
+            <div class="card-icon text-warning">🛡️</div>
             <div>
-                <h3>Seguridad institucional</h3>
-                <p>Acceso controlado mediante roles y permisos del sistema.</p>
+                <h3>Seguridad criptográfica</h3>
+                <p>Acceso controlado e integridad de documentos con FirmaEC.</p>
             </div>
-        </a>
-        {% endif %}
+        </div>
     </section>
 
     <section class="institution-panel">
         <div class="panel-left">
             <span class="panel-badge">INAMHI ECUADOR</span>
             <h2>Innovación tecnológica para la gestión institucional</h2>
-            <p>Esta plataforma fortalece la organización administrativa, optimiza procesos internos y mejora la trazabilidad documental dentro del entorno institucional del INAMHI.</p>
+            <p>
+                Esta plataforma fortalece la organización administrativa, optimiza procesos internos y asegura la legalidad documental mediante estándares criptográficos.
+            </p>
+
             <div class="panel-features">
-                <div class="feature"><span>✔</span><p>Control centralizado de información</p></div>
-                <div class="feature"><span>✔</span><p>Procesos digitales más eficientes</p></div>
-                <div class="feature"><span>✔</span><p>Administración segura y moderna</p></div>
+                <div class="feature">
+                    <span>✔</span>
+                    <p>Integración con certificados .p12 y FirmaEC.</p>
+                </div>
+                <div class="feature">
+                    <span>✔</span>
+                    <p>Autoguardado en tiempo real con tecnología HTMX.</p>
+                </div>
+                <div class="feature">
+                    <span>✔</span>
+                    <p>Generación de copias fieles en formato PDF (ReportLab).</p>
+                </div>
             </div>
         </div>
+
         <div class="panel-right">
             <div class="circle circle-1"></div>
             <div class="circle circle-2"></div>
             <div class="circle circle-3"></div>
-            <div class="center-icon"><i class="bi bi-globe"></i></div>
+            <div class="center-icon text-white">🌎</div>
         </div>
     </section>
+
+    <footer class="footer-inamhi shadow-lg">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h3>Tiempo, Clima y Agua</h3>
+                <p>Comprometidos con la generación de datos precisos para la prevención de riesgos y el desarrollo sostenible del Ecuador.</p>
+            </div>
+            <div class="footer-sites">
+                <div class="footer-card">
+                    <h4 class="text-primary">Sede Guayas</h4>
+                    <p>Campus Gustavo Galindo, ESPOL. Monitoreo del Litoral.</p>
+                </div>
+                <div class="footer-card">
+                    <h4 class="text-success">Sede Pastaza</h4>
+                    <p>Centro neurálgico en la Amazonía, operando desde la ESPOCH.</p>
+                </div>
+                <div class="footer-card">
+                    <h4 style="color: #a78bfa;">Sede Loja</h4>
+                    <p>Edificio Zonal 7. Coordinación para la cuenca del Jubones.</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 INAMHI - Sistema Institucional</span>
+            <span>Dirección Matriz: Corea N36-14 y Iñaquito, Quito - Ecuador | 593-2 397-1100</span>
+        </div>
+    </footer>
 </div>
 {% endblock %}
