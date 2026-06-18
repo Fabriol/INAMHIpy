@@ -2,18 +2,81 @@
 
 {% block content %}
 <style>
-    .split-container { height: calc(100vh - 120px); overflow: hidden; }
-    .scroll-pane { height: 100%; overflow-y: auto; padding-right: 15px; }
-    .seccion-titulo { background: linear-gradient(135deg, #1e3a8a, #0f172a); color: white; padding: 12px 20px; font-weight: 700; border-radius: 12px; margin-bottom: 20px; font-size: 0.95rem; letter-spacing: 0.5px; }
-    .form-label { font-size: 0.8rem; font-weight: 700; color: #475569; margin-bottom: 6px; }
-    .form-control, .form-select { border-radius: 10px; background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 10px 14px; font-size: 0.85rem; font-weight: 600; }
-    .form-control:focus, .form-select:focus { background-color: white; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
-    .card-ingreso { background: white; border-radius: 20px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.02); padding: 25px; margin-bottom: 25px; }
-    .req { color: #dc2626; margin-left: 2px; }
-    
-    /* Contenedor de la Hoja de Previsualización */
-    .preview-pane { background-color: #e2e8f0; border-radius: 24px; padding: 30px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); }
-    .documento-físico { background: white; padding: 50px 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); min-height: 1100px; border-radius: 4px; }
+    /* TUS ESTILOS INTACTOS */
+    .split-container {
+        height: calc(100vh - 120px);
+        overflow: hidden;
+    }
+
+    .scroll-pane {
+        height: 100%;
+        overflow-y: auto;
+        padding-right: 15px;
+    }
+
+    .seccion-titulo {
+        background: linear-gradient(135deg, #1e3a8a, #0f172a);
+        color: white;
+        padding: 12px 20px;
+        font-weight: 700;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+        letter-spacing: 0.5px;
+    }
+
+    .form-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 6px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        background-color: #f8fafc;
+        border: 1px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        background-color: white;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .card-ingreso {
+        background: white;
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .req {
+        color: #dc2626;
+        margin-left: 2px;
+    }
+
+    .preview-pane {
+        background-color: #e2e8f0;
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .documento-físico {
+        background: white;
+        padding: 50px 40px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        min-height: 1100px;
+        border-radius: 4px;
+    }
 </style>
 
 <div class="row split-container g-4">
@@ -23,21 +86,28 @@
                 <h4 class="fw-bold m-0" style="color: #0f172a; letter-spacing: -0.5px;">Formulario Digital</h4>
                 <p class="text-muted small m-0">Llene los campos para actualizar la Hoja Espejo.</p>
             </div>
-            <a href="/dashboard" class="btn btn-sm btn-outline-secondary fw-bold shadow-sm" style="border-radius: 8px;">← Panel</a>
+            <a href="/dashboard" class="btn btn-sm btn-outline-secondary fw-bold shadow-sm"
+                style="border-radius: 8px;">← Panel</a>
         </div>
 
-        <form id="form-paz-salvo" hx-post="/actualizar-espejo" hx-trigger="keyup delay:300ms from:input, change from:select" hx-target="#vista-espejo">
-            
+        <form id="form-paz-salvo" hx-post="/actualizar-espejo"
+            hx-trigger="keyup delay:300ms from:input, change from:select" hx-target="#vista-espejo">
+
+            <input type="hidden" name="solicitud_id" value="{{ solicitud.id }}">
+
             <div class="card-ingreso">
                 <div class="seccion-titulo"><i class="bi bi-person-fill me-2"></i>01. DATOS PERSONALES</div>
                 <div class="mb-3">
                     <label class="form-label">Nombres y Apellidos Completos <span class="req">*</span></label>
-                    <input type="text" class="form-control" name="nombres" value="{{ current_user.nombres }} {{ current_user.apellidos }}" oninput="this.value = this.value.toUpperCase()">
+                    <input type="text" class="form-control" name="nombres"
+                        value="{{ current_user.nombres }} {{ current_user.apellidos }}"
+                        oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '').toUpperCase()">
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Cédula / Pasaporte <span class="req">*</span></label>
-                        <input type="text" class="form-control" name="cedula" value="{{ current_user.cedula }}" maxlength="10">
+                        <input type="text" class="form-control" name="cedula" value="{{ current_user.cedula }}"
+                            maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Modalidad Laboral <span class="req">*</span></label>
@@ -61,40 +131,48 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Dirección Domiciliaria <span class="req">*</span></label>
-                    <input type="text" class="form-control" name="direccion" value="LA BRETAÑA 154-S47B" oninput="this.value = this.value.toUpperCase()">
+                    <input type="text" class="form-control" name="direccion" value="LA BRETAÑA 154-S47B"
+                        oninput="this.value = this.value.toUpperCase()">
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Número de Domicilio</label>
-                        <input type="text" class="form-control" name="num_domicilio" value="021245784" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        <input type="text" class="form-control" name="num_domicilio" value="021245784" maxlength="9"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Celular <span class="req">*</span></label>
-                        <input type="text" class="form-control" name="celular" value="0978811606" maxlength="10">
+                        <input type="text" class="form-control" name="celular" value="0978811606" maxlength="10"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Contacto de Emergencia</label>
-                    <input type="text" class="form-control" name="contacto_emergencia" value="0975213131">
+                    <input type="text" class="form-control" name="contacto_emergencia" value="0975213131" maxlength="10"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label class="form-label">Email Principal <span class="req">*</span></label>
-                        <input type="email" class="form-control" name="email1" value="alex@gmail.com">
+                        <input type="email" class="form-control" name="email1" value="alex@gmail.com"
+                            oninput="this.value = this.value.toLowerCase()">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Email Secundario</label>
-                        <input type="email" class="form-control" name="email2" value="alex21@gmail.com">
+                        <input type="email" class="form-control" name="email2" value="alex21@gmail.com"
+                            oninput="this.value = this.value.toLowerCase()">
                     </div>
                 </div>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label">Provincia <span class="req">*</span></label>
-                        <input type="text" class="form-control" name="provincia" value="PICHINCHA" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" class="form-control" name="provincia" value="PICHINCHA"
+                            oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '').toUpperCase()">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Cantón <span class="req">*</span></label>
-                        <input type="text" class="form-control" name="canton" value="QUITO" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" class="form-control" name="canton" value="QUITO"
+                            oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '').toUpperCase()">
                     </div>
                 </div>
             </div>
@@ -110,74 +188,74 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Dirección / Unidad <span class="req">*</span></label>
-                    <input type="text" class="form-control" name="unidad" value="CLIMATOLOGIA" oninput="this.value = this.value.toUpperCase()">
+                    <input type="text" class="form-control" name="unidad" value="CLIMATOLOGIA"
+                        oninput="this.value = this.value.toUpperCase()">
                 </div>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label">Cargo Desempeñado <span class="req">*</span></label>
-                        <input type="text" class="form-control" name="cargo" value="ANALISIS EN INFORMATICA" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" class="form-control" name="cargo" value="ANALISIS EN INFORMATICA"
+                            oninput="this.value = this.value.toUpperCase()">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Grupo Ocupacional</label>
-                        <input type="text" class="form-control" name="grupo_ocupacional" value="SRVS" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" class="form-control" name="grupo_ocupacional" value="SRVS"
+                            oninput="this.value = this.value.toUpperCase()">
                     </div>
                 </div>
             </div>
 
             <div class="card-ingreso">
                 <div class="seccion-titulo"><i class="bi bi-check2-square me-2"></i>03. GESTIÓN DOCUMENTAL Y ÁREAS</div>
-                <p class="text-muted small">Campos que responden los jefes departamentales y responsables de control técnico:</p>
-                
-                <div class="row g-3 mb-3">
-                    <div class="col-8"><label class="form-label">Informe fin de gestión entregado</label></div>
-                    <div class="col-4"><select class="form-select form-select-sm" name="inf_gestion"><option value="SI">SI</option><option value="NO">NO</option></select></div>
+                <p class="text-muted small">Campos dinámicos que responden los jefes departamentales y responsables
+                    técnicos:</p>
+
+                {% for p in preguntas %}
+                <div class="row g-3 mb-3 align-items-center">
+                    <div class="col-8"><label class="form-label">{{ p.enunciado }}</label></div>
+                    <div class="col-4">
+                        <select class="form-select form-select-sm" name="pregunta_{{ p.id }}">
+                            <option value="SI">SI</option>
+                            <option value="NO">NO</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-8"><label class="form-label">QUIPUX bandeja en cero</label></div>
-                    <div class="col-4"><select class="form-select form-select-sm" name="quipux_cero"><option value="SI">SI</option><option value="NO">NO</option></select></div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-8"><label class="form-label">Acta entrega de claves realizada</label></div>
-                    <div class="col-4"><select class="form-select form-select-sm" name="acta_claves"><option value="SI">SI</option><option value="NO">NO</option></select></div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-8"><label class="form-label">Entrega de bienes y equipos (Adm. Financiera)</label></div>
-                    <div class="col-4"><select class="form-select form-select-sm" name="bienes_financiera"><option value="SI">SI</option><option value="NO">NO</option></select></div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-8"><label class="form-label">Verificación de Equipo Informático (TICs)</label></div>
-                    <div class="col-4"><select class="form-select form-select-sm" name="verif_tics"><option value="SI">SI</option><option value="NO">NO</option></select></div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-8"><label class="form-label">Cierre de cuenta Correo y Sistemas (TICs)</label></div>
-                    <div class="col-4"><select class="form-select form-select-sm" name="cierre_correo"><option value="SI">SI</option><option value="NO">NO</option></select></div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-8"><label class="form-label">Verificación de Información Digital (EGSI)</label></div>
-                    <div class="col-4"><select class="form-select form-select-sm" name="egsi_digital"><option value="SI">SI</option><option value="NO">NO</option></select></div>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-8"><label class="form-label">Devengo de capacitaciones (RRHH)</label></div>
-                    <div class="col-4"><select class="form-select form-select-sm" name="devengo_rrhh"><option value="SI">SI</option><option value="NO">NO</option></select></div>
-                </div>
-                <div class="row g-3">
-                    <div class="col-8"><label class="form-label">Entrega credencial y porta colgante</label></div>
-                    <div class="col-4"><select class="form-select form-select-sm" name="credencial_rrhh"><option value="SI">SI</option><option value="NO">NO</option></select></div>
-                </div>
+                {% else %}
+                <div class="alert alert-warning small">No hay preguntas configuradas en el sistema.</div>
+                {% endfor %}
             </div>
 
-            <div class="mb-5">
-                <button type="submit" class="btn btn-primary w-100 p-3 fw-bold shadow" style="border-radius: 14px; background: linear-gradient(135deg, #2563eb, #1d4ed8);">Enviar Trámite a Validación</button>
+        </form>
+
+        <form action="/paz-salvo/subir-firma/{{ solicitud.id }}" method="post" enctype="multipart/form-data"
+            class="card-ingreso border border-success" style="border-width: 2px !important;">
+            <div class="seccion-titulo" style="background: linear-gradient(135deg, #059669, #10b981);"><i
+                    class="bi bi-shield-check me-2"></i>04. FINALIZAR TRÁMITE</div>
+            <p class="text-muted small">Una vez generado y verificado el PDF, fírmelo digitalmente (FirmaEC) y súbalo
+                aquí.</p>
+            <div class="mb-3">
+                <input type="file" name="pdf_firmado" class="form-control" accept=".pdf" required>
             </div>
+            <button type="submit" class="btn btn-success w-100 p-3 fw-bold shadow" style="border-radius: 14px;">
+                <i class="bi bi-cloud-upload-fill me-2"></i> Subir y Finalizar Trámite
+            </button>
         </form>
     </div>
 
     <div class="col-lg-7 preview-pane scroll-pane">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3 py-2 fw-bold"><i class="bi bi-eye-fill me-1"></i> Previsualización Espejo Criptográfica</span>
+            <span
+                class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3 py-2 fw-bold"><i
+                    class="bi bi-eye-fill me-1"></i> Previsualización Espejo Criptográfica</span>
             <div>
-                <button class="btn btn-sm btn-white bg-white border fw-bold shadow-sm" style="border-radius:8px;">🖨 Imprimir</button>
-                <button class="btn btn-sm btn-white bg-white border fw-bold text-danger shadow-sm" style="border-radius:8px;"> <i class="bi bi-file-earmark-pdf-fill"></i> Exportar</button>
+                <button class="btn btn-sm btn-white bg-white border fw-bold shadow-sm" style="border-radius:8px;"
+                    onclick="window.print()">🖨 Imprimir</button>
+
+                <a href="/paz-salvo/descargar-pdf/{{ solicitud.id }}"
+                    class="btn btn-sm btn-white bg-white border fw-bold text-danger shadow-sm"
+                    style="border-radius:8px;">
+                    <i class="bi bi-file-earmark-pdf-fill"></i> Exportar
+                </a>
             </div>
         </div>
 

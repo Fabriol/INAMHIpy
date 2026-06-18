@@ -13,23 +13,25 @@
     .filter-input { background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 15px; font-size: 0.9rem; color: #475569; width: 100%; outline: none; }
     .filter-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
     
-    .btn-export-excel { background: #10b981; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 700; font-size: 0.9rem; }
-    .btn-export-pdf { background: #ef4444; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 700; font-size: 0.9rem; margin-left: 10px; }
+    .btn-export-excel { background: #10b981; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 700; font-size: 0.9rem; transition: 0.2s; }
+    .btn-export-pdf { background: #ef4444; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 700; font-size: 0.9rem; margin-left: 10px; transition: 0.2s; }
+    .btn-export-excel:hover { background: #059669; }
+    .btn-export-pdf:hover { background: #dc2626; }
     
     .audit-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
     .audit-table th { background: #1e3a8a; color: white; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; padding: 16px; text-align: center; }
     .audit-table td { padding: 16px; font-size: 0.85rem; color: #334155; border-bottom: 1px solid #f1f5f9; text-align: center; vertical-align: middle; font-weight: 600; }
     .audit-table tr:hover td { background: #f8fafc; }
     
-    /* Insignias de la tabla */
-    .role-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; }
+    .role-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
     .role-ex { background: #e0f2fe; color: #0284c7; }
     .role-admin { background: #eff6ff; color: #1d4ed8; }
     .role-tics { background: #cffafe; color: #0891b2; }
+    .role-default { background: #f1f5f9; color: #475569; }
     
-    .action-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; }
+    .action-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
     .action-firma { background: #dcfce7; color: #16a34a; }
-    .action-asignar { background: #dcfce7; color: #15803d; }
+    .action-default { background: #f3e8ff; color: #7e22ce; }
 </style>
 
 <div class="audit-header-card d-flex justify-content-between align-items-center">
@@ -42,30 +44,33 @@
 </div>
 
 <div class="bg-white p-4 rounded-4 shadow-sm border border-light">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="fw-bold m-0" style="color: #0f172a;">Registros de auditoría</h5>
-        <span class="text-muted small fw-bold bg-light px-3 py-2 rounded-3">Actualizar</span>
-    </div>
+    
+    <form id="form-filtros" method="GET" action="/admin/auditoria">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-bold m-0" style="color: #0f172a;">Registros de auditoría (Total: {{ logs|length }})</h5>
+            <button type="submit" class="btn btn-light text-dark fw-bold border rounded-3 px-3 py-2">Actualizar</button>
+        </div>
 
-    <div class="filters-box">
-        <div style="flex: 2;">
-            <input type="text" class="filter-input" placeholder="Buscar por usuario...">
-            <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">Filtro por usuario</div>
+        <div class="filters-box">
+            <div style="flex: 2;">
+                <input type="text" name="usuario" class="filter-input" placeholder="Buscar por usuario (Cédula o Nombre)..." value="{{ request.args.get('usuario', '') }}">
+                <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">Filtro por usuario</div>
+            </div>
+            <div style="flex: 1;">
+                <input type="date" name="fecha_inicio" class="filter-input" value="{{ request.args.get('fecha_inicio', '') }}">
+                <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">Fecha inicio</div>
+            </div>
+            <div style="flex: 1;">
+                <input type="date" name="fecha_fin" class="filter-input" value="{{ request.args.get('fecha_fin', '') }}">
+                <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">Fecha fin</div>
+            </div>
+            <button type="button" onclick="window.location.href='/admin/auditoria'" class="btn text-white fw-bold px-4" style="background: #64748b; border-radius: 8px; height: 45px;">Limpiar filtros</button>
         </div>
-        <div style="flex: 1;">
-            <input type="date" class="filter-input">
-            <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">Fecha inicio</div>
-        </div>
-        <div style="flex: 1;">
-            <input type="date" class="filter-input">
-            <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">Fecha fin</div>
-        </div>
-        <button class="btn text-white fw-bold px-4" style="background: #64748b; border-radius: 8px; height: 45px;">Limpiar filtros</button>
-    </div>
+    </form>
 
     <div class="mb-3">
-        <button class="btn-export-excel">Exportar Excel</button>
-        <button class="btn-export-pdf">Exportar PDF</button>
+        <button onclick="exportarReporte('excel')" class="btn-export-excel"><i class="bi bi-file-earmark-excel-fill me-1"></i> Exportar Excel</button>
+        <button onclick="exportarReporte('pdf')" class="btn-export-pdf"><i class="bi bi-file-earmark-pdf-fill me-1"></i> Exportar PDF</button>
     </div>
 
     <div class="table-responsive">
@@ -82,35 +87,48 @@
                 </tr>
             </thead>
             <tbody>
+                {% for log in logs %}
                 <tr>
-                    <td>#560</td>
-                    <td class="text-dark">ecastro</td>
-                    <td><span class="role-badge role-ex">EX FUNCIONARIO</span></td>
-                    <td>Formularios</td>
-                    <td><span class="action-badge action-firma">FIRMA DIGITAL EC</span></td>
-                    <td style="text-align: left; font-size: 0.75rem;">Firmó celda 'servidor_saliente' del formulario 68 como 'BRYAN ALEJANDRO...'</td>
-                    <td>6/17/26, 11:47 AM</td>
+                    <td>#{{ log.id }}</td>
+                    <td class="text-dark fw-bold">{{ log.usuario.cedula }}</td>
+                    
+                    <td>
+                        <span class="role-badge 
+                            {% if 'ADMIN' in log.usuario.rol.nombre|upper %} role-admin 
+                            {% elif 'EX FUNCIONARIO' in log.usuario.rol.nombre|upper %} role-ex 
+                            {% elif 'TICS' in log.usuario.rol.nombre|upper %} role-tics 
+                            {% else %} role-default {% endif %}">
+                            {{ log.usuario.rol.nombre }}
+                        </span>
+                    </td>
+                    
+                    <td>{{ log.modulo }}</td>
+                    
+                    <td>
+                        <span class="action-badge {% if 'FIRMA' in log.accion|upper %} action-firma {% else %} action-default {% endif %}">
+                            {{ log.accion }}
+                        </span>
+                    </td>
+                    
+                    <td style="text-align: left; font-size: 0.75rem;">{{ log.detalle }}</td>
+                    <td>{{ log.fecha.strftime('%d/%m/%y, %I:%M %p') }}</td>
                 </tr>
+                {% else %}
                 <tr>
-                    <td>#558</td>
-                    <td class="text-dark">admin</td>
-                    <td><span class="role-badge role-admin">ADMINISTRADOR</span></td>
-                    <td>Formularios</td>
-                    <td><span class="action-badge action-asignar">ASIGNAR CAMPOS</span></td>
-                    <td style="text-align: left; font-size: 0.75rem;">Se asignaron 2 campo(s) al usuario ID 14</td>
-                    <td>6/17/26, 11:45 AM</td>
+                    <td colspan="7" class="text-muted py-4">No se encontraron registros en el sistema.</td>
                 </tr>
-                <tr>
-                    <td>#556</td>
-                    <td class="text-dark">cris</td>
-                    <td><span class="role-badge role-tics">TICS</span></td>
-                    <td>Formularios</td>
-                    <td><span class="action-badge action-firma">FIRMA DIGITAL EC</span></td>
-                    <td style="text-align: left; font-size: 0.75rem;">Firmó celda 'admin_r1' del formulario 68 como 'BRYAN ALEJANDRO...'</td>
-                    <td>6/17/26, 11:34 AM</td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<script>
+    // Función para exportar conservando los filtros aplicados en la URL
+    function exportarReporte(tipo) {
+        const parametrosActuales = window.location.search;
+        let url = tipo === 'excel' ? '/admin/auditoria/exportar-excel' : '/admin/auditoria/exportar-pdf';
+        window.location.href = url + parametrosActuales;
+    }
+</script>
 {% endblock %}

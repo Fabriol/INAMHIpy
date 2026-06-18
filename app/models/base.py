@@ -94,3 +94,16 @@ class Respuesta(db.Model):
     valor_respuesta = db.Column(db.String(255), nullable=False) # Obligatorio, no puede quedar vacío
     observacion = db.Column(db.String(255), nullable=True)
     fecha_respuesta = db.Column(db.DateTime, default=datetime.now)
+
+
+class LogAuditoria(db.Model):
+    __tablename__ = 'log_auditoria'
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    modulo = db.Column(db.String(100), nullable=False)
+    accion = db.Column(db.String(100), nullable=False)
+    detalle = db.Column(db.Text, nullable=False)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relación para acceder a los datos del usuario que hizo la acción
+    usuario = db.relationship('Usuario', backref=db.backref('logs', lazy=True))

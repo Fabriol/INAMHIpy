@@ -4,11 +4,14 @@
     .pdf-header-title { font-size: 13px; font-weight: 900; text-align: center; line-height: 1.3; }
     .section-banner { background-color: #000; color: #fff; font-weight: 900; text-transform: uppercase; font-size: 11px; text-align: left; padding: 4px 8px; }
     .cell-label { font-weight: 900; background-color: #f2f2f2; width: 22%; font-size: 10px; }
-    .cell-value { font-size: 11px; }
+    .cell-value { font-size: 11px; color: #1e3a8a; } /* Color azul para destacar los datos ingresados */
     .text-center { text-align: center; }
     .fw-bold { font-weight: bold; }
     .firma-box { min-height: 55px; border: 1px dashed #666; border-radius: 4px; display: flex; align-items: center; justify-content: center; background-color: #fafafa; }
 </style>
+
+{% set ex_func = solicitud.ex_funcionario if solicitud else current_user %}
+{% set dat = datos if datos else {} %}
 
 <table class="pdf-table" style="border-bottom: 3px solid #000;">
     <tr>
@@ -20,6 +23,9 @@
             INSTITUTO NACIONAL DE METEOROLOGÍA E HIDROLOGÍA<br>
             <span style="font-size: 11px; font-weight: 700;">DIRECCIÓN DE ADMINISTRACIÓN DE RECURSOS HUMANOS</span><br>
             <span style="font-size: 11px; font-weight: 900;">FORMULARIO PAZ Y SALVO PARA EL PAGO DE LIQUIDACIÓN DE HABERES</span>
+            {% if solicitud %}
+            <br><span style="color: #dc2626;">TRÁMITE N°: {{ solicitud.id }}</span>
+            {% endif %}
         </td>
     </tr>
 </table>
@@ -30,41 +36,41 @@
     </tr>
     <tr>
         <td class="cell-label">NOMBRES Y APELLIDOS:</td>
-        <td colspan="3" class="cell-value fw-bold text-uppercase">{{ datos.nombres if datos else (current_user.nombres ~ ' ' ~ current_user.apellidos if current_user else 'OLIVER JOSTIN VELASQUE QUITO') }}</td>
+        <td colspan="3" class="cell-value fw-bold text-uppercase">{{ dat.nombres | default(ex_func.nombres ~ ' ' ~ ex_func.apellidos, true) }}</td>
     </tr>
     <tr>
         <td class="cell-label">MODALIDAD LABORAL:</td>
-        <td class="cell-value text-uppercase">{{ datos.modalidad if datos else 'CONTRATO DE TRABAJO' }}</td>
+        <td class="cell-value text-uppercase">{{ dat.modalidad | default('CONTRATO DE TRABAJO', true) }}</td>
         <td class="cell-label" style="width: 18%;">CÉDULA / PASAPORTE:</td>
-        <td class="cell-value fw-bold">{{ datos.cedula if datos else (current_user.cedula if current_user else '1723929160') }}</td>
+        <td class="cell-value fw-bold">{{ dat.cedula | default(ex_func.cedula, true) }}</td>
     </tr>
     <tr>
         <td class="cell-label">FECHA INGRESO:</td>
-        <td class="cell-value">{{ datos.fecha_ingreso if datos else '2025-02-19' }}</td>
+        <td class="cell-value">{{ dat.fecha_ingreso | default('DD/MM/AAAA', true) }}</td>
         <td class="cell-label">FECHA SALIDA:</td>
-        <td class="cell-value">{{ datos.fecha_salida if datos else '2026-06-11' }}</td>
+        <td class="cell-value">{{ dat.fecha_salida | default('DD/MM/AAAA', true) }}</td>
     </tr>
     <tr>
         <td class="cell-label">DIRECCIÓN DOMICILIARIA:</td>
-        <td colspan="3" class="cell-value text-uppercase">{{ datos.direccion if datos else 'LA BRETAÑA 154-S47B' }}</td>
+        <td colspan="3" class="cell-value text-uppercase">{{ dat.direccion | default(ex_func.direccion, true) }}</td>
     </tr>
     <tr>
         <td class="cell-label">NUMERO DOMICILIO:</td>
-        <td class="cell-value">{{ datos.num_domicilio if datos else '021245784' }}</td>
+        <td class="cell-value">{{ dat.num_domicilio | default('---', true) }}</td>
         <td class="cell-label">NUMERO CELULAR:</td>
-        <td class="cell-value">{{ datos.celular if datos else '0978811606' }}</td>
+        <td class="cell-value">{{ dat.celular | default(ex_func.celular, true) }}</td>
     </tr>
     <tr>
         <td class="cell-label">CONTACTO EMERGENCIA:</td>
-        <td class="cell-value">{{ datos.contacto_emergencia if datos else '0975213131' }}</td>
+        <td class="cell-value">{{ dat.contacto_emergencia | default('---', true) }}</td>
         <td class="cell-label">EMAIL PRINCIPAL:</td>
-        <td class="cell-value">{{ datos.email1 if datos else 'alex@gmail.com' }}</td>
+        <td class="cell-value">{{ dat.email1 | default(ex_func.email, true) }}</td>
     </tr>
     <tr>
         <td class="cell-label">EMAIL SECUNDARIO:</td>
-        <td class="cell-value">{{ datos.email2 if datos else 'alex21@gmail.com' }}</td>
+        <td class="cell-value">{{ dat.email2 | default('---', true) }}</td>
         <td class="cell-label">PROVINCIA / CANTÓN:</td>
-        <td class="cell-value text-uppercase">{{ datos.provincia if datos else 'PICHINCHA' }} / {{ datos.canton if datos else 'QUITO' }}</td>
+        <td class="cell-value text-uppercase">{{ dat.provincia | default('PICHINCHA', true) }} / {{ dat.canton | default('QUITO', true) }}</td>
     </tr>
 </table>
 
@@ -74,115 +80,66 @@
     </tr>
     <tr>
         <td class="cell-label">LUGAR DE TRABAJO:</td>
-        <td class="cell-value text-uppercase" style="width:30%;">{{ datos.lugar_trabajo if datos else 'PLANTA CENTRAL' }}</td>
+        <td class="cell-value text-uppercase" style="width:30%;">{{ dat.lugar_trabajo | default('PLANTA CENTRAL', true) }}</td>
         <td class="cell-label" style="width:20%;">DIRECCIÓN / UNIDAD:</td>
-        <td class="cell-value text-uppercase">{{ datos.unidad if datos else 'CLIMATOLOGIA' }}</td>
+        <td class="cell-value text-uppercase">{{ dat.unidad | default('---', true) }}</td>
     </tr>
     <tr>
         <td class="cell-label">CARGO DESEMPEÑADO:</td>
-        <td class="cell-value text-uppercase">{{ datos.cargo if datos else 'ANALISIS EN INFORMATICA' }}</td>
+        <td class="cell-value text-uppercase">{{ dat.cargo | default('---', true) }}</td>
         <td class="cell-label">GRUPO OCUPACIONAL:</td>
-        <td class="cell-value text-uppercase">{{ datos.grupo_ocupacional if datos else 'SRVS' }}</td>
+        <td class="cell-value text-uppercase">{{ dat.grupo_ocupacional | default('---', true) }}</td>
     </tr>
 </table>
 
 <table class="pdf-table">
     <tr>
-        <td colspan="6" class="section-banner">ENTREGA / GESTIÓN DOCUMENTAL Y DE TRÁMITES</td>
+        <td colspan="5" class="section-banner">VALIDACIONES Y REQUISITOS INSTITUCIONALES (AREAS TÉCNICAS)</td>
     </tr>
     <tr style="background-color: #f2f2f2; font-weight: bold;" class="text-center">
-        <td width="35%">DETALLE</td>
-        <td width="6%">SI</td>
-        <td width="6%">NO</td>
-        <td width="23%">NOMBRE RESPONSABLE</td>
+        <td width="40%">DETALLE DEL REQUISITO</td>
+        <td width="10%">RESPUESTA</td>
+        <td width="20%">ÁREA ENCARGADA</td>
         <td width="30%">FIRMA ELECTRÓNICA</td>
     </tr>
-    <tr>
-        <td>Entrega informe de fin de gestión con actividades ejecutadas</td>
-        <td class="text-center fw-bold text-success">{% if datos and datos.inf_gestion == 'SI' %}SI{% else %}—{% endif %}</td>
-        <td class="text-center fw-bold text-danger">{% if datos and datos.inf_gestion == 'NO' %}NO{% else %}—{% endif %}</td>
-        <td class="text-uppercase text-center">Marcelo Quito</td>
-        <td><div class="firma-box"><span style="color:#22c55e; font-size:8px;">[FirmaEC Digital]</span></div></td>
-    </tr>
-    <tr>
-        <td>Trámites asignados en sistema QUIPUX (Bandeja en cero)</td>
-        <td class="text-center fw-bold text-success">{% if datos and datos.quipux_cero == 'SI' %}SI{% else %}—{% endif %}</td>
-        <td class="text-center fw-bold text-danger">{% if datos and datos.quipux_cero == 'NO' %}NO{% else %}—{% endif %}</td>
-        <td class="text-uppercase text-center">Orlando Gómez</td>
-        <td><div class="firma-box"><span style="color:#22c55e; font-size:8px;">[FirmaEC Digital]</span></div></td>
-    </tr>
-    <tr>
-        <td>Realizó acta entrega de claves de su unidad</td>
-        <td class="text-center fw-bold text-success">{% if datos and datos.acta_claves == 'SI' %}SI{% else %}—{% endif %}</td>
-        <td class="text-center fw-bold text-danger">{% if datos and datos.acta_claves == 'NO' %}NO{% else %}—{% endif %}</td>
-        <td class="text-uppercase text-center">Orlando Gómez</td>
-        <td><div class="firma-box"><span style="color:#22c55e; font-size:8px;">[FirmaEC Digital]</span></div></td>
-    </tr>
-</table>
-
-<table class="pdf-table">
-    <tr>
-        <td colspan="6" class="section-banner">DIRECCIÓN ADMINISTRATIVA FINANCIERA - GESTIÓN ADMINISTRATIVA</td>
-    </tr>
-    <tr style="background-color: #f2f2f2; font-weight: bold;" class="text-center">
-        <td width="35%">DETALLE</td>
-        <td width="6%">SI</td>
-        <td width="6%">NO</td>
-        <td>NÚMERO ACTA / VALOR DEDUCIBLE</td>
-        <td width="23%">RESPONSABLE</td>
-        <td width="30%">FIRMA</td>
-    </tr>
-    <tr>
-        <td>¿Entregó bienes muebles y equipos de oficina?</td>
-        <td class="text-center fw-bold text-success">{% if datos and datos.bienes_financiera == 'SI' %}SI{% else %}—{% endif %}</td>
-        <td class="text-center fw-bold text-danger">{% if datos and datos.bienes_financiera == 'NO' %}NO{% else %}—{% endif %}</td>
-        <td class="text-center">Acta Nro. DAF-2026-042</td>
-        <td class="text-center text-uppercase">Ing. Verónica Zapata</td>
-        <td><div class="firma-box"></div></td>
-    </tr>
-</table>
-
-<table class="pdf-table">
-    <tr>
-        <td colspan="6" class="section-banner">GESTIÓN DE TECNOLOGÍAS DE LA INFORMACIÓN Y COMUNICACIÓN (TICs)</td>
-    </tr>
-    <tr>
-        <td class="cell-label">Verificación Equipo Informático:</td>
-        <td class="text-center fw-bold">{% if datos and datos.verif_tics == 'SI' %}SI{% else %}NO{% endif %}</td>
-        <td class="cell-label">Liberación de Cuentas / Backup:</td>
-        <td class="text-center fw-bold">{% if datos and datos.cierre_correo == 'SI' %}COMPLETO{% else %}PENDIENTE{% endif %}</td>
-        <td class="cell-label">Responsable TICs:</td>
-        <td class="text-center text-uppercase">Soporte TICs</td>
-    </tr>
-</table>
-
-<table class="pdf-table">
-    <tr>
-        <td colspan="4" class="section-banner">SEGURIDAD DE LA INFORMACIÓN (EGSI — ACUERDO MINISTERIAL 166)</td>
-    </tr>
-    <tr>
-        <td class="cell-label">Verificación Archivos Digitales/Físicos:</td>
-        <td class="cell-value">{% if datos and datos.egsi_digital == 'SI' %}VALIDADO EN SISTEMA{% else %}PENDIENTE DE REVISIÓN{% endif %}</td>
-        <td class="cell-label">Oficial de Seguridad:</td>
-        <td class="cell-value text-center text-uppercase">Oficial EGSI</td>
-    </tr>
-</table>
-
-<table class="pdf-table">
-    <tr>
-        <td colspan="4" class="section-banner">DIRECCIÓN DE ADMINISTRACIÓN DE RECURSOS HUMANOS</td>
-    </tr>
-    <tr>
-        <td class="cell-label">Devengo Cursos / Capacitaciones:</td>
-        <td class="cell-value">{% if datos and datos.devengo_rrhh == 'SI' %}NO ADEUDA VALORES (CERTIFICADO){% else %}EN VERIFICACIÓN{% endif %}</td>
-        <td class="cell-label">Entrega de Credencial y Colgante:</td>
-        <td class="cell-value">{% if datos and datos.credencial_rrhh == 'SI' %}ENTREGADO COMPLETO{% else %}NO ENTREGADO{% endif %}</td>
-    </tr>
+    
+    {% if preguntas %}
+        {% for p in preguntas %}
+        <tr>
+            <td>{{ p.enunciado }}</td>
+            
+            {% set resp_en_vivo = dat.get('pregunta_' ~ p.id) %}
+            {% set resp_bd = None %}
+            {% if solicitud and solicitud.respuestas %}
+                {% for r in solicitud.respuestas %}
+                    {% if r.pregunta_id == p.id %}{% set resp_bd = r.valor_respuesta %}{% endif %}
+                {% endfor %}
+            {% endif %}
+            
+            {% set respuesta_final = resp_en_vivo | default(resp_bd, true) %}
+            
+            <td class="text-center fw-bold {% if respuesta_final == 'SI' %}text-success{% elif respuesta_final == 'NO' %}text-danger{% endif %}">
+                {{ respuesta_final | default('PENDIENTE', true) }}
+            </td>
+            
+            <td class="text-center" style="font-size: 9px;">{{ p.rol.nombre | default('---') }}</td>
+            <td>
+                <div class="firma-box">
+                    {% if respuesta_final %}
+                    <span style="color:#22c55e; font-size:8px;">[VÁLIDO EN SISTEMA]</span>
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr><td colspan="4" class="text-center text-danger fw-bold">NO HAY PREGUNTAS CONFIGURADAS</td></tr>
+    {% endif %}
 </table>
 
 <table class="pdf-table" style="margin-top: 15px;">
     <tr>
-        <td class="section-banner">AUTORIZACIÓN</td>
+        <td class="section-banner">AUTORIZACIÓN LEGAL</td>
     </tr>
     <tr>
         <td style="font-size: 9px; line-height: 1.4; text-align: justify; padding: 8px;">
@@ -191,9 +148,13 @@
     </tr>
 </table>
 
-<div style="margin-top: 25px; text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;">
+<div style="margin-top: 35px; text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;">
     <div style="width: 320px; border-bottom: 1.5px solid #000; margin-bottom: 5px;"></div>
-    <div style="font-size: 10px; font-weight: 900; text-transform: uppercase;">FIRMA DEL SERVIDOR SALIENTE: {{ datos.nombres if datos else (current_user.nombres ~ ' ' ~ current_user.apellidos if current_user else 'OLIVER JOSTIN VELASQUE QUITO') }}</div>
-    <div style="font-size: 10px; font-weight: 700;">C.C: {{ datos.cedula if datos else (current_user.cedula if current_user else '1723929160') }}</div>
-    <div style="font-size: 8px; color: #555; margin-top: 2px;">(Este documento electrónico debe ser firmado usando la llave estándar .p12 mediante FirmaEC)</div>
+    <div style="font-size: 11px; font-weight: 900; text-transform: uppercase; color: #1e3a8a;">
+        FIRMA DEL EX FUNCIONARIO: {{ dat.nombres | default(ex_func.nombres ~ ' ' ~ ex_func.apellidos, true) }}
+    </div>
+    <div style="font-size: 10px; font-weight: 700;">C.C: {{ dat.cedula | default(ex_func.cedula, true) }}</div>
+    <div style="font-size: 9px; color: #dc2626; font-weight: bold; margin-top: 4px; padding: 4px; border: 1px dashed #dc2626; background: #fef2f2;">
+        (ESTE DOCUMENTO ES NULO SIN LA FIRMA ELECTRÓNICA .P12 / FIRMAEC)
+    </div>
 </div>

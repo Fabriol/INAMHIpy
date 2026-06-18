@@ -18,7 +18,7 @@
     
     .hero-info { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; margin-bottom: 25px; }
     .hero-item { min-width: 140px; padding: 16px; border-radius: 20px; background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .18); backdrop-filter: blur(14px); }
-    .hero-item strong { display: block; font-size: 22px; font-weight: 900; color: white; }
+    .hero-item strong { display: block; font-size: 26px; font-weight: 900; color: white; }
     .hero-item span { color: #bfdbfe; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 
     /* WEATHER CARD (DERECHA) */
@@ -30,19 +30,19 @@
     .weather-card p { margin-top: 8px; font-size: 12px; color: #dbeafe; }
     .pulse-ring { position: absolute; width: 100px; height: 100px; right: -30px; bottom: -30px; border-radius: 50%; border: 15px solid rgba(34, 197, 94, .25); animation: pulseRing 2.5s ease-in-out infinite; }
 
-    /* TARJETAS DE INFORMACIÓN (SIN ENLACES) */
+    /* TARJETAS DE MÉTRICAS PÚRAMENTE INFORMATIVAS */
     .dashboard-grid { margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
-    .info-card { position: relative; overflow: hidden; display: flex; align-items: flex-start; gap: 18px; padding: 26px; background: white; border: 1px solid #e2e8f0; border-radius: 30px; box-shadow: 0 10px 30px rgba(15, 23, 42, .03); animation: cardUp .75s ease both; transition: .25s ease; }
-    .info-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(15, 23, 42, .08); }
+    .info-card { position: relative; overflow: hidden; display: flex; align-items: center; gap: 18px; padding: 26px; background: white; border: 1px solid #e2e8f0; border-radius: 30px; box-shadow: 0 10px 30px rgba(15, 23, 42, .03); animation: cardUp .75s ease both; }
     .info-card::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: linear-gradient(90deg, #2563eb, #0ea5e9); }
-    .card-icon { width: 56px; height: 56px; display: grid; place-items: center; flex-shrink: 0; border-radius: 18px; font-size: 28px; }
-    .info-card h3 { margin: 0; color: #0f172a; font-size: 18px; font-weight: 900; }
-    .info-card p { margin: 8px 0 0; color: #64748b; font-size: 13px; font-weight: 600; line-height: 1.5; }
+    .card-icon { width: 64px; height: 64px; display: grid; place-items: center; flex-shrink: 0; border-radius: 20px; font-size: 28px; font-weight: 900; }
+    .info-card .metric-value { margin: 0; color: #0f172a; font-size: 32px; font-weight: 900; line-height: 1; }
+    .info-card .metric-label { margin: 5px 0 0; color: #64748b; font-size: 13px; font-weight: 700; text-transform: uppercase; }
     
-    .info-card.blue .card-icon { background: #dbeafe; }
-    .info-card.green .card-icon { background: #dcfce7; }
-    .info-card.purple .card-icon { background: #ede9fe; }
-    .info-card.orange .card-icon { background: #fef3c7; }
+    .info-card.blue .card-icon { background: #dbeafe; color: #2563eb; }
+    .info-card.green .card-icon { background: #dcfce7; color: #16a34a; }
+    .info-card.purple .card-icon { background: #ede9fe; color: #7e22ce; }
+    .info-card.orange .card-icon { background: #fef3c7; color: #d97706; }
+    
     .info-card.green::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
     .info-card.purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
     .info-card.orange::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
@@ -103,21 +103,23 @@
                     <span>Tu Rol Actual</span>
                 </div>
                 <div class="hero-item">
-                    <strong>Activo</strong>
-                    <span>Estado del Sistema</span>
+                    <strong>{{ stats.tramites_activos | default(0) }}</strong>
+                    <span>Trámites en Curso</span>
                 </div>
                 <div class="hero-item">
-                    <strong>Paz y Salvo</strong>
-                    <span>Módulo Principal</span>
+                    <strong>{{ stats.tramites_completados | default(0) }}</strong>
+                    <span>Documentos Firmados</span>
                 </div>
             </div>
 
+            {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
             <form action="/paz-salvo/nueva" method="POST" style="margin-top: 10px;">
                 <input type="hidden" name="cedula" value="9999999999">
                 <button type="submit" class="btn btn-light fw-bold shadow-lg" style="border-radius: 14px; padding: 14px 28px; color: #1e40af; font-size: 15px;">
                     <i class="bi bi-file-earmark-plus-fill me-2"></i> Iniciar Trámite Paz y Salvo
                 </button>
             </form>
+            {% endif %}
         </div>
 
         <div class="hero-right">
@@ -134,34 +136,34 @@
 
     <section class="dashboard-grid">
         <div class="info-card blue">
-            <div class="card-icon text-primary">📄</div>
+            <div class="card-icon"><i class="bi bi-people-fill"></i></div>
             <div>
-                <h3>Gestión documental</h3>
-                <p>Control y almacenamiento seguro de archivos institucionales.</p>
+                <p class="metric-value">{{ stats.total_usuarios | default(0) }}</p>
+                <p class="metric-label">Usuarios Activos</p>
             </div>
         </div>
 
         <div class="info-card green">
-            <div class="card-icon text-success">📊</div>
+            <div class="card-icon"><i class="bi bi-folder-check"></i></div>
             <div>
-                <h3>Reportes dinámicos</h3>
-                <p>Visualización estadística y análisis de datos en tiempo real.</p>
+                <p class="metric-value">{{ stats.areas_control | default(8) }}</p>
+                <p class="metric-label">Áreas de Control</p>
             </div>
         </div>
 
         <div class="info-card purple">
-            <div class="card-icon" style="color: #8b5cf6;">🧾</div>
+            <div class="card-icon"><i class="bi bi-pen-fill"></i></div>
             <div>
-                <h3>Formularios inteligentes</h3>
-                <p>Procesos automatizados y validación mediante firma electrónica.</p>
+                <p class="metric-value">{{ stats.firmas_validadas | default(0) }}</p>
+                <p class="metric-label">Firmas Validadas (FirmaEC)</p>
             </div>
         </div>
 
         <div class="info-card orange">
-            <div class="card-icon text-warning">🛡️</div>
+            <div class="card-icon"><i class="bi bi-shield-check"></i></div>
             <div>
-                <h3>Seguridad criptográfica</h3>
-                <p>Acceso controlado e integridad de documentos con FirmaEC.</p>
+                <p class="metric-value">{{ stats.logs_auditoria | default(0) }}</p>
+                <p class="metric-label">Registros de Auditoría</p>
             </div>
         </div>
     </section>
@@ -177,11 +179,11 @@
             <div class="panel-features">
                 <div class="feature">
                     <span>✔</span>
-                    <p>Integración con certificados .p12 y FirmaEC.</p>
+                    <p>Integración obligatoria con certificados .p12 y FirmaEC.</p>
                 </div>
                 <div class="feature">
                     <span>✔</span>
-                    <p>Autoguardado en tiempo real con tecnología HTMX.</p>
+                    <p>Flujo secuencial paralelo y autoguardado en tiempo real.</p>
                 </div>
                 <div class="feature">
                     <span>✔</span>
