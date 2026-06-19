@@ -122,7 +122,7 @@
                 {{ respuesta_final | default('PENDIENTE', true) }}
             </td>
             
-            <td class="text-center" style="font-size: 9px;">{{ p.rol.nombre | default('---') }}</td>
+            <td class="text-center" style="font-size: 9px;">{{ p.area_nombre | default('---') }}</td>
             <td>
                 <div class="firma-box">
                     {% if respuesta_final %}

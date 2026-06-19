@@ -1,64 +1,264 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="card shadow-lg border-0" style="width: 100%; max-width: 550px; border-radius: 24px; overflow: hidden;">
-        <div class="card-header bg-primary text-white p-4"
-            style="background: linear-gradient(135deg, #1e3a8a, #3b82f6) !important;">
-            <div class="d-flex align-items-center gap-3">
-                <div class="bg-white text-primary rounded-circle d-flex justify-content-center align-items-center"
-                    style="width: 48px; height: 48px; font-size: 24px; font-weight: bold;">
-                    <i class="bi bi-file-earmark-plus"></i>
-                </div>
-                <div>
-                    <h4 class="mb-0 fw-bold">Nuevo Paz y Salvo</h4>
-                    <p class="mb-0 small text-white-50">Ingrese los datos iniciales del ex funcionario</p>
-                </div>
+<style>
+    .panel-creacion {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 24px 30px;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+
+    .panel-creacion::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #1e3a8a, #0ea5e9);
+    }
+
+    .badge-modulo {
+        background: #1e3a8a;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    .panel-title {
+        font-weight: 900;
+        color: #0f172a;
+        margin: 0 0 5px 0;
+        font-size: 2rem;
+    }
+
+    .card-formulario {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .form-label-custom {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control-custom {
+        border-radius: 10px;
+        background-color: #f8fafc;
+        border: 1px solid #cbd5e1;
+        padding: 12px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .form-control-custom:focus {
+        background-color: white;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        outline: none;
+    }
+
+    .tabla-expedientes {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        border: 1px solid #e2e8f0;
+    }
+
+    .tabla-expedientes th {
+        background: #1e3a8a;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .tabla-expedientes td {
+        padding: 16px;
+        font-size: 0.85rem;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+        text-align: center;
+        vertical-align: middle;
+        font-weight: 600;
+    }
+
+    .tabla-expedientes tr:hover td {
+        background: #f8fafc;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .status-creado {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+    }
+
+    .status-proceso {
+        background: #fffbeb;
+        color: #b45309;
+        border: 1px solid #fef3c7;
+    }
+
+    .status-completo {
+        background: #ecfdf5;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+    }
+</style>
+
+<div class="panel-creacion d-flex justify-content-between align-items-center">
+    <div>
+        <span class="badge-modulo">Trámites de Personal</span>
+        <h1 class="panel-title">Apertura de Paz y Salvo</h1>
+        <p class="text-muted small m-0">Ingrese los datos iniciales para la apertura del expediente institucional.</p>
+    </div>
+    <a href="/dashboard" class="btn btn-sm btn-outline-secondary fw-bold px-3 py-2" style="border-radius: 8px;">← Volver
+        al Panel</a>
+</div>
+
+<div class="card-formulario">
+    <h5 class="fw-bold mb-4" style="color: #0f172a;"><i class="bi bi-file-earmark-medical me-2 text-primary"></i>Datos
+        Iniciales de Identificación</h5>
+
+    <form action="/paz-salvo/nueva" method="POST">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <label class="form-label-custom">Cédula de Identidad <span class="text-danger">*</span></label>
+                <input type="text" name="cedula" class="form-control form-control-custom w-100"
+                    placeholder="Ej: 1777777777" maxlength="10" required
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label-custom">Nombres Completos <span class="text-danger">*</span></label>
+                <input type="text" name="nombres" class="form-control form-control-custom w-100"
+                    placeholder="INGRESE LOS DOS NOMBRES" required
+                    oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '').toUpperCase()">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label-custom">Apellidos Completos <span class="text-danger">*</span></label>
+                <input type="text" name="apellidos" class="form-control form-control-custom w-100"
+                    placeholder="INGRESE LOS DOS APELLIDOS" required
+                    oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '').toUpperCase()">
             </div>
         </div>
 
-        <div class="card-body p-4 p-md-5">
-            <form action="/paz-salvo/nueva" method="POST">
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-secondary small text-uppercase">Cédula de Identidad <span
-                            class="text-danger">*</span></label>
-                    <input type="text" name="cedula" class="form-control form-control-lg bg-light"
-                        placeholder="Ej: 1712345678" maxlength="10" required pattern="\d{10}"
-                        title="Debe contener exactamente 10 dígitos numéricos"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-6">
-                        <label class="form-label fw-bold text-secondary small text-uppercase">Nombres <span
-                                class="text-danger">*</span></label>
-                        <input type="text" name="nombres" class="form-control form-control-lg bg-light"
-                            placeholder="Dos nombres" required
-                            oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '').toUpperCase();">
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label fw-bold text-secondary small text-uppercase">Apellidos <span
-                                class="text-danger">*</span></label>
-                        <input type="text" name="apellidos" class="form-control form-control-lg bg-light"
-                            placeholder="Dos apellidos" required
-                            oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '').toUpperCase();">
-                    </div>
-                </div>
-
-                <div class="mb-5">
-                    <label class="form-label fw-bold text-secondary small text-uppercase">Correo Personal</label>
-                    <input type="email" name="email" class="form-control form-control-lg bg-light"
-                        placeholder="ejemplo@gmail.com" oninput="this.value = this.value.toLowerCase();">
-                </div>
-
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg fw-bold" style="border-radius: 12px;">Crear
-                        Expediente e Iniciar</button>
-                    <a href="/dashboard" class="btn btn-light fw-bold text-secondary"
-                        style="border-radius: 12px;">Cancelar</a>
-                </div>
-            </form>
+        <div class="row g-4 mt-2">
+            <div class="col-md-12">
+                <label class="form-label-custom">Correo Electrónico Notificable (Opcional)</label>
+                <input type="email" name="email" class="form-control form-control-custom w-100"
+                    placeholder="ejemplo@inamhi.gob.ec" oninput="this.value = this.value.toLowerCase().trim()">
+            </div>
         </div>
+
+        <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
+            <a href="/dashboard" class="btn btn-light fw-bold px-4 py-2"
+                style="border-radius: 10px; color: #64748b;">Cancelar</a>
+            <button type="submit" class="btn btn-primary fw-bold px-4 py-2"
+                style="border-radius: 10px; background: linear-gradient(135deg, #1e3a8a, #2563eb); border: none;">
+                <i class="bi bi-shield-plus me-2"></i>Crear Expediente e Iniciar
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="bg-white p-4 rounded-4 shadow-sm border border-light">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold m-0" style="color: #0f172a;"><i class="bi bi-layers-half me-2 text-primary"></i>Expedientes
+            Activos en Sistema</h5>
+        <span class="badge bg-light text-dark border fw-bold px-3 py-2 rounded-3" style="font-size: 0.75rem;">Total
+            Registrados: {{ solicitudes|length }}</span>
     </div>
+
+    <div class="table-responsive">
+        <table class="tabla-expedientes">
+            <thead>
+                <tr>
+                    <th>Nro. Trámite</th>
+                    <th>Cédula</th>
+                    <th>Ex Funcionario</th>
+                    <th>Correo Electrónico</th>
+                    <th>Estado</th>
+                    <th>Acción Coherente</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sol in solicitudes %}
+                <tr>
+                    <td>#{{ sol.id }}</td>
+
+                    <td class="text-dark">{{ sol.usuario_data.cedula }}</td>
+                    <td class="text-start text-uppercase">{{ sol.usuario_data.apellidos }} {{ sol.usuario_data.nombres
+                        }}</td>
+                    <td>{{ sol.usuario_data.email }}</td>
+
+                    <td>
+                        <span class="status-badge 
+                            {% if sol.estado == 'CREADO' %} status-creado 
+                            {% elif sol.estado == 'COMPLETADO' %} status-completo 
+                            {% else %} status-proceso {% endif %}">
+                            {{ sol.estado }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="/paz-salvo/llenar/{{ sol.id }}" class="btn btn-sm btn-primary fw-bold px-3 py-2"
+                            style="border-radius: 8px; font-size: 0.75rem; background: #1e293b; border: none;">
+                            <i class="bi bi-folder-symlink-fill me-1"></i> Abrir y Llenar Formulario
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-muted py-4">No existen expedientes de Paz y Salvo generados en la base
+                        de datos actual.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="alert alert-info mt-4 d-flex align-items-center gap-3 border-0 rounded-4 p-3"
+    style="background-color: #f0fdf4; color: #166534;">
+    <i class="bi bi-info-circle-fill text-success" style="font-size: 1.2rem;"></i>
+    <p class="m-0 small fw-bold">
+        <strong>Regla de Negocio 8.2:</strong> Recuerda que la visualización está blindada. Al hacer clic en el botón de
+        llenado, el sistema segmentará de forma automática exponiendo únicamente las preguntas que fueron delegadas a tu
+        rol o departamento por la administración.
+    </p>
 </div>
 {% endblock %}

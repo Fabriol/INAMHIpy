@@ -3,23 +3,20 @@ from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 import os
 
-# Asegúrate de importar LogAuditoria
 from app.models.base import db, Usuario, Rol, SolicitudPazSalvo, Respuesta, Pregunta, LogAuditoria
-
 from app.services.pdf_service import generar_documento_paz_salvo
 from app.services.firma_service import validar_firma_p12
 
 paz_salvo_bp = Blueprint('paz_salvo', __name__)
 
 # ==========================================
-# 1. RUTA: INICIAR SOLICITUD (Bypass para Admin)
+# 1. RUTA: INICIAR SOLICITUD
 # ==========================================
 @paz_salvo_bp.route('/paz-salvo/nueva', methods=['GET', 'POST'])
 @login_required
 def nueva_solicitud():
-    # El Administrador tiene acceso total
     if current_user.rol.nombre not in ['Administrador', 'Talento Humano - Recepción Documentos']:
-        flash('Acceso denegado. No tiene permisos para iniciar este trámite.', 'danger')
+        flash('Acceso denegado. No tiene permisos para gestionar este módulo.', 'danger')
         return redirect(url_for('dashboard.index'))
 
     if request.method == 'POST':
@@ -32,32 +29,39 @@ def nueva_solicitud():
             
             rol_ex = Rol.query.filter_by(nombre='Ex Funcionario').first()
             usuario = Usuario(
-                rol_id=rol_ex.id, cedula=cedula, 
+                rol_id=rol_ex.id, 
+                cedula=cedula, 
                 nombres=request.form.get('nombres', '').upper(),
                 apellidos=request.form.get('apellidos', '').upper(),
-                email=email_seguro, password_hash=generate_password_hash(cedula), activo=True
+                email=email_seguro,
+                password_hash=generate_password_hash(cedula), 
+                activo=True
             )
             db.session.add(usuario)
             db.session.commit()
 
         if SolicitudPazSalvo.query.filter_by(ex_funcionario_id=usuario.id, estado='CREADO').first():
-            flash('Este usuario ya tiene un trámite activo.', 'info')
-            return redirect(url_for('dashboard.index'))
+            flash('Este ex funcionario ya cuenta con un trámite activo en el sistema.', 'warning')
+            return redirect(url_for('paz_salvo.nueva_solicitud'))
 
         nueva_solicitud = SolicitudPazSalvo(ex_funcionario_id=usuario.id, estado='CREADO')
         db.session.add(nueva_solicitud)
         
-        # --- AUDITORÍA: CREACIÓN ---
         log = LogAuditoria(
-            usuario_id=current_user.id, modulo='Formularios', accion='NUEVO TRÁMITE', 
-            detalle=f"Inició trámite Paz y Salvo para la cédula {usuario.cedula}"
+            usuario_id=current_user.id, modulo='Formularios', accion='NUEVO EXPEDIENTE', 
+            detalle=f"Creó expediente de Paz y Salvo N° transitorio para CI: {usuario.cedula}"
         )
         db.session.add(log)
         db.session.commit()
         
+        flash('Expediente creado correctamente. Puede proceder con el llenado de datos.', 'success')
         return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=nueva_solicitud.id))
 
-    return render_template('paz_salvo/crear.html')
+    solicitudes_db = SolicitudPazSalvo.query.order_by(SolicitudPazSalvo.id.desc()).all()
+    for sol in solicitudes_db:
+        sol.usuario_data = Usuario.query.get(sol.ex_funcionario_id)
+        
+    return render_template('paz_salvo/crear.html', solicitudes=solicitudes_db)
 
 
 # ==========================================
@@ -67,16 +71,22 @@ def nueva_solicitud():
 @login_required
 def llenar_formulario(solicitud_id):
     solicitud = SolicitudPazSalvo.query.get_or_404(solicitud_id)
-    # Llave maestra: Si es admin, puede ver el formulario aunque no sea suyo
+    solicitud.ex_funcionario = Usuario.query.get(solicitud.ex_funcionario_id)
+    
     if current_user.id != solicitud.ex_funcionario_id and current_user.rol.nombre != 'Administrador':
         abort(403)
         
     preguntas = Pregunta.query.all()
+    # SOLUCIÓN: Buscamos el nombre del rol manualmente y se lo pegamos a la pregunta
+    for p in preguntas:
+        rol_obj = Rol.query.get(p.rol_asignado_id)
+        p.area_nombre = rol_obj.nombre if rol_obj else 'ÁREA TÉCNICA'
+        
     return render_template('paz_salvo/llenar_formulario.html', solicitud=solicitud, preguntas=preguntas)
 
 
 # ==========================================
-# 3. RUTA: AUTOGUARDADO HTMX CON AUDITORÍA EXTREMA
+# 3. RUTA: AUTOGUARDADO HTMX
 # ==========================================
 @paz_salvo_bp.route('/actualizar-espejo', methods=['POST'])
 @login_required
@@ -84,28 +94,45 @@ def actualizar_espejo():
     datos = request.form.to_dict()
     solicitud_id = datos.get('solicitud_id')
     solicitud = SolicitudPazSalvo.query.get(solicitud_id)
+    cambios_registrados = []
     
     if solicitud:
-        # 1. Guardar Datos Personales Permanentes en el Usuario
+        solicitud.ex_funcionario = Usuario.query.get(solicitud.ex_funcionario_id)
+        
         if datos.get('celular'):
             solicitud.ex_funcionario.celular = datos.get('celular')
         if datos.get('direccion'):
             solicitud.ex_funcionario.direccion = datos.get('direccion')
 
-        # 2. Guardar las respuestas de las preguntas dinámicas
         for key, value in datos.items():
             if key.startswith('pregunta_'):
                 pregunta_id = key.split('_')[1]
                 respuesta = Respuesta.query.filter_by(solicitud_id=solicitud_id, pregunta_id=pregunta_id).first()
+                
                 if respuesta:
-                    respuesta.valor_respuesta = value
+                    if respuesta.valor_respuesta != value:
+                        cambios_registrados.append(f"P{pregunta_id} a '{value}'")
+                        respuesta.valor_respuesta = value
                 else:
+                    cambios_registrados.append(f"P{pregunta_id} respondida '{value}'")
                     db.session.add(Respuesta(solicitud_id=solicitud_id, pregunta_id=pregunta_id, valor_respuesta=value))
         
+        if cambios_registrados:
+            log = LogAuditoria(
+                usuario_id=current_user.id, modulo='Formularios', accion='EDICIÓN CAMPOS', 
+                detalle=f"Tramite #{solicitud_id} actualizado: {', '.join(cambios_registrados)}"
+            )
+            db.session.add(log)
+            
         db.session.commit()
     
-    # Enviamos el diccionario "datos" y "solicitud" completos al Informe para que se reflejen en tiempo real
-    return render_template('paz_salvo/partials/hoja_espejo.html', datos=datos, solicitud=solicitud)
+    # SOLUCIÓN: Volvemos a enviar las preguntas al actualizar para que no desaparezcan de la tabla
+    preguntas = Pregunta.query.all()
+    for p in preguntas:
+        rol_obj = Rol.query.get(p.rol_asignado_id)
+        p.area_nombre = rol_obj.nombre if rol_obj else 'ÁREA TÉCNICA'
+    
+    return render_template('paz_salvo/partials/hoja_espejo.html', datos=datos, solicitud=solicitud, preguntas=preguntas)
 
 
 # ==========================================
@@ -120,21 +147,24 @@ def descargar_pdf(solicitud_id):
 
     respuestas_db = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
     respuestas_por_area = {}
+    
+    # SOLUCIÓN: Buscar el rol manualmente en la generación del PDF para evitar colapsos
     for r in respuestas_db:
-        nombre_area = r.pregunta.rol.nombre
+        rol_obj = Rol.query.get(r.pregunta.rol_asignado_id)
+        nombre_area = rol_obj.nombre if rol_obj else 'ÁREA TÉCNICA'
         respuestas_por_area.setdefault(nombre_area, []).append({'pregunta': r.pregunta.enunciado, 'valor': r.valor_respuesta})
 
     directorio_temp = os.path.join('app', 'static', 'temp')
     os.makedirs(directorio_temp, exist_ok=True)
     ruta_pdf = os.path.join(directorio_temp, f'PazSalvo_{solicitud.id}.pdf')
     
-    # --- AUDITORÍA: EXPORTACIÓN PDF ---
     log = LogAuditoria(usuario_id=current_user.id, modulo='Reportes', accion='DESCARGA PDF', detalle=f"Descargó borrador PDF del trámite #{solicitud.id}")
     db.session.add(log)
     db.session.commit()
     
     try:
-        generar_documento_paz_salvo(solicitud, solicitud.ex_funcionario, respuestas_por_area, ruta_pdf)
+        usuario_obj = Usuario.query.get(solicitud.ex_funcionario_id)
+        generar_documento_paz_salvo(solicitud, usuario_obj, respuestas_por_area, ruta_pdf)
     except Exception as e:
         flash(f'Ocurrió un error al generar el PDF: {str(e)}', 'danger')
         return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=solicitud.id))
@@ -165,7 +195,6 @@ def subir_firma_digital(solicitud_id):
         solicitud.estado = 'COMPLETADO'
         solicitud.pdf_firmado_path = ruta_final
         
-        # --- AUDITORÍA: FIRMA APROBADA ---
         log = LogAuditoria(
             usuario_id=current_user.id, modulo='Firma Digital', accion='FIRMA APROBADA', 
             detalle=f"FirmaEC validada para trámite #{solicitud.id}. Metadata: {mensaje}"
@@ -178,7 +207,6 @@ def subir_firma_digital(solicitud_id):
         if os.path.exists(ruta_final):
             os.remove(ruta_final)
         
-        # --- AUDITORÍA: INTENTO FALLIDO DE FIRMA ---
         log = LogAuditoria(usuario_id=current_user.id, modulo='Seguridad', accion='ALERTA FIRMA', detalle=f"Intento de firma inválida en trámite #{solicitud.id}")
         db.session.add(log)
         db.session.commit()
