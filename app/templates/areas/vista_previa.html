@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Diseño del Escritorio de Visualización */
+    .desk-background {
+        background-color: #cbd5e1; /* Color gris escritorio */
+        padding: 40px 20px;
+        min-height: calc(100vh - 60px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 16px;
+    }
+
+    /* La Hoja de Papel Blanca */
+    .paper-sheet {
+        background: white;
+        width: 100%;
+        max-width: 900px;
+        min-height: 1100px;
+        padding: 60px 50px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        border-radius: 4px;
+    }
+
+    /* Barra de herramientas superior */
+    .toolbar-preview {
+        width: 100%;
+        max-width: 900px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        background: white;
+        padding: 15px 25px;
+        border-radius: 12px;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+
+    /* Ocultar elementos innecesarios al Imprimir */
+    @media print {
+        .sidebar, .toolbar-preview, .alert { display: none !important; }
+        .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
+        .desk-background { background: white !important; padding: 0 !important; }
+        .paper-sheet { box-shadow: none !important; padding: 0 !important; }
+    }
+</style>
+
+<div class="desk-background">
+    <div class="toolbar-preview align-items-center">
+        <div>
+            <span class="badge bg-primary fs-6 me-2">Vista Previa</span>
+            <span class="fw-bold text-secondary">Trámite #{{ solicitud.id }}</span>
+        </div>
+        
+        <div>
+            <button onclick="window.close()" class="btn btn-light border fw-bold shadow-sm me-2 text-secondary">
+                <i class="bi bi-x-lg me-1"></i> Cerrar
+            </button>
+            
+            <button onclick="window.print()" class="btn btn-dark fw-bold shadow-sm">
+                <i class="bi bi-printer-fill me-2"></i> Imprimir Documento
+            </button>
+        </div>
+    </div>
+
+    <div class="paper-sheet">
+        {% include 'paz_salvo/partials/hoja_espejo.html' %}
+    </div>
+</div>
+{% endblock %}

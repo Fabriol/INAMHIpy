@@ -12,6 +12,8 @@ paz_salvo_bp = Blueprint('paz_salvo', __name__)
 # ==========================================
 # 1. RUTA: INICIAR SOLICITUD
 # ==========================================
+# Reemplaza solo esta función en tu app/routes/paz_salvo.py
+
 @paz_salvo_bp.route('/paz-salvo/nueva', methods=['GET', 'POST'])
 @login_required
 def nueva_solicitud():
@@ -21,48 +23,63 @@ def nueva_solicitud():
 
     if request.method == 'POST':
         cedula = request.form.get('cedula', '').strip()
+        username_input = request.form.get('username', '').strip()
+        email_input = request.form.get('email', '').strip()
+
+        # VALIDACIÓN 1: Verificamos si la cédula ya existe en la base de datos
         usuario = Usuario.query.filter_by(cedula=cedula).first()
         
         if not usuario:
-            email_ingresado = request.form.get('email', '').lower().strip()
-            email_seguro = email_ingresado if email_ingresado else f"{cedula}@inamhi.gob.ec"
-            
+            # VALIDACIÓN 2: Verificamos que el correo generado no pertenezca a OTRO usuario
+            correo_existente = Usuario.query.filter_by(email=email_input).first()
+            if correo_existente:
+                flash(f'El correo {email_input} ya está asignado a otro funcionario. Por favor, modifique manualmente el nombre de usuario (Ej: agregue un número al final).', 'danger')
+                return redirect(url_for('paz_salvo.nueva_solicitud'))
+
             rol_ex = Rol.query.filter_by(nombre='Ex Funcionario').first()
+            
+            # Guardamos el usuario con el nuevo campo username y el correo institucional
             usuario = Usuario(
                 rol_id=rol_ex.id, 
                 cedula=cedula, 
                 nombres=request.form.get('nombres', '').upper(),
                 apellidos=request.form.get('apellidos', '').upper(),
-                email=email_seguro,
+                username=username_input,   # <-- NUEVO DATO GUARDADO
+                email=email_input,         # <-- CORREO AUTOCOMPLETADO
                 password_hash=generate_password_hash(cedula), 
                 activo=True
             )
             db.session.add(usuario)
             db.session.commit()
 
-        if SolicitudPazSalvo.query.filter_by(ex_funcionario_id=usuario.id, estado='CREADO').first():
-            flash('Este ex funcionario ya cuenta con un trámite activo en el sistema.', 'warning')
+        # VALIDACIÓN 3: Prevenir duplicidad de trámites (Que no tenga 2 trámites abiertos)
+        tramite_creado = SolicitudPazSalvo.query.filter_by(ex_funcionario_id=usuario.id, estado='CREADO').first()
+        tramite_proceso = SolicitudPazSalvo.query.filter_by(ex_funcionario_id=usuario.id, estado='EN_PROGRESO').first()
+        
+        if tramite_creado or tramite_proceso:
+            flash('Este ex funcionario ya cuenta con un trámite activo en el sistema. Utilice el botón "Abrir y Llenar Formulario" en la tabla inferior.', 'warning')
             return redirect(url_for('paz_salvo.nueva_solicitud'))
 
+        # Si pasa todas las validaciones, se crea el expediente
         nueva_solicitud = SolicitudPazSalvo(ex_funcionario_id=usuario.id, estado='CREADO')
         db.session.add(nueva_solicitud)
         
         log = LogAuditoria(
             usuario_id=current_user.id, modulo='Formularios', accion='NUEVO EXPEDIENTE', 
-            detalle=f"Creó expediente de Paz y Salvo N° transitorio para CI: {usuario.cedula}"
+            detalle=f"Creó expediente de Paz y Salvo para CI: {usuario.cedula} ({usuario.email})"
         )
         db.session.add(log)
         db.session.commit()
         
-        flash('Expediente creado correctamente. Puede proceder con el llenado de datos.', 'success')
+        flash('Expediente institucional creado exitosamente. Proceda con el llenado de datos.', 'success')
         return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=nueva_solicitud.id))
 
+    # Renderiza la vista y envía la lista de solicitudes para la tabla inferior
     solicitudes_db = SolicitudPazSalvo.query.order_by(SolicitudPazSalvo.id.desc()).all()
     for sol in solicitudes_db:
         sol.usuario_data = Usuario.query.get(sol.ex_funcionario_id)
         
     return render_template('paz_salvo/crear.html', solicitudes=solicitudes_db)
-
 
 # ==========================================
 # 2. RUTA: FORMULARIO DINÁMICO

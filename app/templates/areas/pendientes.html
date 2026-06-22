@@ -1,43 +1,130 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mt-4">
-    <div class="col-md-12">
-        <h2 class="fw-bold mb-4" style="color: #003366;">Mis Tareas Pendientes ({{ current_user.rol.nombre }})</h2>
-        <p class="text-muted">Seleccione una solicitud para responder a las validaciones designadas a su departamento.</p>
+<style>
+    /* =========================================
+       ESTILOS PREMIUM - PANEL DE ÁREAS
+       ========================================= */
+    .panel-creacion { background: #f8fafc; border-radius: 16px; padding: 24px 30px; margin-bottom: 24px; position: relative; overflow: hidden; border: 1px solid #e2e8f0; }
+    .panel-creacion::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #10b981, #3b82f6); }
+    .badge-modulo { background: #10b981; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; margin-bottom: 10px; }
+    .panel-title { font-weight: 900; color: #0f172a; margin: 0 0 5px 0; font-size: 2rem; letter-spacing: -0.5px; }
+    
+    .card-formulario { background: white; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.02); padding: 30px; margin-bottom: 30px; }
+    
+    .tabla-expedientes { width: 100%; border-collapse: separate; border-spacing: 0; background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+    .tabla-expedientes th { background: #0f172a; color: white; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; padding: 16px; text-align: center; white-space: nowrap; }
+    .tabla-expedientes td { padding: 16px; font-size: 0.85rem; color: #334155; border-bottom: 1px solid #f1f5f9; text-align: center; vertical-align: middle; font-weight: 600; }
+    .tabla-expedientes tr:hover td { background: #f8fafc; }
+
+    /* Barra de Progreso Personalizada */
+    .progress-container { width: 100%; background-color: #e2e8f0; border-radius: 20px; height: 12px; overflow: hidden; margin-top: 5px; position: relative; }
+    .progress-bar-custom { height: 100%; border-radius: 20px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: linear-gradient(90deg, #3b82f6, #0ea5e9); }
+    .progress-100 { background: linear-gradient(90deg, #10b981, #059669) !important; }
+    .porcentaje-text { font-size: 0.75rem; font-weight: 900; color: #475569; display: block; text-align: right; margin-bottom: 2px; }
+
+    /* Badges de Estado */
+    .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+    .status-proceso { background: #fffbeb; color: #b45309; border: 1px solid #fef3c7; }
+    .status-completo { background: #ecfdf5; color: #15803d; border: 1px solid #bbf7d0; }
+    
+    /* Botones de Acción */
+    .btn-action { border-radius: 8px; font-size: 0.75rem; font-weight: 800; padding: 8px 12px; transition: 0.3s; white-space: nowrap; }
+    .btn-validar { background: #1e3a8a; color: white; border: none; }
+    .btn-validar:hover { background: #2563eb; color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+    .btn-ver { background: white; color: #475569; border: 1px solid #cbd5e1; }
+    .btn-ver:hover { background: #f8fafc; color: #0f172a; border-color: #94a3b8; transform: translateY(-2px); }
+</style>
+
+<div class="panel-creacion d-flex justify-content-between align-items-center">
+    <div>
+        <span class="badge-modulo">Bandeja de Entrada</span>
+        <h1 class="panel-title">Mis Tareas Pendientes</h1>
+        <p class="text-muted small m-0">Departamento actual: <strong>{{ current_user.rol.nombre }}</strong>. Valide los requisitos de su área.</p>
     </div>
+    <a href="/dashboard" class="btn btn-sm btn-outline-secondary fw-bold px-3 py-2" style="border-radius: 8px;">← Volver al Panel</a>
 </div>
 
-<div class="card shadow-sm border-0 rounded-3">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nro. Trámite</th>
-                        <th>Fecha de Inicio</th>
-                        <th>Estado Actual</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for solicitud in solicitudes %}
-                    <tr>
-                        <td class="fw-bold">#{{ solicitud.id }}</td>
-                        <td>{{ solicitud.fecha_creacion.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td><span class="badge bg-warning text-dark">{{ solicitud.estado }}</span></td>
-                        <td>
-                            <a href="/areas/responder/{{ solicitud.id }}" class="btn btn-primary btn-sm fw-bold">Validar Formulario</a>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="4" class="text-center text-muted py-4">Su bandeja está limpia. No hay tareas pendientes para su área.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="card-formulario">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold m-0" style="color: #0f172a;"><i class="bi bi-inboxes-fill me-2 text-success"></i>Trámites en Curso</h5>
+        <button onclick="window.location.reload();" class="btn btn-sm btn-light border fw-bold text-secondary"><i class="bi bi-arrow-clockwise me-1"></i> Actualizar Bandeja</button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="tabla-expedientes">
+            <thead>
+                <tr>
+                    <th width="10%">Nro.</th>
+                    <th width="20%" style="text-align: left;">Ex Funcionario</th>
+                    <th width="15%">Fecha de Inicio</th>
+                    <th width="25%">Progreso del Trámite</th>
+                    <th width="10%">Estado</th>
+                    <th width="20%">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for solicitud in solicitudes %}
+                
+                {% set total_preguntas = 8 %}
+                {% set respondidas = solicitud.respuestas|length if solicitud.respuestas else 0 %}
+                {% set porcentaje = ((respondidas / total_preguntas) * 100) | round(0) | int %}
+                {% if porcentaje > 100 %}{% set porcentaje = 100 %}{% endif %}
+
+                <tr>
+                    <td class="text-primary fw-bold fs-6">#{{ solicitud.id }}</td>
+                    
+                    <td style="text-align: left;">
+                        {% if solicitud.usuario_data %}
+                            <div class="text-uppercase fw-bold text-dark">{{ solicitud.usuario_data.apellidos }} {{ solicitud.usuario_data.nombres }}</div>
+                            <div class="small text-muted">{{ solicitud.usuario_data.cedula }}</div>
+                        {% else %}
+                            <div class="text-danger small fw-bold">Dato No Vinculado</div>
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        <div class="fw-bold">{{ solicitud.fecha_creacion.strftime('%Y-%m-%d') }}</div>
+                        <div class="small text-muted">{{ solicitud.fecha_creacion.strftime('%H:%M') }}</div>
+                    </td>
+                    
+                    <td style="padding: 16px 25px;">
+                        <span class="porcentaje-text {% if porcentaje == 100 %}text-success{% endif %}">{{ porcentaje }}% Completado</span>
+                        <div class="progress-container shadow-sm">
+                            <div class="progress-bar-custom" style="width: {{ porcentaje }}%;"></div>
+                        </div>
+                    </td>
+                    
+                    <td>
+                        {% if porcentaje == 100 %}
+                            <span class="status-badge status-completo"><i class="bi bi-check2-all me-1"></i> Listo</span>
+                        {% else %}
+                            <span class="status-badge status-proceso"><i class="bi bi-hourglass-split me-1"></i> {{ solicitud.estado }}</span>
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="/areas/ver/{{ solicitud.id }}" target="_blank" class="btn btn-action btn-ver" title="Ver Formulario Completo">
+                                <i class="bi bi-eye-fill"></i> Ver
+                            </a>
+                            <a href="/areas/responder/{{ solicitud.id }}" class="btn btn-action btn-validar">
+                                <i class="bi bi-pencil-square me-1"></i> Validar Área
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <div class="text-muted mb-2"><i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i></div>
+                        <h6 class="fw-bold text-dark">Su bandeja está limpia.</h6>
+                        <p class="small text-muted m-0">No hay trámites pendientes de validación para el departamento de {{ current_user.rol.nombre }}.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

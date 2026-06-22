@@ -31,20 +31,20 @@ class Rol(db.Model):
 # 3. TABLA DE USUARIOS (Login y Seguridad)
 # UserMixin ayuda a Flask-Login a manejar las sesiones
 # ==========================================
-class Usuario(UserMixin, db.Model):
+class Usuario(db.Model, UserMixin):
     __tablename__ = 'usuarios'
     id = db.Column(db.Integer, primary_key=True)
     rol_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
-    
     cedula = db.Column(db.String(10), unique=True, nullable=False)
+    
+    # Asegúrate de tener esta línea para guardar el usuario generado:
+    username = db.Column(db.String(50), unique=True, nullable=True) 
+    
     nombres = db.Column(db.String(100), nullable=False)
     apellidos = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    
-    # Si es False, el usuario (ej. Ex Funcionario aprobado) ya no puede entrar
-    activo = db.Column(db.Boolean, default=True) 
-
+    activo = db.Column(db.Boolean, default=True)
 # ==========================================
 # 4. TABLAS DEL FORMULARIO Y PREGUNTAS DINÁMICAS
 # ==========================================
