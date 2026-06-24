@@ -5,9 +5,12 @@
 
 <style>
     :root {
-        --blue-50: #eff6ff; --blue-600: #2563eb; --blue-900: #1e3a8a;
-        --red-500: #ef4444; --red-600: #dc2626; --slate-300: #cbd5e1; --slate-500: #64748b;
+        --blue-50: #eff6ff; --blue-100: #dbeafe; --blue-600: #2563eb; --blue-900: #1e3a8a;
+        --green-50: #f0fdf4; --green-600: #16a34a; 
+        --red-50: #fff1f2; --red-500: #ef4444; --red-600: #dc2626;
+        --slate-50: #f8fafc; --slate-200: #e2e8f0; --slate-300: #cbd5e1; --slate-500: #64748b; --slate-900: #0f172a;
         --grad-header: linear-gradient(90deg, #2563eb, #0ea5e9, #22c55e);
+        --blur: blur(18px);
     }
     .page-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; border-radius: 12px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border-top: 4px solid var(--blue-600); }
     .doc-form-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: flex-start; }
@@ -26,7 +29,6 @@
     .doc-input:focus { border-color: var(--blue-600); background: #fff !important; box-shadow: 0 0 0 3px rgba(37,99,235,.15); outline: none; }
     .doc-input[type="email"] { text-transform: lowercase; }
     
-    /* VALIDACIONES VISUALES ESTRICTAS */
     .has-error .doc-input { border-color: var(--red-500) !important; background: #fff5f5 !important; }
     .has-error label { color: var(--red-600) !important; }
     .error-msg { font-size: 10px; color: var(--red-600); font-weight: 800; display: none; margin-top: 2px; }
@@ -36,20 +38,33 @@
     .btn-firmaec:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 5px 10px rgba(29,78,216,.3); }
     .hoja-espejo-preview { background: #e2e8f0; border-radius: 12px; padding: 15px; position: sticky; top: 15px; box-shadow: inset 0 4px 10px rgba(0,0,0,0.05); }
     
+    /* =================================================================
+       CONFIGURACIÓN MAESTRA DE IMPRESIÓN A4
+       ================================================================= */
     @media print {
+        @page { size: A4 portrait; margin: 10mm; }
+        body, html { margin: 0 !important; padding: 0 !important; background: #fff !important; }
         body * { visibility: hidden; }
+        .no-print, .page-header, .doc-form-left { display: none !important; }
+        
+        .hoja-espejo-preview { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; padding: 0 !important; background: transparent !important; box-shadow: none !important; }
         #vista-espejo, #vista-espejo * { visibility: visible; }
-        #vista-espejo { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
-        .no-print { display: none !important; }
+        #vista-espejo { position: relative; width: 100%; padding: 0; border: none; box-shadow: none; }
     }
 </style>
 
-{% macro input_text(name, label, type='text', width='', max_len='', js_val='') %}
+<!-- MACROS -->
+{% macro input_text(name, label, type='text', width='', max_len='', on_input='') %}
+{% set js_code = "" %}
+{% if on_input %}{% set js_code = js_code ~ on_input ~ ";" %}{% endif %}
+{% if type == 'email' %}{% set js_code = js_code ~ "validarEmail(this);" %}{% endif %}
+{% set attr_oninput = 'oninput="' ~ js_code ~ '"' if js_code else '' %}
+
 <div class="input-group {{ width }}" id="grp_{{ name }}">
     <label>{{ label }} <span class="req text-danger">*</span></label>
     <input type="{{ type }}" name="{{ name }}" class="doc-input" 
            {% if max_len %}maxlength="{{ max_len }}"{% endif %} 
-           oninput="{{ js_val }}">
+           {{ attr_oninput | safe }}>
     <span class="error-msg" id="msg_{{ name }}">⚠ Entrada inválida.</span>
 </div>
 {% endmacro %}
@@ -89,6 +104,7 @@
     </div>
 
     <div class="doc-form-layout">
+        <!-- FORMULARIO IZQUIERDO -->
         <div class="doc-form-left no-print">
             <form id="formularioOficial" hx-post="/actualizar-espejo" hx-trigger="keyup changed delay:100ms, change" hx-target="#vista-espejo">
                 <input type="hidden" name="solicitud_id" value="{{ solicitud.id }}">
@@ -101,14 +117,14 @@
                         <label>Modalidad Laboral</label>
                         <select name="modalidad" class="doc-input"><option value="">—</option><option value="PERMANENTE">Nombramiento Permanente</option><option value="PROVISIONAL">Nombramiento Provisional</option><option value="OCASIONAL">Contrato Ocasional</option><option value="TRABAJO">Contrato de Trabajo</option></select>
                     </div>
-                    {{ input_text('fecha_ingreso', 'Fecha Ingreso', 'date', '', '', 'validarFechas()') }}
-                    {{ input_text('fecha_salida', 'Fecha Salida', 'date', '', '', 'validarFechas()') }}
+                    <div class="input-group" id="grp_ingreso"><label>Fecha Ingreso</label><input type="date" name="fecha_ingreso" id="f_in" class="doc-input" onchange="validarFechas()"></div>
+                    <div class="input-group" id="grp_salida"><label>Fecha Salida</label><input type="date" name="fecha_salida" id="f_out" class="doc-input" onchange="validarFechas()"><span class="error-msg" id="msg_salida">⚠ Fecha debe ser mayor al ingreso.</span></div>
                     {{ input_text('direccion', 'Dirección Domiciliaria', 'text', 'span-2') }}
                     {{ input_text('numero_domicilio', 'Teléfono Fijo', 'text', '', '9', 'validarConvencional(this)') }}
                     {{ input_text('celular', 'Celular', 'text', '', '10', 'validarCelular(this)') }}
                     {{ input_text('emergencia', 'Contacto Emergencia', 'text', '', '10', 'validarCelular(this)') }}
-                    {{ input_text('email1', 'Email Principal', 'email', '', '', 'validarEmail(this)') }}
-                    {{ input_text('email2', 'Email Secundario', 'email', '', '', 'validarEmail(this)') }}
+                    {{ input_text('email1', 'Email Principal', 'email') }}
+                    {{ input_text('email2', 'Email Secundario', 'email') }}
                     {{ input_text('provincia', 'Provincia', 'text', '', '', 'soloLetras(this)') }}
                     {{ input_text('canton', 'Cantón', 'text', '', '', 'soloLetras(this)') }}
                 </div>
@@ -328,10 +344,12 @@
             </form>
         </div>
 
+        <!-- LADO DERECHO (ESPEJO A4) -->
         <div class="hoja-espejo-preview">
             <div class="d-flex justify-content-between align-items-center mb-3 no-print">
-                <span class="badge bg-white text-primary px-3 py-2 shadow-sm border border-primary" style="font-weight: 800;"><span class="spinner-grow spinner-grow-sm text-primary me-2" style="width: 10px; height: 10px;"></span>Espejo en Tiempo Real</span>
+                <span class="badge bg-white text-primary px-3 py-2 shadow-sm border border-primary" style="font-weight: 800;"><span class="spinner-grow spinner-grow-sm text-primary me-2" style="width: 10px; height: 10px;"></span>Espejo A4</span>
                 <div>
+                    <!-- Botones Funcionales -->
                     <button class="btn btn-sm btn-light fw-bold shadow-sm me-2" onclick="window.print()"><i class="bi bi-printer-fill"></i> Imprimir</button>
                     <a href="/paz-salvo/descargar-pdf/{{ solicitud.id }}" target="_blank" class="btn btn-sm btn-danger fw-bold shadow-sm"><i class="bi bi-file-pdf-fill"></i> PDF</a>
                 </div>
@@ -344,6 +362,7 @@
     </div>
 </div>
 
+<!-- SCRIPTS DE VALIDACIÓN JAVASCRIPT -->
 <script>
     function mostrarError(el, msg) {
         const grp = el.closest('.input-group');
@@ -359,7 +378,6 @@
         if(span) { span.style.display = 'none'; }
     }
 
-    // ELIMINA CUALQUIER CARÁCTER QUE NO SEA LETRA INSTANTÁNEAMENTE
     function soloLetras(el) {
         if (/[^a-zA-ZÀ-ÿ\s]/.test(el.value)) {
             el.value = el.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
@@ -367,7 +385,6 @@
         } else { quitarError(el); }
     }
 
-    // ELIMINA LETRAS INSTANTÁNEAMENTE
     function soloNumeros(el) {
         if (/[^0-9]/.test(el.value)) {
             el.value = el.value.replace(/[^0-9]/g, '');
@@ -375,7 +392,6 @@
         } else { quitarError(el); }
     }
 
-    // VALIDACIÓN TELÉFONO FIJO (9 DÍGITOS)
     function validarConvencional(el) {
         el.value = el.value.replace(/[^0-9]/g, '');
         if (el.value.length > 0 && el.value.length !== 9) {
@@ -383,7 +399,6 @@
         } else { quitarError(el); }
     }
 
-    // VALIDACIÓN CELULAR (09 + 10 DÍGITOS)
     function validarCelular(el) {
         el.value = el.value.replace(/[^0-9]/g, '');
         if (el.value.length > 0 && (el.value.length !== 10 || !el.value.startsWith('09'))) {
@@ -405,7 +420,6 @@
         } else { quitarError(el); }
     }
 
-    // VALIDACIÓN NATIVA CÉDULA ECUATORIANA
     function validarCedula(el) {
         el.value = el.value.replace(/[^0-9]/g, '');
         const cedula = el.value;
@@ -428,12 +442,17 @@
         const ing = document.getElementById('f_in').value;
         const sal = document.getElementById('f_out').value;
         const grp = document.getElementById('grp_salida');
+        const msg = document.getElementById('msg_salida');
         if (ing && sal && new Date(sal) <= new Date(ing)) {
             grp.classList.add('has-error');
-        } else { grp.classList.remove('has-error'); }
+            if(msg) msg.style.display = 'block';
+        } else { 
+            grp.classList.remove('has-error'); 
+            if(msg) msg.style.display = 'none';
+        }
     }
 
-    // MODAL DE FIRMAEC (SweetAlert2)
+    // MODAL DE FIRMAEC
     function abrirModalFirmaEC(campoFirma, labelFirma) {
         Swal.fire({
             title: '<h2 style="color:white; margin:0; font-size:18px; font-weight:900;">FirmaEC PAdES</h2>',
@@ -442,10 +461,8 @@
                     <p style="font-size: 12px; color: #64748b; margin-bottom: 20px;">
                         Ingrese su certificado digital para firmar: <br><b style="color: #1e3a8a;">${labelFirma}</b>.
                     </p>
-                    
                     <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">1. CERTIFICADO (.P12 / .PFX)</label>
                     <input type="file" id="swal-p12-file" accept=".p12,.pfx" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 2px dashed #93c5fd; border-radius: 8px; background: #eff6ff; outline:none;">
-                    
                     <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">2. CONTRASEÑA</label>
                     <input type="password" id="swal-p12-pass" placeholder="••••••••••••" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline:none;">
                 </div>

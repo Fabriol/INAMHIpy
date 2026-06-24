@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file, abort
+from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash, send_file, abort
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 import os
@@ -165,14 +165,14 @@ def descargar_pdf(solicitud_id):
     respuestas_db = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
     respuestas_por_area = {}
     
-    # SOLUCIÓN: Buscar el rol manualmente en la generación del PDF para evitar colapsos
     for r in respuestas_db:
         rol_obj = Rol.query.get(r.pregunta.rol_asignado_id)
         nombre_area = rol_obj.nombre if rol_obj else 'ÁREA TÉCNICA'
         respuestas_por_area.setdefault(nombre_area, []).append({'pregunta': r.pregunta.enunciado, 'valor': r.valor_respuesta})
 
-    directorio_temp = os.path.join('app', 'static', 'temp')
-    os.makedirs(directorio_temp, exist_ok=True)
+    # SOLUCIÓN DE LA RUTA: current_app.root_path encuentra la ruta exacta sin duplicar carpetas
+    directorio_temp = os.path.join(current_app.root_path, 'static', 'temp')
+    os.makedirs(directorio_temp, exist_ok=True) # Crea la carpeta si no existe
     ruta_pdf = os.path.join(directorio_temp, f'PazSalvo_{solicitud.id}.pdf')
     
     log = LogAuditoria(usuario_id=current_user.id, modulo='Reportes', accion='DESCARGA PDF', detalle=f"Descargó borrador PDF del trámite #{solicitud.id}")
@@ -181,6 +181,7 @@ def descargar_pdf(solicitud_id):
     
     try:
         usuario_obj = Usuario.query.get(solicitud.ex_funcionario_id)
+        # Aquí generas el documento
         generar_documento_paz_salvo(solicitud, usuario_obj, respuestas_por_area, ruta_pdf)
     except Exception as e:
         flash(f'Ocurrió un error al generar el PDF: {str(e)}', 'danger')
