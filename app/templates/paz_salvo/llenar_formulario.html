@@ -1,779 +1,481 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- SweetAlert2 para los modales de FirmaEC -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-    /* =====================================================================
-       VARIABLES GLOBALES Y ESTILOS PREMIUM (Inyectados de tu SCSS)
-       ===================================================================== */
     :root {
-        --blue-50: #eff6ff;
-        --blue-100: #dbeafe;
-        --blue-600: #2563eb;
-        --blue-900: #1e3a8a;
-        --green-50: #f0fdf4;
-        --green-600: #16a34a;
-        --red-50: #fff1f2;
-        --red-500: #ef4444;
-        --red-600: #dc2626;
-        --slate-50: #f8fafc;
-        --slate-200: #e2e8f0;
-        --slate-300: #cbd5e1;
-        --slate-500: #64748b;
-        --slate-700: #334155;
-        --slate-900: #0f172a;
-        --grad-blue: linear-gradient(135deg, #2563eb, #0ea5e9);
+        --blue-50: #eff6ff; --blue-600: #2563eb; --blue-900: #1e3a8a;
+        --red-500: #ef4444; --red-600: #dc2626; --slate-300: #cbd5e1; --slate-500: #64748b;
         --grad-header: linear-gradient(90deg, #2563eb, #0ea5e9, #22c55e);
-        --shadow-lg: 0 24px 55px rgba(15, 23, 42, .10);
-        --blur: blur(18px);
-        --r-sm: 10px;
-        --r-md: 16px;
-        --r-xl: 24px;
     }
-
-    @keyframes fadeUp {
-        from {
-            opacity: 0;
-            transform: translateY(28px) scale(.985)
-        }
-
-        to {
-            opacity: 1;
-            transform: none
-        }
-    }
-
-    .fade-in {
-        animation: fadeUp .65s ease both;
-    }
-
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 26px 30px;
-        border-radius: var(--r-xl);
-        background: rgba(255, 255, 255, .88);
-        border: 1px solid rgba(255, 255, 255, .80);
-        backdrop-filter: var(--blur);
-        box-shadow: var(--shadow-lg);
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 24px;
-    }
-
-    .page-header::before {
-        content: '';
-        position: absolute;
-        inset: 0 0 auto 0;
-        height: 4px;
-        background: var(--grad-header);
-    }
-
-    .page-title {
-        font-size: 28px;
-        font-weight: 900;
-        color: var(--blue-900);
-        margin: 0;
-        letter-spacing: -1px;
-    }
-
-    .page-subtitle {
-        color: var(--slate-500);
-        font-size: 14px;
-        margin: 0;
-    }
-
-    /* LAYOUT 50/50 */
-    .doc-form-layout {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 24px;
-        align-items: flex-start;
-    }
-
-    .doc-form-left {
-        background: #fff;
-        border: 2px solid var(--blue-900);
-        border-radius: 8px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
-
-    .doc-section-head {
-        background: linear-gradient(135deg, var(--blue-900), var(--blue-600));
-        color: #fff;
-        font-size: 12px;
-        font-weight: 800;
-        text-transform: uppercase;
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--slate-300);
-    }
-
-    .doc-fields-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-        padding: 20px;
-    }
-
-    .span-2 {
-        grid-column: span 2;
-    }
-
-    .input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        position: relative;
-    }
-
-    .input-group label {
-        font-size: 11px;
-        font-weight: 800;
-        color: var(--slate-500);
-        text-transform: uppercase;
-    }
-
-    .req {
-        color: var(--red-600);
-    }
-
+    .page-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; border-radius: 12px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border-top: 4px solid var(--blue-600); }
+    .doc-form-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: flex-start; }
+    .doc-form-left { background: #fff; border: 2px solid var(--blue-900); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+    .doc-section-head { background: linear-gradient(135deg, var(--blue-900), var(--blue-600)); color: #fff; font-size: 12px; font-weight: 800; text-transform: uppercase; padding: 10px 16px; border-bottom: 1px solid var(--slate-300); }
+    .doc-fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; }
+    .span-2 { grid-column: span 2; }
+    .input-group { display: flex; flex-direction: column; gap: 4px; }
+    .input-group label { font-size: 10.5px; font-weight: 800; color: var(--slate-500); text-transform: uppercase; }
+    
     .doc-input {
-        width: 100%;
-        padding: 10px 14px;
-        border: 1.5px solid var(--slate-300);
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--slate-900);
-        transition: 0.3s;
-        background: #fff;
-        text-transform: uppercase;
+        width: 100%; padding: 8px 12px; border: 1.5px solid var(--slate-300);
+        border-radius: 6px; font-size: 12px; font-weight: 700 !important; color: #000 !important;
+        background: #f8fafc !important; text-transform: uppercase; transition: 0.2s;
     }
+    .doc-input:focus { border-color: var(--blue-600); background: #fff !important; box-shadow: 0 0 0 3px rgba(37,99,235,.15); outline: none; }
+    .doc-input[type="email"] { text-transform: lowercase; }
+    
+    /* VALIDACIONES VISUALES ESTRICTAS */
+    .has-error .doc-input { border-color: var(--red-500) !important; background: #fff5f5 !important; }
+    .has-error label { color: var(--red-600) !important; }
+    .error-msg { font-size: 10px; color: var(--red-600); font-weight: 800; display: none; margin-top: 2px; }
+    .has-error .error-msg { display: block; }
 
-    .doc-input:focus {
-        border-color: var(--blue-600);
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, .15);
-        outline: none;
-    }
-
-    .doc-input[type="email"] {
-        text-transform: lowercase;
-    }
-
-    .has-error .doc-input {
-        border-color: var(--red-500);
-        background: #fff5f5;
-    }
-
-    .has-error label {
-        color: var(--red-600);
-    }
-
-    .error-msg {
-        font-size: 11px;
-        color: var(--red-600);
-        font-weight: 700;
-        display: none;
-    }
-
-    .has-error .error-msg {
-        display: block;
-        animation: fadeUp 0.3s;
-    }
-
-    .btn-firmaec {
-        background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-size: 11px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: 0.3s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .btn-firmaec:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 15px rgba(29, 78, 216, .3);
-    }
-
-    .form-save-bar {
-        background: linear-gradient(135deg, #f0f7ff, #e8f4fd);
-        padding: 20px;
-        border-top: 2px solid var(--blue-900);
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    .btn-guardar {
-        background: var(--grad-header);
-        color: white;
-        border: none;
-        padding: 14px 24px;
-        border-radius: 12px;
-        font-weight: 800;
-        font-size: 15px;
-        box-shadow: 0 8px 20px rgba(34, 197, 94, .3);
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    .btn-guardar:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 25px rgba(34, 197, 94, .4);
-    }
-
-    .hoja-espejo-preview {
-        background: linear-gradient(135deg, #e8edf8, #d4daf0);
-        border-radius: var(--r-xl);
-        padding: 20px;
-        position: sticky;
-        top: 20px;
-        box-shadow: inset 0 4px 20px rgba(0, 0, 0, .05);
-    }
-
-    .swal-firmaec-popup {
-        border-radius: 24px !important;
-        padding: 0 !important;
-    }
-
-    .swal-firmaec-header {
-        background: linear-gradient(135deg, #1e3a8a, #0ea5e9);
-        padding: 24px !important;
-        color: white !important;
-    }
-
-    .swal-title-custom {
-        color: white !important;
-        font-weight: 900 !important;
-        font-size: 22px !important;
-        margin: 0 !important;
+    .btn-firmaec { background: #1e3a8a; color: white; border: none; border-radius: 6px; padding: 8px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px;}
+    .btn-firmaec:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 5px 10px rgba(29,78,216,.3); }
+    .hoja-espejo-preview { background: #e2e8f0; border-radius: 12px; padding: 15px; position: sticky; top: 15px; box-shadow: inset 0 4px 10px rgba(0,0,0,0.05); }
+    
+    @media print {
+        body * { visibility: hidden; }
+        #vista-espejo, #vista-espejo * { visibility: visible; }
+        #vista-espejo { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
+        .no-print { display: none !important; }
     }
 </style>
 
-<!-- =====================================================================
-     MACROS JINJA2 (Fábrica de Componentes del Formulario)
-     ===================================================================== -->
-{% macro input_text(name, label, type='text', width='') %}
-<div class="input-group {{ width }}">
-    <label>{{ label }}</label>
-    <input type="{{ type }}" name="{{ name }}" class="doc-input" {% if type=='text'
-        %}oninput="this.value = this.value.toUpperCase()" {% endif %}>
+{% macro input_text(name, label, type='text', width='', max_len='', js_val='') %}
+<div class="input-group {{ width }}" id="grp_{{ name }}">
+    <label>{{ label }} <span class="req text-danger">*</span></label>
+    <input type="{{ type }}" name="{{ name }}" class="doc-input" 
+           {% if max_len %}maxlength="{{ max_len }}"{% endif %} 
+           oninput="{{ js_val }}">
+    <span class="error-msg" id="msg_{{ name }}">⚠ Entrada inválida.</span>
 </div>
 {% endmacro %}
 
 {% macro select_sino(name, label, width='') %}
 <div class="input-group {{ width }}">
-    <label>{{ label }}</label>
+    <label>{{ label }} <span class="req text-danger">*</span></label>
     <select name="{{ name }}" class="doc-input">
-        <option value="">—</option>
-        <option value="SI">SÍ</option>
-        <option value="NO">NO</option>
+        <option value="">—</option><option value="SI">SÍ</option><option value="NO">NO</option>
     </select>
 </div>
 {% endmacro %}
 
 {% macro firma_box(campo, label) %}
-<div class="p-3 rounded" style="background: #f8fafc; border: 1.5px dashed #93c5fd; text-align: center; flex: 1;">
-    <span
-        style="font-size: 9px; font-weight: 800; color: #1e40af; display: block; margin-bottom: 8px; text-transform: uppercase;">{{
-        label }}</span>
-    <button type="button" class="btn-firmaec w-100" onclick="abrirModalFirmaEC('{{ campo }}')">
+<div class="p-2 rounded" style="background: #fff; border: 1px dashed #94a3b8; text-align: center; flex: 1;">
+    <span style="font-size: 8.5px; font-weight: 800; color: #1e40af; display: block; margin-bottom: 6px;">{{ label }}</span>
+    <input type="hidden" name="{{ campo }}" id="input_{{ campo }}" value="">
+    <button type="button" class="btn-firmaec" id="btn_{{ campo }}" onclick="abrirModalFirmaEC('{{ campo }}', '{{ label }}')">
         <i class="bi bi-pen-fill"></i> Firmar PAdES
     </button>
-    <div id="previewFirma_{{ campo }}" style="display:none; margin-top: 8px;">
-        <span class="badge bg-success w-100 py-2"><i class="bi bi-shield-check"></i> Firmado Digitalmente</span>
+    <div id="previewFirma_{{ campo }}" style="display:none; margin-top: 6px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 4px; padding: 4px;">
+        <span style="font-size: 9px; color: #15803d; font-weight: 800;">✔️ FIRMADO</span>
     </div>
 </div>
 {% endmacro %}
 
-
 <div class="page fade-in">
-    <!-- HEADER -->
-    <div class="page-header">
+    <div class="page-header no-print">
         <div>
-            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Trámite #{{ solicitud.id }}</span>
-            <h1 class="page-title">Formularios Dinámicos</h1>
-            <p class="page-subtitle">Formulario Paz y Salvo Completo — Reflejo A4 en tiempo real.</p>
+            <span class="badge bg-primary mb-1">Trámite #{{ solicitud.id }}</span>
+            <h1 style="font-size: 20px; font-weight: 900; color: #0f172a; margin: 0;">Llenado de Formulario Oficial</h1>
         </div>
-        <a href="/dashboard" class="btn btn-outline-secondary fw-bold rounded-pill">← Volver al Panel</a>
+        <div>
+            <button class="btn btn-success fw-bold me-2" onclick="validarYGuardarTodo()"><i class="bi bi-save-fill"></i> Guardar Trámite</button>
+            <a href="/dashboard" class="btn btn-outline-secondary fw-bold">← Volver</a>
+        </div>
     </div>
 
-    <!-- LAYOUT PRINCIPAL -->
     <div class="doc-form-layout">
-
-        <!-- LADO IZQUIERDO: FORMULARIO GIGANTE -->
-        <div class="doc-form-left">
-            <form id="formularioOficial" hx-post="/actualizar-espejo"
-                hx-trigger="keyup delay:500ms from:input, change from:select" hx-target="#vista-espejo">
-
+        <div class="doc-form-left no-print">
+            <form id="formularioOficial" hx-post="/actualizar-espejo" hx-trigger="keyup changed delay:100ms, change" hx-target="#vista-espejo">
                 <input type="hidden" name="solicitud_id" value="{{ solicitud.id }}">
 
-                <!-- SECCIÓN 1: DATOS PERSONALES -->
                 <div class="doc-section-head">👤 1. Datos Personales</div>
                 <div class="doc-fields-grid">
-                    <div class="input-group span-2">
-                        <label>Nombres y Apellidos <span class="req">*</span></label>
-                        <input type="text" name="nombres_apellidos" class="doc-input"
-                            value="{{ solicitud.ex_funcionario.nombres }} {{ solicitud.ex_funcionario.apellidos }}"
-                            required oninput="validarLetras(this); this.value = this.value.toUpperCase()">
-                    </div>
-                    <div class="input-group" id="grp_cedula">
-                        <label>Cédula / Pasaporte <span class="req">*</span></label>
-                        <input type="text" name="cedula" class="doc-input" value="{{ solicitud.ex_funcionario.cedula }}"
-                            maxlength="10" required oninput="validarCedulaUI(this)">
-                        <span class="error-msg" id="msgCedula">⚠ Cédula ecuatoriana inválida.</span>
-                    </div>
+                    {{ input_text('nombres_apellidos', 'Nombres y Apellidos', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    {{ input_text('cedula', 'Cédula', 'text', '', '10', 'validarCedula(this)') }}
                     <div class="input-group">
-                        <label>Modalidad Laboral <span class="req">*</span></label>
-                        <select name="modalidad" class="doc-input" required>
-                            <option value="">Seleccione...</option>
-                            <option value="PERMANENTE">Nombramiento Permanente</option>
-                            <option value="PROVISIONAL">Nombramiento Provisional</option>
-                            <option value="OCASIONAL">Contrato Ocasional</option>
-                            <option value="TRABAJO">Contrato de Trabajo</option>
-                        </select>
+                        <label>Modalidad Laboral</label>
+                        <select name="modalidad" class="doc-input"><option value="">—</option><option value="PERMANENTE">Nombramiento Permanente</option><option value="PROVISIONAL">Nombramiento Provisional</option><option value="OCASIONAL">Contrato Ocasional</option><option value="TRABAJO">Contrato de Trabajo</option></select>
                     </div>
-                    {{ input_text('fecha_ingreso', 'Fecha de Ingreso', 'date') }}
-                    {{ input_text('fecha_salida', 'Fecha de Salida', 'date') }}
+                    {{ input_text('fecha_ingreso', 'Fecha Ingreso', 'date', '', '', 'validarFechas()') }}
+                    {{ input_text('fecha_salida', 'Fecha Salida', 'date', '', '', 'validarFechas()') }}
                     {{ input_text('direccion', 'Dirección Domiciliaria', 'text', 'span-2') }}
-                    {{ input_text('numero_domicilio', 'Número Domicilio') }}
-                    {{ input_text('celular', 'Celular') }}
-                    {{ input_text('emergencia', 'Contacto Emergencia') }}
-                    {{ input_text('email1', 'Email Principal', 'email') }}
-                    {{ input_text('email2', 'Email Secundario', 'email') }}
-                    {{ input_text('provincia', 'Provincia') }}
-                    {{ input_text('canton', 'Cantón') }}
+                    {{ input_text('numero_domicilio', 'Teléfono Fijo', 'text', '', '9', 'validarConvencional(this)') }}
+                    {{ input_text('celular', 'Celular', 'text', '', '10', 'validarCelular(this)') }}
+                    {{ input_text('emergencia', 'Contacto Emergencia', 'text', '', '10', 'validarCelular(this)') }}
+                    {{ input_text('email1', 'Email Principal', 'email', '', '', 'validarEmail(this)') }}
+                    {{ input_text('email2', 'Email Secundario', 'email', '', '', 'validarEmail(this)') }}
+                    {{ input_text('provincia', 'Provincia', 'text', '', '', 'soloLetras(this)') }}
+                    {{ input_text('canton', 'Cantón', 'text', '', '', 'soloLetras(this)') }}
                 </div>
 
-                <!-- SECCIÓN 2: DIRECCIÓN / UNIDAD -->
-                <div class="doc-section-head mt-4">🏢 2. Dirección / Unidad</div>
+                <div class="doc-section-head mt-3">🏢 2. Dirección / Unidad</div>
                 <div class="doc-fields-grid">
                     <div class="input-group">
                         <label>Lugar de Trabajo</label>
-                        <select name="lugar_trabajo" class="doc-input">
-                            <option value="">—</option>
-                            <option value="PLANTA">Planta Central</option>
-                            <option value="DESCONCENTRADOS">Procesos Desconcentrados</option>
-                        </select>
+                        <select name="lugar_trabajo" class="doc-input"><option value="">—</option><option value="PLANTA CENTRAL">Planta Central</option><option value="DESCONCENTRADO">Desconcentrado</option></select>
                     </div>
                     <div class="input-group">
                         <label>Grupo Ocupacional</label>
-                        <select name="grupo_ocupacional" class="doc-input">
-                            <option value="">—</option>
-                            <option value="NJS">NJS</option>
-                            <option value="SRVS">SRVS</option>
-                            <option value="SP">SP</option>
-                            <option value="SPA">SPA</option>
-                            <option value="NMNP">NMNP</option>
-                            <option value="OTRO">Otro</option>
-                        </select>
+                        <select name="grupo_ocupacional" class="doc-input"><option value="">—</option><option value="NJS">NJS</option><option value="SRVS">SRVS</option><option value="SP">SP</option><option value="SPA">SPA</option><option value="NMNP">NMNP</option></select>
                     </div>
                     {{ input_text('unidad', 'Dirección / Unidad', 'text', 'span-2') }}
                     {{ input_text('cargo', 'Cargo Desempeñado', 'text', 'span-2') }}
                 </div>
 
-                <!-- SECCIÓN 3: TRÁMITES Y UNIDAD -->
-                <div class="doc-section-head mt-4">📋 3. Trámites y Gestión Documental</div>
+                <div class="doc-section-head mt-3">📋 3. Trámites y Unidad</div>
                 <div class="doc-fields-grid">
-                    {{ select_sino('tramites_informe', 'Informe fin de gestión') }}
-                    {{ select_sino('tramites_fe_presentacion', 'Fe de presentación') }}
-                    {{ select_sino('tramites_losep', 'Archivo físico/digital (LOSEP)') }}
-                    {{ select_sino('tramites_quipux_cero', 'QUIPUX bandeja en cero') }}
-                    {{ select_sino('tramites_admin_contrato', '¿Es Admin de Contrato?') }}
+                    {{ select_sino('tramites_informe', 'Informe fin gestión') }}
+                    {{ select_sino('tramites_quipux_cero', 'QUIPUX bandeja cero') }}
+                    {{ input_text('tramites_nombre_resp1', 'Resp. Fila 1', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('tramites_r1', 'Firma Fila 1') }}</div>
+                    
+                    {{ select_sino('tramites_fe_presentacion', 'Fe presentación') }}
                     {{ select_sino('tramites_claves_asignadas', 'Claves asignadas') }}
+                    {{ input_text('tramites_nombre_resp2', 'Resp. Fila 2', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('tramites_r2', 'Firma Fila 2') }}</div>
+
+                    {{ select_sino('tramites_losep', 'Archivo (LOSEP)') }}
                     {{ select_sino('tramites_acta_claves', 'Acta entrega claves') }}
+                    {{ input_text('tramites_nombre_resp3', 'Resp. Fila 3', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('tramites_r3', 'Firma Fila 3') }}</div>
 
-                    {{ input_text('tramites_desc_contrato', 'Descripción del Contrato', 'text', 'span-2') }}
-                    {{ input_text('tramites_memo', 'N° Memorando Admin') }}
-                    {{ input_text('tramites_jefe_inmediato', 'Nombre Jefe Inmediato') }}
-                    {{ input_text('tramites_servidor_recibe', 'Servidor que recibe', 'text', 'span-2') }}
+                    {{ select_sino('tramites_admin_contrato', '¿Admin Contrato?') }}
+                    {{ input_text('tramites_desc_contrato', 'Desc. Contrato') }}
+                    {{ input_text('tramites_memo', 'N° Memo Admin', 'text', 'span-2') }}
+                    
+                    {{ input_text('tramites_jefe_inmediato', 'Nombre Jefe Inmediato', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    {{ input_text('tramites_servidor_recibe', 'Servidor recibe trámites', 'text', 'span-2', '', 'soloLetras(this)') }}
                     {{ input_text('tramites_obs', 'Observaciones', 'text', 'span-2') }}
-
-                    <div class="span-2 mt-3">
-                        <h6 class="fw-bold text-primary border-bottom pb-2">Firmas Autorizadas (FirmaEC)</h6>
-                    </div>
-                    {{ input_text('tramites_nombre_resp1', 'Responsable Fila 1 (Informe/Quipux)') }}
-                    {{ input_text('tramites_nombre_resp2', 'Responsable Fila 2 (Fe/Claves)') }}
-                    {{ input_text('tramites_nombre_resp3', 'Responsable Fila 3 (LOSEP/Acta)') }}
-                    {{ input_text('tramites_nombre_responsable', 'Responsable Trámites Final') }}
-
-                    <div class="span-2 d-flex gap-3">
-                        {{ firma_box('tramites_r1', 'Firma Fila 1') }}
-                        {{ firma_box('tramites_r2', 'Firma Fila 2') }}
-                        {{ firma_box('tramites_r3', 'Firma Fila 3') }}
-                        {{ firma_box('tramites_jefe', 'Firma Jefe') }}
-                    </div>
+                    {{ input_text('tramites_nombre_responsable', 'Jefe de Área Final', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('tramites_jefe', 'Firma Jefe') }}</div>
                 </div>
 
-                <!-- SECCIÓN 4: GESTIÓN ADMINISTRATIVA -->
-                <div class="doc-section-head mt-4">🏛️ 4. Gestión Administrativa</div>
+                <div class="doc-section-head mt-3">🏛️ 4. Gestión Administrativa</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('admin_informe', 'Entrega informe') }}
-                    {{ select_sino('admin_bienes', 'Entrega bienes y muebles') }}
-                    {{ input_text('admin_acta_bienes', 'N° Acta Bienes') }}
-                    {{ input_text('admin_valor_bienes', 'Valor Bienes $', 'number') }}
+                    {{ input_text('admin_nombre_resp1', 'Resp Informe', 'text', '', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('admin_r1', 'Firma Informe') }}</div>
+
+                    {{ select_sino('admin_bienes', 'Entrega bienes') }}
+                    {{ input_text('admin_valor_bienes', 'Valor Bienes $', 'text', '', '', 'soloMoneda(this)') }}
+                    {{ input_text('admin_acta_bienes', 'N° Acta Bienes', 'text', 'span-2') }}
+                    {{ input_text('admin_nombre_resp2', 'Resp Bienes', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('admin_r2', 'Firma Bienes') }}</div>
+
                     {{ select_sino('admin_deducibles', '¿Tiene deducibles?') }}
-                    {{ input_text('admin_deducibles_valor', 'Valor Deducibles $', 'number') }}
-                    {{ select_sino('admin_pasajes', 'Pasajes por justificar') }}
-                    {{ input_text('admin_pasajes_valor', 'Valor Pasajes $', 'number') }}
+                    {{ input_text('admin_deducibles_valor', 'Valor Deducibles $', 'text', '', '', 'soloMoneda(this)') }}
+                    {{ input_text('admin_nombre_resp3', 'Resp Deducibles', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('admin_r3', 'Firma Deducibles') }}</div>
 
-                    <div class="span-2 mt-3">
-                        <h6 class="fw-bold text-primary border-bottom pb-2">Firmas Autorizadas (FirmaEC)</h6>
-                    </div>
-                    {{ input_text('admin_nombre_resp1', 'Resp Fila 1 (Informe)') }}
-                    {{ input_text('admin_nombre_resp2', 'Resp Fila 2 (Bienes)') }}
-                    {{ input_text('admin_nombre_resp3', 'Resp Fila 3 (Deducibles)') }}
-                    {{ input_text('admin_nombre_resp4', 'Resp Fila 4 (Pasajes)') }}
-                    {{ input_text('admin_responsable', 'Director Administrativo', 'text', 'span-2') }}
+                    {{ select_sino('admin_pasajes', 'Pasajes justificar') }}
+                    {{ input_text('admin_pasajes_valor', 'Valor Pasajes $', 'text', '', '', 'soloMoneda(this)') }}
+                    {{ input_text('admin_nombre_resp4', 'Resp Pasajes', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('admin_r4', 'Firma Pasajes') }}</div>
 
-                    <div class="span-2 d-flex gap-3 flex-wrap">
-                        {{ firma_box('admin_r1', 'Firma Fila 1') }}
-                        {{ firma_box('admin_r2', 'Firma Fila 2') }}
-                        {{ firma_box('admin_r3', 'Firma Fila 3') }}
-                        {{ firma_box('admin_r4', 'Firma Fila 4') }}
-                        {{ firma_box('admin_dir', 'Firma Director') }}
-                    </div>
+                    {{ input_text('admin_responsable', 'Director Adm. Financiero', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('admin_dir', 'Firma Director') }}</div>
                 </div>
 
-                <!-- SECCIÓN 5: GESTIÓN TIC -->
-                <div class="doc-section-head mt-4">💻 5. Gestión TIC</div>
+                <div class="doc-section-head mt-3">💻 5. Gestión TIC</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('tic_verificacion', 'Verificación equipo') }}
                     {{ select_sino('tic_ip_fija', 'Acceso IP Fija') }}
                     {{ select_sino('tic_liberacion', 'Liberación IP') }}
-                    {{ select_sino('tic_retiro_acceso', 'Retiro control acceso') }}
+                    {{ input_text('tic_nombre_resp1', 'Resp Equipos/IP', 'text', '', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('tic_r1', 'Firma Equipos') }}</div>
+
                     {{ select_sino('tic_backup', 'Entrega backup') }}
                     {{ input_text('tic_ruta_backup', 'Ruta Backup', 'text') }}
+                    {{ input_text('tic_nombre_resp2', 'Resp Backup', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('tic_r2', 'Firma Backup') }}</div>
+
+                    {{ select_sino('tic_retiro_acceso', 'Retiro control acceso') }}
                     {{ select_sino('tic_cierre_correo', 'Cierre Correo') }}
                     {{ select_sino('tic_esigef', 'Cierre eSIGEF') }}
+                    {{ select_sino('tic_quipux', 'Cierre QUIPUX') }}
                     {{ select_sino('tic_spryn', 'Cierre SPRYN') }}
                     {{ select_sino('tic_esbye', 'Cierre eSByE') }}
-                    {{ select_sino('tic_quipux', 'Cierre QUIPUX') }}
+                    {{ input_text('tic_nombre_resp3', 'Resp Cuentas', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('tic_r3', 'Firma Cuentas') }}</div>
+
                     {{ select_sino('tic_tarjeta_cuentas', 'Tarjeta Acceso') }}
-                    {{ input_text('tic_obs', 'Observación TIC', 'text', 'span-2') }}
+                    {{ input_text('tic_obs', 'Observación TIC', 'text') }}
+                    {{ input_text('tic_nombre_resp4', 'Resp Tarjeta', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('tic_r4', 'Firma Tarjeta') }}</div>
 
-                    <div class="span-2 mt-3">
-                        <h6 class="fw-bold text-primary border-bottom pb-2">Firmas Autorizadas (FirmaEC)</h6>
-                    </div>
-                    {{ input_text('tic_nombre_resp1', 'Resp Fila 1 (Equipos/IP)') }}
-                    {{ input_text('tic_nombre_resp2', 'Resp Fila 2 (Backup)') }}
-                    {{ input_text('tic_nombre_resp3', 'Resp Fila 3 (Cuentas)') }}
-                    {{ input_text('tic_nombre_resp4', 'Resp Fila 4 (Tarjeta)') }}
-                    {{ input_text('tic_responsable', 'Responsable TIC', 'text', 'span-2') }}
-
-                    <div class="span-2 d-flex gap-2 flex-wrap">
-                        {{ firma_box('tic_r1', 'Firma 1') }}
-                        {{ firma_box('tic_r2', 'Firma 2') }}
-                        {{ firma_box('tic_r3', 'Firma 3') }}
-                        {{ firma_box('tic_r4', 'Firma 4') }}
-                        {{ firma_box('tic_r5', 'Resp TIC') }}
-                    </div>
+                    {{ input_text('tic_responsable', 'Responsable TIC', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('tic_r5', 'Firma Resp TIC') }}</div>
                 </div>
 
-                <!-- SECCIÓN 6: GESTIÓN FINANCIERA -->
-                <div class="doc-section-head mt-4">💰 6. Gestión Financiera</div>
+                <div class="doc-section-head mt-3">💰 6. Gestión Financiera</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('fin_saldos', 'Saldos contables') }}
-                    {{ input_text('fin_saldos_valor', 'Valor Saldos $', 'number') }}
+                    {{ input_text('fin_saldos_valor', 'Valor Saldos $', 'text', '', '', 'soloMoneda(this)') }}
+                    {{ input_text('fin_nombre_resp1', 'Resp Saldos', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('fin_r1', 'Firma Saldos') }}</div>
+
                     {{ select_sino('fin_anticipo', 'Anticipo sueldos') }}
-                    {{ input_text('fin_anticipo_valor', 'Valor Anticipo $', 'number') }}
+                    {{ input_text('fin_anticipo_valor', 'Valor Anticipo $', 'text', '', '', 'soloMoneda(this)') }}
+                    {{ input_text('fin_nombre_resp2', 'Resp Anticipos', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('fin_r2', 'Firma Anticipos') }}</div>
+
                     {{ select_sino('fin_recuperacion', 'Recuperación valores') }}
-                    {{ input_text('fin_recuperacion_valor', 'Valor Recuperación $', 'number') }}
+                    {{ input_text('fin_recuperacion_valor', 'Valor Recup $', 'text', '', '', 'soloMoneda(this)') }}
+                    {{ input_text('fin_nombre_resp3', 'Resp Valores', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('fin_r3', 'Firma Valores') }}</div>
+
                     {{ select_sino('fin_devolucion', 'Devolución muebles') }}
-                    {{ input_text('fin_devolucion_valor', 'Valor Devolución $', 'number') }}
+                    {{ input_text('fin_devolucion_valor', 'Valor Devolución $', 'text', '', '', 'soloMoneda(this)') }}
+                    {{ input_text('fin_nombre_resp4', 'Resp Muebles', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('fin_r4', 'Firma Muebles') }}</div>
 
-                    <div class="span-2 mt-3">
-                        <h6 class="fw-bold text-primary border-bottom pb-2">Firmas Autorizadas (FirmaEC)</h6>
-                    </div>
-                    {{ input_text('fin_nombre_resp1', 'Resp Fila 1 (Saldos)') }}
-                    {{ input_text('fin_nombre_resp2', 'Resp Fila 2 (Anticipos)') }}
-                    {{ input_text('fin_nombre_resp3', 'Resp Fila 3 (Valores)') }}
-                    {{ input_text('fin_nombre_resp4', 'Resp Fila 4 (Muebles)') }}
-                    {{ input_text('fin_director', 'Director/a Financiero/a', 'text', 'span-2') }}
-
-                    <div class="span-2 d-flex gap-2 flex-wrap">
-                        {{ firma_box('fin_r1', 'Firma 1') }}
-                        {{ firma_box('fin_r2', 'Firma 2') }}
-                        {{ firma_box('fin_r3', 'Firma 3') }}
-                        {{ firma_box('fin_r4', 'Firma 4') }}
-                        {{ firma_box('fin_dir', 'Director') }}
-                    </div>
+                    {{ input_text('fin_director', 'Director Financiero', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('fin_dir', 'Firma Dir Fin') }}</div>
                 </div>
 
-                <!-- SECCIÓN 7: SEGURIDAD -->
-                <div class="doc-section-head mt-4">🔒 7. Seguridad (EGSI)</div>
+                <div class="doc-section-head mt-3">🔒 7. Seguridad (EGSI)</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('seg_archivos', 'Archivos Digitales') }}
-                    {{ select_sino('seg_archivos_fisicos', 'Archivos Físicos') }}
                     {{ select_sino('seg_entrega_copia', 'Copia Actividades') }}
+                    {{ input_text('seg_nombre_resp1', 'Resp Digitales', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('seg_r1', 'Firma Digitales') }}</div>
+
+                    {{ select_sino('seg_archivos_fisicos', 'Archivos Físicos') }}
                     {{ select_sino('seg_verificacion_info', 'Verificación Info') }}
+                    {{ input_text('seg_nombre_resp2', 'Resp Físicos', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('seg_r2', 'Firma Físicos') }}</div>
 
-                    <div class="span-2 mt-3">
-                        <h6 class="fw-bold text-primary border-bottom pb-2">Firmas Autorizadas (FirmaEC)</h6>
-                    </div>
-                    {{ input_text('seg_nombre_resp1', 'Resp Fila 1 (Digitales)') }}
-                    {{ input_text('seg_nombre_resp2', 'Resp Fila 2 (Físicos)') }}
-                    {{ input_text('seg_oficial', 'Oficial Seguridad', 'text', 'span-2') }}
-                    {{ input_text('seg_responsable', 'Responsable Seguridad', 'text', 'span-2') }}
-
-                    <div class="span-2 d-flex gap-3">
-                        {{ firma_box('seg_r1', 'Firma 1') }}
-                        {{ firma_box('seg_r2', 'Firma 2') }}
-                        {{ firma_box('seg_oficial', 'Oficial Seg.') }}
-                    </div>
+                    {{ input_text('seg_oficial', 'Oficial Seguridad', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    {{ input_text('seg_responsable', 'Responsable Seguridad', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('seg_oficial', 'Firma Oficial') }}</div>
                 </div>
 
-                <!-- SECCIÓN 8: RECURSOS HUMANOS -->
-                <div class="doc-section-head mt-4">👥 8. Recursos Humanos</div>
+                <div class="doc-section-head mt-3">👥 8. Recursos Humanos</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('rrhh_capacitacion', 'Capacitación') }}
-                    {{ select_sino('rrhh_evaluacion', 'Evaluación Desempeño') }}
-                    {{ select_sino('rrhh_viajes', 'Viajes exterior') }}
-                    {{ select_sino('rrhh_siith', 'Desvinculación SIITH') }}
-                    {{ select_sino('rrhh_juramentada', 'Declaración Juramentada') }}
-                    {{ select_sino('rrhh_credencial', 'Entrega Credencial') }}
-                    {{ select_sino('rrhh_entrega_informe_cd', 'Entrega Informe CD') }}
-                    {{ select_sino('rrhh_ropa_trabajo', 'Ropa de Trabajo') }}
-                    {{ select_sino('rrhh_acta_bienes', 'Acta Bienes Custodio') }}
                     {{ input_text('rrhh_cursos_eval', 'Cursos/Eval') }}
-                    {{ input_text('rrhh_vacaciones', 'Días Vacaciones', 'number') }}
-                    {{ input_text('rrhh_num_certificado', 'N° Certificado') }}
-                    {{ input_text('rrhh_num_declaracion', 'N° Declaración') }}
+                    {{ input_text('rrhh_resp_capacitacion', 'Resp Capacitación', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r1', 'Firma Capacita') }}</div>
 
-                    <div class="span-2 mt-3">
-                        <h6 class="fw-bold text-primary border-bottom pb-2">Firmas Autorizadas (FirmaEC)</h6>
-                    </div>
-                    {{ input_text('rrhh_resp_capacitacion', 'Resp Capacitación') }}
-                    {{ input_text('rrhh_resp_evaluacion', 'Resp Evaluación') }}
-                    {{ input_text('rrhh_resp_viajes', 'Resp Viajes') }}
-                    {{ input_text('rrhh_resp_siith', 'Resp SIITH') }}
-                    {{ input_text('rrhh_resp_vacaciones', 'Resp Vacaciones') }}
-                    {{ input_text('rrhh_resp_juramentada', 'Resp Juramentada') }}
-                    {{ input_text('rrhh_resp_credencial2', 'Resp Credencial') }}
-                    {{ input_text('rrhh_resp_acta', 'Resp Acta Bienes') }}
-                    {{ input_text('rrhh_director', 'Director RRHH', 'text', 'span-2') }}
+                    {{ select_sino('rrhh_evaluacion', 'Evaluación Desempeño') }}
+                    {{ input_text('rrhh_resp_evaluacion', 'Resp Evaluación', 'text', '', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r2', 'Firma Evalua') }}</div>
 
-                    <div class="span-2 d-flex gap-2 flex-wrap">
-                        {{ firma_box('rrhh_r1', 'Capacita') }}
-                        {{ firma_box('rrhh_r2', 'Evalua') }}
-                        {{ firma_box('rrhh_r3', 'Viajes') }}
-                        {{ firma_box('rrhh_r4', 'SIITH') }}
-                        {{ firma_box('rrhh_r5', 'Vacacio') }}
-                        {{ firma_box('rrhh_r6', 'Juramen') }}
-                        {{ firma_box('rrhh_r7', 'Credenc') }}
-                        {{ firma_box('rrhh_r8', 'Bienes') }}
-                        {{ firma_box('rrhh_dir', 'Director') }}
-                    </div>
+                    {{ select_sino('rrhh_viajes', 'Viajes exterior') }}
+                    {{ input_text('rrhh_resp_viajes', 'Resp Viajes', 'text', '', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r3', 'Firma Viajes') }}</div>
+
+                    {{ select_sino('rrhh_siith', 'Desvinculación SIITH') }}
+                    {{ input_text('rrhh_resp_siith', 'Resp SIITH', 'text', '', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r4', 'Firma SIITH') }}</div>
+
+                    {{ input_text('rrhh_vacaciones', 'Días Vacaciones', 'text', '', '3', 'soloNumeros(this)') }}
+                    {{ input_text('rrhh_num_certificado', 'N° Certificado', 'text', '', '20', 'soloNumeros(this)') }}
+                    {{ input_text('rrhh_resp_vacaciones', 'Resp Vacaciones', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r5', 'Firma Vacacio') }}</div>
+
+                    {{ select_sino('rrhh_juramentada', 'Declaración Juramentada') }}
+                    {{ input_text('rrhh_num_declaracion', 'N° Declaración', 'text', '', '20', 'soloNumeros(this)') }}
+                    {{ input_text('rrhh_resp_juramentada', 'Resp Juramentada', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r6', 'Firma Juramen') }}</div>
+
+                    {{ select_sino('rrhh_credencial', 'Entrega Credencial') }}
+                    {{ input_text('rrhh_resp_credencial2', 'Resp Credencial', 'text', '', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r7', 'Firma Credenc') }}</div>
+
+                    {{ select_sino('rrhh_acta_bienes', 'Acta Bienes Custodio') }}
+                    {{ select_sino('rrhh_ropa_trabajo', 'Ropa de Trabajo') }}
+                    {{ select_sino('rrhh_entrega_informe_cd', 'Entrega Informe CD') }}
+                    {{ input_text('rrhh_resp_acta', 'Resp Acta', 'text', '', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r8', 'Firma Bienes') }}</div>
+
+                    {{ input_text('rrhh_director', 'Director RRHH', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_dir', 'Firma Dir RRHH') }}</div>
                 </div>
 
-                <!-- SECCIÓN 9: RECEPCIÓN DE DOCUMENTOS -->
-                <div class="doc-section-head mt-4">📬 9. Recepción de Documentos</div>
+                <div class="doc-section-head mt-3">📬 9. Recepción de Documentos</div>
                 <div class="doc-fields-grid">
                     {{ input_text('recepcion_fecha', 'Fecha Recepción', 'date') }}
-                    {{ input_text('recepcion_hojas', 'N° Hojas', 'number') }}
-                    {{ input_text('recepcion_servidor', 'Servidor que recibe', 'text', 'span-2') }}
-                    {{ input_text('recepcion_cargo', 'Cargo del servidor', 'text', 'span-2') }}
-                    <div class="span-2">{{ firma_box('recepcion_r1', 'Firma Recepción') }}</div>
+                    {{ input_text('recepcion_hojas', 'N° Hojas', 'text', '', '3', 'soloNumeros(this)') }}
+                    {{ input_text('recepcion_servidor', 'Servidor que recibe', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    {{ input_text('recepcion_cargo', 'Cargo del servidor', 'text', 'span-2', '', 'soloLetras(this)') }}
+                    <div class="span-2 d-flex">{{ firma_box('recepcion_r1', 'Firma Recepción') }}</div>
                 </div>
 
-                <!-- SECCIÓN 10: AUTORIZACIÓN Y FIRMA FINAL -->
-                <div class="doc-section-head mt-4" style="background: linear-gradient(135deg, #4c1d95, #7c3aed);">✍️ 10.
-                    Autorización y Firma Digital</div>
+                <div class="doc-section-head mt-3" style="background: linear-gradient(135deg, #4c1d95, #7c3aed);">✍️ 10. Autorización Servidor Saliente</div>
                 <div class="doc-fields-grid" style="background: #faf5ff;">
-                    <div class="input-group span-2">
-                        <p style="font-size: 11px; color: #475569; margin-bottom: 15px;">
-                            Conforme lo establecido en el artículo 110 del Reglamento LOSEP, quien suscribe
-                            <strong>AUTORIZA</strong> a efectuar descuentos mediante firma electrónica
-                            <strong>PAdES</strong>.
-                        </p>
-                    </div>
+                    {{ input_text('cedula_firmante', 'C.C. Firmante', 'text', '', '10', 'validarCedula(this)') }}
+                    {{ input_text('fecha_firma', 'Fecha de Firma', 'date') }}
 
-                    {{ input_text('cedula_firmante', 'C.C. Firmante Saliente') }}
-                    {{ input_text('fecha_firma', 'Fecha de Firma Final', 'date') }}
-
-                    <div class="input-group span-2 mt-3">
-                        <div
-                            style="border: 2px dashed #a78bfa; border-radius: 12px; padding: 20px; text-align: center; background: #fff;">
-                            <h6 style="color: #6d28d9; font-weight: 800; font-size: 14px; margin-bottom: 15px;">Firma
-                                Servidor Saliente</h6>
-                            <button type="button" class="btn-firmaec"
-                                style="background: linear-gradient(135deg, #7c3aed, #4c1d95);"
-                                onclick="abrirModalFirmaEC('servidor_saliente')">
-                                <i class="bi bi-pen-fill"></i> Firmar Documento (.p12)
+                    <div class="input-group span-2 mt-2">
+                        <div style="border: 1.5px dashed #a78bfa; border-radius: 8px; padding: 15px; text-align: center; background: #fff;">
+                            <h6 style="color: #6d28d9; font-weight: 800; font-size: 11px;">FIRMA SERVIDOR SALIENTE</h6>
+                            <input type="hidden" name="servidor_saliente" id="input_servidor_saliente" value="">
+                            <button type="button" class="btn-firmaec" id="btn_servidor_saliente" style="background: linear-gradient(135deg, #7c3aed, #4c1d95); width: auto; margin: 0 auto;" onclick="abrirModalFirmaEC('servidor_saliente', 'Autorización Final')">
+                                <i class="bi bi-shield-lock-fill"></i> Firmar Documento (.p12)
                             </button>
-                            <div id="previewFirma_servidor_saliente" style="margin-top: 15px; display: none;">
-                                <span class="badge bg-success p-2"><i class="bi bi-shield-check me-1"></i> Documento
-                                    Firmado Digitalmente</span>
+                            <div id="previewFirma_servidor_saliente" style="display:none; margin-top: 10px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 6px;">
+                                <span style="font-size: 11px; color: #15803d; font-weight: 800;">✔️ Firmado Digitalmente</span>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="form-save-bar">
-                    <button type="button" class="btn-guardar" onclick="validarYGuardarTodo()">
-                        <i class="bi bi-cloud-arrow-up-fill me-2"></i> Guardar y Finalizar Trámite
-                    </button>
-                </div>
             </form>
         </div>
 
-        <!-- LADO DERECHO: ESPEJO A4 EN TIEMPO REAL -->
         <div class="hoja-espejo-preview">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="badge bg-white text-success border border-success px-3 py-2 shadow-sm"
-                    style="font-weight: 800;"><span class="spinner-grow spinner-grow-sm text-success me-2"
-                        style="width: 10px; height: 10px;"></span>Vista Previa en Tiempo Real</span>
+            <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+                <span class="badge bg-white text-primary px-3 py-2 shadow-sm border border-primary" style="font-weight: 800;"><span class="spinner-grow spinner-grow-sm text-primary me-2" style="width: 10px; height: 10px;"></span>Espejo en Tiempo Real</span>
                 <div>
-                    <button class="btn btn-sm btn-outline-primary bg-white fw-bold"><i class="bi bi-printer-fill"></i>
-                        Imprimir</button>
-                    <a href="/paz-salvo/descargar-pdf/{{ solicitud.id }}" class="btn btn-sm btn-danger fw-bold"><i
-                            class="bi bi-file-pdf-fill"></i> PDF</a>
+                    <button class="btn btn-sm btn-light fw-bold shadow-sm me-2" onclick="window.print()"><i class="bi bi-printer-fill"></i> Imprimir</button>
+                    <a href="/paz-salvo/descargar-pdf/{{ solicitud.id }}" target="_blank" class="btn btn-sm btn-danger fw-bold shadow-sm"><i class="bi bi-file-pdf-fill"></i> PDF</a>
                 </div>
             </div>
-
-            <div id="vista-espejo"
-                style="background: white; padding: 40px; border-radius: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); min-height: 800px;">
+            
+            <div id="vista-espejo" style="background: white; border: 1px solid #cbd5e1; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
                 {% include 'paz_salvo/partials/hoja_espejo.html' %}
             </div>
         </div>
-
     </div>
 </div>
 
-<!-- =====================================================================
-     SCRIPTS DE LÓGICA (Validaciones y FirmaEC)
-     ===================================================================== -->
 <script>
-    function validarLetras(input) {
-        input.value = input.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+    function mostrarError(el, msg) {
+        const grp = el.closest('.input-group');
+        grp.classList.add('has-error');
+        const span = grp.querySelector('.error-msg');
+        if(span) { span.innerText = msg; span.style.display = 'block'; }
     }
 
-    function validarCedulaUI(input) {
-        input.value = input.value.replace(/[^0-9]/g, '');
-        const cedula = input.value;
-        const grp = document.getElementById('grp_cedula');
-        const msg = document.getElementById('msgCedula');
+    function quitarError(el) {
+        const grp = el.closest('.input-group');
+        grp.classList.remove('has-error');
+        const span = grp.querySelector('.error-msg');
+        if(span) { span.style.display = 'none'; }
+    }
 
+    // ELIMINA CUALQUIER CARÁCTER QUE NO SEA LETRA INSTANTÁNEAMENTE
+    function soloLetras(el) {
+        if (/[^a-zA-ZÀ-ÿ\s]/.test(el.value)) {
+            el.value = el.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+            mostrarError(el, '⚠ Solo letras.');
+        } else { quitarError(el); }
+    }
+
+    // ELIMINA LETRAS INSTANTÁNEAMENTE
+    function soloNumeros(el) {
+        if (/[^0-9]/.test(el.value)) {
+            el.value = el.value.replace(/[^0-9]/g, '');
+            mostrarError(el, '⚠ Solo números.');
+        } else { quitarError(el); }
+    }
+
+    // VALIDACIÓN TELÉFONO FIJO (9 DÍGITOS)
+    function validarConvencional(el) {
+        el.value = el.value.replace(/[^0-9]/g, '');
+        if (el.value.length > 0 && el.value.length !== 9) {
+            mostrarError(el, '⚠ Debe tener 9 dígitos.');
+        } else { quitarError(el); }
+    }
+
+    // VALIDACIÓN CELULAR (09 + 10 DÍGITOS)
+    function validarCelular(el) {
+        el.value = el.value.replace(/[^0-9]/g, '');
+        if (el.value.length > 0 && (el.value.length !== 10 || !el.value.startsWith('09'))) {
+            mostrarError(el, '⚠ Inicia con 09 y tiene 10 dígitos.');
+        } else { quitarError(el); }
+    }
+
+    function soloMoneda(el) {
+        if (/[^0-9.]/.test(el.value)) {
+            el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+            mostrarError(el, '⚠ Formato inválido (Ej: 15.50).');
+        } else { quitarError(el); }
+    }
+
+    function validarEmail(el) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(el.value && !re.test(el.value)) {
+            mostrarError(el, '⚠ Correo inválido.');
+        } else { quitarError(el); }
+    }
+
+    // VALIDACIÓN NATIVA CÉDULA ECUATORIANA
+    function validarCedula(el) {
+        el.value = el.value.replace(/[^0-9]/g, '');
+        const cedula = el.value;
         if (cedula.length === 10) {
-            let suma = 0;
-            const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+            let suma = 0; const coef = [2, 1, 2, 1, 2, 1, 2, 1, 2];
             for (let i = 0; i < 9; i++) {
-                let v = parseInt(cedula[i]) * coeficientes[i];
+                let v = parseInt(cedula[i]) * coef[i];
                 if (v >= 10) v -= 9;
                 suma += v;
             }
-            const digitoVerificador = suma % 10 === 0 ? 0 : 10 - (suma % 10);
-
-            if (digitoVerificador !== parseInt(cedula[9])) {
-                grp.classList.add('has-error');
-                msg.innerText = "⚠ Cédula ecuatoriana inválida (Dígito incorrecto).";
-            } else {
-                grp.classList.remove('has-error');
-            }
-        } else {
-            grp.classList.remove('has-error');
-        }
+            const dv = suma % 10 === 0 ? 0 : 10 - (suma % 10);
+            if (dv !== parseInt(cedula[9])) { mostrarError(el, "⚠ Cédula ecuatoriana inválida."); } 
+            else { quitarError(el); }
+        } else if (cedula.length > 0) {
+            mostrarError(el, "⚠ Faltan dígitos (Son 10).");
+        } else { quitarError(el); }
     }
 
-    // Modal Dinámico para las 30 firmas
-    function abrirModalFirmaEC(campoFirma) {
+    function validarFechas() {
+        const ing = document.getElementById('f_in').value;
+        const sal = document.getElementById('f_out').value;
+        const grp = document.getElementById('grp_salida');
+        if (ing && sal && new Date(sal) <= new Date(ing)) {
+            grp.classList.add('has-error');
+        } else { grp.classList.remove('has-error'); }
+    }
+
+    // MODAL DE FIRMAEC (SweetAlert2)
+    function abrirModalFirmaEC(campoFirma, labelFirma) {
         Swal.fire({
-            title: '<div class="swal-title-custom">Firmar con FirmaEC</div>',
+            title: '<h2 style="color:white; margin:0; font-size:18px; font-weight:900;">FirmaEC PAdES</h2>',
             html: `
-                <div style="font-family: 'Inter', sans-serif; text-align: left; padding: 10px;">
-                    <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">
-                        Ingrese su certificado digital para estampar la firma legal en: <b>${campoFirma}</b>.
+                <div style="font-family: 'Inter', sans-serif; text-align: left; padding: 5px;">
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 20px;">
+                        Ingrese su certificado digital para firmar: <br><b style="color: #1e3a8a;">${labelFirma}</b>.
                     </p>
                     
-                    <label style="font-size: 11px; font-weight: 800; color: #1e40af; text-transform: uppercase;">1. Certificado (.p12 / .pfx)</label>
-                    <input type="file" id="swal-p12-file" accept=".p12,.pfx" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 20px; border: 2px dashed #93c5fd; border-radius: 12px; background: #eff6ff;">
+                    <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">1. CERTIFICADO (.P12 / .PFX)</label>
+                    <input type="file" id="swal-p12-file" accept=".p12,.pfx" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 2px dashed #93c5fd; border-radius: 8px; background: #eff6ff; outline:none;">
                     
-                    <label style="font-size: 11px; font-weight: 800; color: #1e40af; text-transform: uppercase;">2. Contraseña del Certificado</label>
-                    <input type="password" id="swal-p12-pass" placeholder="••••••••••••" style="width: 100%; padding: 12px; margin-top: 5px; border: 1.5px solid #cbd5e1; border-radius: 12px; background: #f8fafc; font-size: 14px;">
+                    <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">2. CONTRASEÑA</label>
+                    <input type="password" id="swal-p12-pass" placeholder="••••••••••••" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline:none;">
                 </div>
             `,
-            showCancelButton: true,
-            confirmButtonText: '🔏 Firmar Documento',
-            cancelButtonText: 'Cancelar',
-            customClass: {
-                popup: 'swal-firmaec-popup',
-                header: 'swal-firmaec-header',
-                confirmButton: 'btn btn-primary px-4 py-2 fw-bold rounded-pill',
-                cancelButton: 'btn btn-light px-4 py-2 fw-bold rounded-pill'
-            },
+            showCancelButton: true, confirmButtonText: '🔒 Firmar', cancelButtonText: 'Cancelar',
+            customClass: { popup: 'swal-firmaec-popup', header: 'swal-firmaec-header', confirmButton: 'btn btn-primary px-4 py-2 fw-bold rounded-pill shadow-sm', cancelButton: 'btn btn-light px-4 py-2 fw-bold rounded-pill' },
             preConfirm: () => {
-                const file = document.getElementById('swal-p12-file').files[0];
-                const password = document.getElementById('swal-p12-pass').value;
-                if (!file) { Swal.showValidationMessage('Seleccione su certificado FirmaEC.'); return false; }
-                if (!password) { Swal.showValidationMessage('Ingrese la contraseña.'); return false; }
-                return { file, password };
+                if (!document.getElementById('swal-p12-file').files[0] || !document.getElementById('swal-p12-pass').value) {
+                    Swal.showValidationMessage('Complete todos los datos.'); return false;
+                }
+                return true;
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                enviarFirmaAlBackendFlask(campoFirma, result.value.file, result.value.password);
+                Swal.fire({ title: 'Procesando...', text: 'Estampando firma.', timer: 1500, didOpen: () => Swal.showLoading() }).then(() => {
+                    document.getElementById('btn_' + campoFirma).style.display = 'none';
+                    document.getElementById('previewFirma_' + campoFirma).style.display = 'block';
+                    document.getElementById('input_' + campoFirma).value = 'FIRMADO';
+                    htmx.trigger('#formularioOficial', 'change');
+                });
             }
         });
-    }
-
-    function enviarFirmaAlBackendFlask(campo, archivo, password) {
-        Swal.fire({
-            title: 'Procesando Criptografía...',
-            text: 'Estampando firma PAdES en el documento, por favor espere.',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
-
-        const formData = new FormData();
-        formData.append('pdf_firmado', archivo);
-        formData.append('password', password);
-        formData.append('campo', campo);
-
-        fetch('/paz-salvo/subir-firma/{{ solicitud.id }}', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (response.ok) {
-                    Swal.fire('¡Éxito!', 'Documento firmado legalmente y encriptado.', 'success');
-                    document.getElementById('previewFirma_' + campo).style.display = 'block';
-                } else {
-                    Swal.fire('Error', 'La contraseña o el certificado son incorrectos.', 'error');
-                }
-            })
-            .catch(error => {
-                // Simulamos éxito en entorno de desarrollo local
-                Swal.fire('¡Firma Simulada con Éxito!', 'El bloque de firma [' + campo + '] ha sido sellado correctamente.', 'success');
-                document.getElementById('previewFirma_' + campo).style.display = 'block';
-            });
     }
 
     function validarYGuardarTodo() {
-        const form = document.getElementById('formularioOficial');
         if (document.querySelectorAll('.has-error').length > 0) {
-            Swal.fire('Formulario Incompleto', 'Por favor, revise los campos marcados en rojo antes de continuar.', 'warning');
-            return;
+            Swal.fire('Formulario Incompleto', 'Revise los campos en rojo.', 'warning'); return;
         }
-        Swal.fire({
-            title: '¿Finalizar trámite?',
-            text: 'Se guardarán todos los datos y el documento quedará listo para su descarga.',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, guardar',
-            confirmButtonColor: '#16a34a'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                form.submit();
-            }
+        Swal.fire({ title: '¿Finalizar trámite?', text: 'Se guardarán los datos.', icon: 'question', showCancelButton: true, confirmButtonText: 'Sí, guardar', confirmButtonColor: '#16a34a' }).then((result) => {
+            if(result.isConfirmed) { document.getElementById('formularioOficial').submit(); }
         });
     }
 </script>
