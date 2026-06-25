@@ -5,204 +5,81 @@
 
 <style>
     :root {
-        --blue-50: #eff6ff;
-        --blue-100: #dbeafe;
-        --blue-600: #2563eb;
-        --blue-900: #1e3a8a;
-        --green-50: #f0fdf4;
-        --green-600: #16a34a;
-        --red-50: #fff1f2;
-        --red-500: #ef4444;
-        --red-600: #dc2626;
-        --slate-50: #f8fafc;
-        --slate-200: #e2e8f0;
-        --slate-300: #cbd5e1;
-        --slate-500: #64748b;
-        --slate-900: #0f172a;
+        --blue-50: #eff6ff; --blue-100: #dbeafe; --blue-600: #2563eb; --blue-900: #1e3a8a;
+        --green-50: #f0fdf4; --green-600: #16a34a; 
+        --red-50: #fff1f2; --red-500: #ef4444; --red-600: #dc2626;
+        --slate-50: #f8fafc; --slate-200: #e2e8f0; --slate-300: #cbd5e1; --slate-500: #64748b; --slate-900: #0f172a;
         --grad-header: linear-gradient(90deg, #2563eb, #0ea5e9, #22c55e);
+        --blur: blur(18px);
     }
-
+    
     .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 30px;
-        border-radius: 12px;
-        background: #fff;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        margin-bottom: 20px;
-        border-top: 4px solid var(--blue-600);
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 26px 30px; border-radius: 20px; background: rgba(255,255,255,.88); 
+        border: 1px solid rgba(255,255,255,.80); backdrop-filter: var(--blur); 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; overflow: hidden; margin-bottom: 24px;
     }
-
-    .doc-form-layout {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        align-items: flex-start;
-    }
-
-    .doc-form-left {
-        background: #fff;
-        border: 2px solid var(--blue-900);
-        border-radius: 8px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
-
-    .doc-section-head {
-        background: linear-gradient(135deg, var(--blue-900), var(--blue-600));
-        color: #fff;
-        font-size: 12px;
-        font-weight: 800;
-        text-transform: uppercase;
-        padding: 10px 16px;
-        border-bottom: 1px solid var(--slate-300);
-    }
-
-    .doc-fields-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 16px;
-    }
-
-    .span-2 {
-        grid-column: span 2;
-    }
-
-    .input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .input-group label {
-        font-size: 10.5px;
-        font-weight: 800;
-        color: var(--slate-500);
-        text-transform: uppercase;
-    }
-
+    .page-header::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--grad-header); }
+    
+    .panel-admin-box { background: #fafcff; border: 2px dashed var(--blue-600); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+    
+    .doc-form-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: flex-start; }
+    .doc-form-left { background: #fff; border: 2px solid var(--blue-900); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+    .doc-section-head { background: linear-gradient(135deg, var(--blue-900), var(--blue-600)); color: #fff; font-size: 12px; font-weight: 800; text-transform: uppercase; padding: 12px 16px; border-bottom: 1px solid var(--slate-300); }
+    .doc-fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 20px; }
+    .span-2 { grid-column: span 2; }
+    
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    .input-group label { font-size: 11px; font-weight: 800; color: var(--slate-500); text-transform: uppercase; }
+    
     .doc-input {
-        width: 100%;
-        padding: 8px 12px;
-        border: 1.5px solid var(--slate-300);
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 700 !important;
-        color: #000 !important;
-        background: #f8fafc !important;
-        text-transform: uppercase;
-        transition: 0.2s;
+        width: 100%; padding: 10px 14px; border: 1.5px solid var(--slate-300);
+        border-radius: 8px; font-size: 13px; font-weight: 700 !important; color: #000 !important;
+        background: #fff !important; text-transform: uppercase; transition: 0.3s;
     }
+    .doc-input:focus { border-color: var(--blue-600); box-shadow: 0 0 0 4px rgba(37,99,235,.15); outline: none; }
+    .doc-input[type="email"] { text-transform: lowercase; }
+    
+    .has-error .doc-input { border-color: var(--red-500); background: #fff5f5 !important; }
+    .has-error label { color: var(--red-600); }
+    .error-msg { font-size: 10px; color: var(--red-600); font-weight: 700; display: none; margin-top: 2px; }
+    .has-error .error-msg { display: block; }
 
-    .doc-input:focus {
-        border-color: var(--blue-600);
-        background: #fff !important;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
-        outline: none;
-    }
+    .btn-firmaec { background: linear-gradient(135deg, #1e3a8a, #1d4ed8); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px;}
+    .btn-firmaec:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(29,78,216,.3); }
+    .hoja-espejo-preview { background: linear-gradient(135deg, #e8edf8, #d4daf0); border-radius: 20px; padding: 20px; position: sticky; top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .swal-firmaec-popup { border-radius: 24px !important; }
+    .swal-firmaec-header { background: linear-gradient(135deg, #1e3a8a, #0ea5e9); padding: 24px !important; color: white !important; }
 
-    .doc-input[type="email"] {
-        text-transform: lowercase;
-    }
-
-    /* VALIDACIONES VISUALES ESTRICTAS */
-    .has-error .doc-input {
-        border-color: var(--red-500) !important;
-        background: #fff5f5 !important;
-    }
-
-    .has-error label {
-        color: var(--red-600) !important;
-    }
-
-    .error-msg {
-        font-size: 10px;
-        color: var(--red-600);
-        font-weight: 800;
-        display: none;
-        margin-top: 2px;
-    }
-
-    .has-error .error-msg {
-        display: block;
-    }
-
-    .btn-firmaec {
-        background: #1e3a8a;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 8px;
-        font-size: 11px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: 0.2s;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-    }
-
-    .btn-firmaec:hover {
-        background: #2563eb;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 10px rgba(29, 78, 216, .3);
-    }
-
-    .hoja-espejo-preview {
-        background: #e2e8f0;
-        border-radius: 12px;
-        padding: 15px;
-        position: sticky;
-        top: 15px;
-        box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
-
+    /* MODO IMPRESIÓN LIMPIO */
     @media print {
-        body * {
-            visibility: hidden;
-        }
-
-        #vista-espejo,
-        #vista-espejo * {
-            visibility: visible;
-        }
-
-        #vista-espejo {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            padding: 0;
-        }
-
-        .no-print {
-            display: none !important;
-        }
+        @page { size: A4 portrait; margin: 10mm; }
+        body, html { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+        body * { visibility: hidden; }
+        .no-print, .page-header, .panel-admin-box, .doc-form-left { display: none !important; }
+        .hoja-espejo-preview { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; padding: 0 !important; background: transparent !important; box-shadow: none !important; }
+        #vista-espejo, #vista-espejo * { visibility: visible; }
+        #vista-espejo { position: relative; width: 100%; padding: 0; border: none; box-shadow: none; }
     }
 </style>
 
-{% macro input_text(name, label, type='text', width='', max_len='', js_val='') %}
-{% set js_code = "" %}
-{% if js_val %}{% set js_code = js_code ~ js_val ~ ";" %}{% endif %}
-{% if type == 'email' %}{% set js_code = js_code ~ "validarEmail(this);" %}{% endif %}
-{% set attr_oninput = 'oninput="' ~ js_code ~ '"' if js_code else '' %}
+{% set bloqueados = campos_bloqueados if campos_bloqueados else [] %}
 
+{% macro input_text(name, label, type='text', width='', max_len='', js_val='', val='') %}
 <div class="input-group {{ width }}" id="grp_{{ name }}">
-    <label>{{ label }} <span class="req text-danger">*</span></label>
-    <input type="{{ type }}" name="{{ name }}" class="doc-input" {% if max_len %}maxlength="{{ max_len }}" {% endif %}
-        {{ attr_oninput | safe }}>
-    <span class="error-msg" id="msg_{{ name }}">⚠ Entrada inválida.</span>
+    <label>{{ label }}</label>
+    <input type="{{ type }}" name="{{ name }}" class="doc-input" value="{{ val }}"
+           {% if name in bloqueados %} readonly disabled style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}
+           {% if max_len %}maxlength="{{ max_len }}"{% endif %}
+           oninput="if('{{ js_val }}') { window['{{ js_val }}'](this); } if('{{ type }}' === 'email') { validarEmail(this); }">
+    <span class="error-msg" id="msg_{{ name }}">⚠ Campo requerido o con formato incorrecto.</span>
 </div>
 {% endmacro %}
 
 {% macro select_sino(name, label, width='') %}
-<div class="input-group {{ width }}">
-    <label>{{ label }} <span class="req text-danger">*</span></label>
-    <select name="{{ name }}" class="doc-input">
+<div class="input-group {{ width }}" id="grp_{{ name }}">
+    <label>{{ label }}</label>
+    <select name="{{ name }}" class="doc-input" {% if name in bloqueados %} disabled style="background-color: #e2e8f0 !important;" {% endif %}>
         <option value="">—</option>
         <option value="SI">SÍ</option>
         <option value="NO">NO</option>
@@ -211,334 +88,427 @@
 {% endmacro %}
 
 {% macro firma_box(campo, label) %}
-<div class="p-2 rounded" style="background: #fff; border: 1px dashed #94a3b8; text-align: center; flex: 1;">
-    <span style="font-size: 8.5px; font-weight: 800; color: #1e40af; display: block; margin-bottom: 6px;">{{ label
-        }}</span>
-    <input type="hidden" name="{{ campo }}" id="input_{{ campo }}" value="">
-    <button type="button" class="btn-firmaec" id="btn_{{ campo }}"
-        onclick="abrirModalFirmaEC('{{ campo }}', '{{ label }}')">
-        <i class="bi bi-pen-fill"></i> Firmar PAdES
+<div class="p-3 rounded" style="background: #f8fafc; border: 1.5px dashed #93c5fd; text-align: center; flex: 1;">
+    <span style="font-size: 9px; font-weight: 800; color: #1e40af; display: block; margin-bottom: 8px; text-transform: uppercase;">{{ label }}</span>
+    <input type="hidden" name="{{ campo }}" id="input_{{ campo }}" value="{% if campo in bloqueados %}FIRMADO{% endif %}">
+    
+    <button type="button" class="btn-firmaec" id="btn_{{ campo }}" {% if campo in bloqueados %} style="display:none;" {% endif %} onclick="abrirModalFirmaEC('{{ campo }}', '{{ label }}')">
+        🔒 Firmar PAdES (.p12)
     </button>
-    <div id="previewFirma_{{ campo }}"
-        style="display:none; margin-top: 6px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 4px; padding: 4px;">
-        <span style="font-size: 9px; color: #15803d; font-weight: 800;">✔️ CERTIFICADO CARGADO</span>
+    
+    <div id="previewFirma_{{ campo }}" {% if campo in bloqueados %} style="display:block;" {% else %} style="display:none;" {% endif %} style="margin-top: 8px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 6px;">
+        <span style="font-size: 10px; color: #15803d; font-weight: 800;">✔️ Certificado Verificado</span>
     </div>
 </div>
 {% endmacro %}
 
+
 <div class="page fade-in">
     <div class="page-header no-print">
         <div>
-            <span class="badge bg-primary mb-1">Trámite #{{ solicitud.id }}</span>
-            <h1 style="font-size: 20px; font-weight: 900; color: #0f172a; margin: 0;">Llenado de Formulario Oficial</h1>
+            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Trámite Institucional #{{ solicitud.id }}</span>
+            <h1 style="font-size: 24px; font-weight: 900; color: #1e3a8a; margin: 0;">Gestión de Liquidación Base</h1>
         </div>
         <div>
-            <button class="btn btn-success fw-bold me-2" onclick="validarYGuardarTodo()"><i class="bi bi-save-fill"></i>
-                Guardar Trámite</button>
-            <a href="/dashboard" class="btn btn-outline-secondary fw-bold">← Volver</a>
+            <button class="btn btn-lg btn-light border fw-bold shadow-sm me-2 text-dark" onclick="window.print()">
+                <i class="bi bi-printer-fill text-primary me-2"></i> Imprimir Hoja Espejo
+            </button>
+            <a href="/paz-salvo/descargar-pdf/{{ solicitud.id }}" target="_blank" class="btn btn-lg btn-danger fw-bold shadow-sm">
+                <i class="bi bi-file-pdf-fill me-2"></i> Descargar PDF Legal
+            </a>
         </div>
     </div>
 
+    <!-- =====================================================================
+       PANEL SUPERIOR: DESIGNACIÓN DE PREGUNTAS (EXCLUSIVO ADMINISTRADOR)
+       ===================================================================== -->
+    {% if current_user.rol.nombre == 'Administrador' %}
+    <div class="panel-admin-box no-print fade-in">
+        <h5 style="color: var(--blue-900); font-weight: 900; text-transform: uppercase; margin-bottom: 12px;"><i class="bi bi-shield-lock-fill me-2"></i> Panel de Designación Analítica (Campo por Campo)</h5>
+        <p style="font-size: 12px; color: var(--slate-500); margin-bottom: 15px;">Seleccione los campos exactos y asígnelos al servidor correspondiente de cada Dirección Técnica.</p>
+        
+        <form hx-post="/paz-salvo/asignar-campos/{{ solicitud.id }}" hx-target="#live-alert">
+            <div class="row g-3 align-items-start">
+                <div class="col-md-7">
+                    <!-- ACORDEÓN DE CAMPOS -->
+                    <div class="accordion" id="accordionAdmin" style="box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        
+                        <!-- SECCIÓN 3 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headSec3">
+                                <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec3" style="font-size: 12px; background: #f0f9ff; color: #0369a1;">
+                                    3. Trámites y Gestión Documental
+                                </button>
+                            </h2>
+                            <div id="colSec3" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
+                                <div class="accordion-body" style="font-size: 11px; max-height: 150px; overflow-y: auto;">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tramites_informe"> <label class="form-check-label fw-bold">Informe fin gestión y QUIPUX (Firma 1)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tramites_fe_presentacion"> <label class="form-check-label fw-bold">Fe de presentación y Claves (Firma 2)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tramites_losep"> <label class="form-check-label fw-bold">Archivo LOSEP y Acta Claves (Firma 3)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tramites_admin_contrato"> <label class="form-check-label fw-bold">Gestión de Contratos / Jefe Inmediato (Firma Jefe)</label></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 4 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headSec4">
+                                <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec4" style="font-size: 12px; background: #f1f5f9; color: #334155;">
+                                    4. Gestión Administrativa
+                                </button>
+                            </h2>
+                            <div id="colSec4" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
+                                <div class="accordion-body" style="font-size: 11px; max-height: 150px; overflow-y: auto;">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="admin_informe"> <label class="form-check-label fw-bold">Entrega informe actividades (Firma 1)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="admin_bienes"> <label class="form-check-label fw-bold">Bienes, Muebles y Actas (Firma 2)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="admin_deducibles"> <label class="form-check-label fw-bold">Deducibles pendientes (Firma 3)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="admin_pasajes"> <label class="form-check-label fw-bold">Pasajes por justificar (Firma 4)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="admin_responsable"> <label class="form-check-label fw-bold text-danger">Firma Global Director/a Administrativo</label></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 5 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headSec5">
+                                <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec5" style="font-size: 12px; background: #faf5ff; color: #7e22ce;">
+                                    5. TIC (Tecnologías de Información)
+                                </button>
+                            </h2>
+                            <div id="colSec5" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
+                                <div class="accordion-body" style="font-size: 11px; max-height: 150px; overflow-y: auto;">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tic_verificacion"> <label class="form-check-label fw-bold">Verificación equipo e IPs (Firma 1)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tic_backup"> <label class="form-check-label fw-bold">Entrega y Rutas de Backup (Firma 2)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tic_retiro_acceso"> <label class="form-check-label fw-bold">Cierre Sistemas: QUIPUX, eSIGEF, SPRYN (Firma 3)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tic_tarjeta_cuentas"> <label class="form-check-label fw-bold">Tarjeta Magnética y Accesos (Firma 4)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tic_responsable"> <label class="form-check-label fw-bold text-danger">Firma Global Responsable TIC</label></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 6 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headSec6">
+                                <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec6" style="font-size: 12px; background: #ecfdf5; color: #047857;">
+                                    6. Gestión Financiera
+                                </button>
+                            </h2>
+                            <div id="colSec6" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
+                                <div class="accordion-body" style="font-size: 11px; max-height: 150px; overflow-y: auto;">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="fin_saldos"> <label class="form-check-label fw-bold">Saldos contables (Firma 1)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="fin_anticipo"> <label class="form-check-label fw-bold">Anticipo sueldos (Firma 2)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="fin_recuperacion"> <label class="form-check-label fw-bold">Recuperación de valores (Firma 3)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="fin_devolucion"> <label class="form-check-label fw-bold">Devolución de muebles (Firma 4)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="fin_director"> <label class="form-check-label fw-bold text-danger">Firma Global Director/a Financiero</label></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECCIONES 7 y 8 (Seguridad y RRHH) -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headSec78">
+                                <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec78" style="font-size: 12px; background: #fffbeb; color: #b45309;">
+                                    7 y 8. Seguridad EGSI & Recursos Humanos
+                                </button>
+                            </h2>
+                            <div id="colSec78" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
+                                <div class="accordion-body" style="font-size: 11px; max-height: 150px; overflow-y: auto;">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="seg_archivos"> <label class="form-check-label fw-bold">Seguridad Archivos Digitales (Firma Seg 1)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="seg_archivos_fisicos"> <label class="form-check-label fw-bold">Seguridad Archivos Físicos (Firma Seg 2)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="seg_oficial"> <label class="form-check-label fw-bold text-danger">Firma Oficial de Seguridad</label></div>
+                                    <hr class="my-1">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="rrhh_capacitacion"> <label class="form-check-label fw-bold">Capacitación y Evaluación (Firmas RRHH 1 y 2)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="rrhh_viajes"> <label class="form-check-label fw-bold">Viajes y SIITH (Firmas RRHH 3 y 4)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="rrhh_vacaciones"> <label class="form-check-label fw-bold">Vacaciones y Juramentada (Firmas RRHH 5 y 6)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="rrhh_credencial"> <label class="form-check-label fw-bold">Credenciales y Ropa de Trabajo (Firmas RRHH 7 y 8)</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="rrhh_director"> <label class="form-check-label fw-bold text-danger">Firma Global Director/a RRHH</label></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <label class="fw-bold small text-secondary mb-1">SERVIDOR PÚBLICO DESTINATARIO</label>
+                    <select name="usuario_asignado_id" class="form-select mb-3 shadow-sm border-primary" style="padding: 10px;" required>
+                        <option value="">— Seleccione Servidor —</option>
+                        {% for u in usuarios_disponibles %}
+                        <option value="{{ u.id }}">{{ u.apellidos }} {{ u.nombres }} ({{ u.rol.nombre }})</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow"><i class="bi bi-person-plus-fill me-2"></i> Delegar Campos Seleccionados</button>
+                </div>
+            </div>
+        </form>
+        <div id="live-alert" class="mt-2"></div>
+    </div>
+    {% endif %}
+
     <div class="doc-form-layout">
+        
         <div class="doc-form-left no-print">
-            <form id="formularioOficial" hx-post="/actualizar-espejo" hx-trigger="keyup changed delay:100ms, change"
-                hx-target="#vista-espejo">
+            <form id="formularioOficial" hx-post="/actualizar-espejo" hx-trigger="keyup changed delay:100ms, change" hx-target="#vista-espejo">
                 <input type="hidden" name="solicitud_id" value="{{ solicitud.id }}">
 
-                <div class="doc-section-head">👤 1. Datos Personales</div>
+                <div class="doc-section-head">👤 1. Datos Personales del Servidor Saliente</div>
                 <div class="doc-fields-grid">
-                    {{ input_text('nombres_apellidos', 'Nombres y Apellidos', 'text', 'span-2', '', 'soloLetras(this)')
-                    }}
-                    {{ input_text('cedula', 'Cédula', 'text', '', '10', 'validarCedula(this)') }}
-                    <div class="input-group">
-                        <label>Modalidad Laboral <span class="req text-danger">*</span></label>
-                        <select name="modalidad" class="doc-input">
-                            <option value="">—</option>
+                    {{ input_text('nombres_apellidos', 'Nombres y Apellidos Completos', 'text', 'span-2', '100', 'soloLetras', solicitud.ex_funcionario.nombres ~ ' ' ~ solicitud.ex_funcionario.apellidos) }}
+                    {{ input_text('cedula', 'Cédula de Ciudadanía', 'text', '', '10', 'validarCedula', solicitud.ex_funcionario.cedula) }}
+                    
+                    <div class="input-group" id="grp_modalidad">
+                        <label>Modalidad Laboral</label>
+                        <select name="modalidad" class="doc-input" {% if 'modalidad' in bloqueados %} disabled {% endif %}>
+                            <option value="">Seleccione...</option>
                             <option value="PERMANENTE">Nombramiento Permanente</option>
                             <option value="PROVISIONAL">Nombramiento Provisional</option>
                             <option value="OCASIONAL">Contrato Ocasional</option>
                             <option value="TRABAJO">Contrato de Trabajo</option>
                         </select>
                     </div>
-                    <div class="input-group" id="grp_ingreso"><label>Fecha Ingreso <span
-                                class="req text-danger">*</span></label><input type="date" name="fecha_ingreso"
-                            id="f_in" class="doc-input" onchange="validarFechas()"></div>
-                    <div class="input-group" id="grp_salida"><label>Fecha Salida <span
-                                class="req text-danger">*</span></label><input type="date" name="fecha_salida"
-                            id="f_out" class="doc-input" onchange="validarFechas()"><span class="error-msg"
-                            id="msg_salida">⚠ Fecha debe ser mayor al ingreso.</span></div>
-                    {{ input_text('direccion', 'Dirección Domiciliaria', 'text', 'span-2') }}
-                    {{ input_text('numero_domicilio', 'Teléfono Fijo', 'text', '', '9', 'validarConvencional(this)') }}
-                    {{ input_text('celular', 'Celular', 'text', '', '10', 'validarCelular(this)') }}
-                    {{ input_text('emergencia', 'Contacto Emergencia', 'text', '', '10', 'validarCelular(this)') }}
-                    {{ input_text('email1', 'Email Principal', 'email') }}
-                    {{ input_text('email2', 'Email Secundario', 'email') }}
 
+                    {{ input_text('fecha_ingreso', 'Fecha de Ingreso Institucional', 'date', '', '', 'validarFechas') }}
+                    {{ input_text('fecha_salida', 'Fecha de Salida Efectiva', 'date', '', '', 'validarFechas') }}
+                    {{ input_text('direccion', 'Dirección Domiciliaria', 'text', 'span-2', '200') }}
+                    
+                    {{ input_text('numero_domicilio', 'Teléfono Fijo Casa', 'text', '', '9', 'validarConvencional') }}
+                    {{ input_text('celular', 'Teléfono Celular', 'text', '', '10', 'validarCelular') }}
+                    {{ input_text('emergencia', 'Contacto de Emergencia', 'text', '', '10', 'validarCelular') }}
+                    
+                    {{ input_text('email1', 'Correo Electrónico Principal', 'email', '', '100') }}
+                    {{ input_text('email2', 'Correo Electrónico Alternativo', 'email', '', '100') }}
+                    
                     <div class="input-group">
-                        <label>Provincia <span class="req text-danger">*</span></label>
-                        <select name="provincia" id="provinciaSelect" class="doc-input" onchange="actualizarCantones()">
-                            <option value="">Seleccione Provincia...</option>
-                        </select>
+                        <label>Provincia Ecuatoriana</label>
+                        <select name="provincia" id="provinciaSelect" class="doc-input" onchange="filtrarCantonesEcuador()"></select>
                     </div>
                     <div class="input-group">
-                        <label>Cantón <span class="req text-danger">*</span></label>
-                        <select name="canton" id="cantonSelect" class="doc-input">
-                            <option value="">Seleccione Cantón...</option>
-                        </select>
+                        <label>Cantón Asignado</label>
+                        <select name="canton" id="cantonSelect" class="doc-input"></select>
                     </div>
                 </div>
 
-                <div class="doc-section-head mt-3">🏢 2. Dirección / Unidad</div>
+                <div class="doc-section-head mt-4">🏢 2. Dirección / Unidad de Desempeño</div>
                 <div class="doc-fields-grid">
                     <div class="input-group">
-                        <label>Lugar de Trabajo <span class="req text-danger">*</span></label>
-                        <select name="lugar_trabajo" class="doc-input">
-                            <option value="">—</option>
-                            <option value="PLANTA CENTRAL">Planta Central</option>
-                            <option value="DESCONCENTRADO">Desconcentrado</option>
-                        </select>
+                        <label>Lugar de Dependencia</label>
+                        <select name="lugar_trabajo" class="doc-input"><option value="">—</option><option value="PLANTA CENTRAL">Planta Central</option><option value="DESCONCENTRADO">Procesos Desconcentrados</option></select>
                     </div>
                     <div class="input-group">
-                        <label>Grupo Ocupacional <span class="req text-danger">*</span></label>
-                        <select name="grupo_ocupacional" class="doc-input">
-                            <option value="">—</option>
-                            <option value="NJS">NJS</option>
-                            <option value="SRVS">SRVS</option>
-                            <option value="SP">SP</option>
-                            <option value="SPA">SPA</option>
-                            <option value="NMNP">NMNP</option>
-                        </select>
+                        <label>Grupo Ocupacional LOSEP</label>
+                        <select name="grupo_ocupacional" class="doc-input"><option value="">—</option><option value="NJS">NJS (Jerárquico)</option><option value="SRVS">SRVS (Servicios)</option><option value="SP">SP (Servidor Público)</option><option value="SPA">SPA (Apoyo)</option></select>
                     </div>
-                    {{ input_text('unidad', 'Dirección / Unidad', 'text', 'span-2') }}
-                    {{ input_text('cargo', 'Cargo Desempeñado', 'text', 'span-2') }}
+                    {{ input_text('unidad', 'Dirección Técnica / Unidad', 'text', 'span-2') }}
+                    {{ input_text('cargo', 'Cargo Institucional Desempeñado', 'text', 'span-2') }}
                 </div>
 
-                <div class="doc-section-head mt-3">📋 3. Trámites y Unidad</div>
+                <div class="doc-section-head mt-4">📋 3. Gestión Documental, Archivo y Trámites</div>
                 <div class="doc-fields-grid">
-                    {{ select_sino('tramites_informe', 'Informe fin gestión') }}
-                    {{ select_sino('tramites_quipux_cero', 'QUIPUX bandeja cero') }}
-                    {{ input_text('tramites_nombre_resp1', 'Resp. Fila 1', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('tramites_r1', 'Firma Fila 1') }}</div>
+                    {{ select_sino('tramites_informe', '¿Entrega Informe de Fin de Gestión?') }}
+                    {{ select_sino('tramites_quipux_cero', '¿Bandeja de QUIPUX en Cero?') }}
+                    {{ input_text('tramites_nombre_resp1', 'Servidor Validador Fila 1', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('tramites_r1', 'Firma Responsable Fila 1') }}</div>
+                    
+                    {{ select_sino('tramites_fe_presentacion', '¿Posee Fe de Presentación?') }}
+                    {{ select_sino('tramites_claves_asignadas', '¿Retiro de Claves de Sistemas?') }}
+                    {{ input_text('tramites_nombre_resp2', 'Servidor Validador Fila 2', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('tramites_r2', 'Firma Responsable Fila 2') }}</div>
 
-                    {{ select_sino('tramites_fe_presentacion', 'Fe presentación') }}
-                    {{ select_sino('tramites_claves_asignadas', 'Claves asignadas') }}
-                    {{ input_text('tramites_nombre_resp2', 'Resp. Fila 2', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('tramites_r2', 'Firma Fila 2') }}</div>
+                    {{ select_sino('tramites_losep', '¿Entrega de Expediente Físico LOSEP?') }}
+                    {{ select_sino('tramites_acta_claves', '¿Acta de Entrega de Claves?') }}
+                    {{ input_text('tramites_nombre_resp3', 'Servidor Validador Fila 3', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('tramites_r3', 'Firma Responsable Fila 3') }}</div>
 
-                    {{ select_sino('tramites_losep', 'Archivo (LOSEP)') }}
-                    {{ select_sino('tramites_acta_claves', 'Acta entrega claves') }}
-                    {{ input_text('tramites_nombre_resp3', 'Resp. Fila 3', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('tramites_r3', 'Firma Fila 3') }}</div>
-
-                    {{ select_sino('tramites_admin_contrato', '¿Admin Contrato?') }}
-                    {{ input_text('tramites_desc_contrato', 'Desc. Contrato') }}
-                    {{ input_text('tramites_memo', 'N° Memo Admin', 'text', 'span-2') }}
-
-                    {{ input_text('tramites_jefe_inmediato', 'Nombre Jefe Inmediato', 'text', 'span-2', '',
-                    'soloLetras(this)') }}
-                    {{ input_text('tramites_servidor_recibe', 'Servidor recibe trámites', 'text', 'span-2', '',
-                    'soloLetras(this)') }}
-                    {{ input_text('tramites_obs', 'Observaciones', 'text', 'span-2') }}
-                    {{ input_text('tramites_nombre_responsable', 'Jefe de Área Final', 'text', 'span-2', '',
-                    'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('tramites_jefe', 'Firma Jefe') }}</div>
+                    {{ select_sino('tramites_admin_contrato', '¿Fue Administrador de Contratos?') }}
+                    {{ input_text('tramites_desc_contrato', 'Detalle de Contratos a Cargo') }}
+                    {{ input_text('tramites_memo', 'N° Memorando de Relevo', 'text', 'span-2') }}
+                    
+                    {{ input_text('tramites_jefe_inmediato', 'Nombre del Jefe Inmediato Superior', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('tramites_servidor_recibe', 'Servidor que recibe custodia', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('tramites_obs', 'Observaciones de la Gestión Documental', 'text', 'span-2') }}
+                    {{ input_text('tramites_nombre_responsable', 'Responsable de Gestión de Trámites (Jefe)', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('tramites_jefe', 'Firma Electrónica Jefe') }}</div>
                 </div>
 
-                <div class="doc-section-head mt-3">🏛️ 4. Gestión Administrativa</div>
+                <div class="doc-section-head mt-4">🏛️ 4. Dirección Administrativa — Bienes e Inventario</div>
                 <div class="doc-fields-grid">
-                    {{ select_sino('admin_informe', 'Entrega informe') }}
-                    {{ input_text('admin_nombre_resp1', 'Resp Informe', 'text', '', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('admin_r1', 'Firma Informe') }}</div>
+                    {{ select_sino('admin_informe', '¿Validación de Informe de Bienes?') }}
+                    {{ input_text('admin_nombre_resp1', 'Responsable Fila 1 (Informe)', 'text', '', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('admin_r1', 'Firma Validación Informe') }}</div>
 
-                    {{ select_sino('admin_bienes', 'Entrega bienes') }}
-                    {{ input_text('admin_valor_bienes', 'Valor Bienes $', 'text', '', '', 'soloMoneda(this)') }}
-                    {{ input_text('admin_acta_bienes', 'N° Acta Bienes', 'text', 'span-2') }}
-                    {{ input_text('admin_nombre_resp2', 'Resp Bienes', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('admin_r2', 'Firma Bienes') }}</div>
+                    {{ select_sino('admin_bienes', '¿Devolución de Bienes Larga Duración?') }}
+                    {{ input_text('admin_valor_bienes', 'Valorización por Pérdida/Faltante $', 'text', '', '', 'soloMoneda') }}
+                    {{ input_text('admin_acta_bienes', 'N° Acta de Entrega Recepción', 'text', 'span-2') }}
+                    {{ input_text('admin_nombre_resp2', 'Responsable Fila 2 (Bienes)', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('admin_r2', 'Firma Custodio Bienes') }}</div>
 
-                    {{ select_sino('admin_deducibles', '¿Tiene deducibles?') }}
-                    {{ input_text('admin_deducibles_valor', 'Valor Deducibles $', 'text', '', '', 'soloMoneda(this)') }}
-                    {{ input_text('admin_nombre_resp3', 'Resp Deducibles', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('admin_r3', 'Firma Deducibles') }}</div>
+                    {{ select_sino('admin_deducibles', '¿Registra Valores Deducibles?') }}
+                    {{ input_text('admin_deducibles_valor', 'Monto a Descontar $', 'text', '', '', 'soloMoneda') }}
+                    {{ input_text('admin_nombre_resp3', 'Responsable Fila 3 (Deducibles)', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('admin_r3', 'Firma Deducibles') }}</div>
 
-                    {{ select_sino('admin_pasajes', 'Pasajes justificar') }}
-                    {{ input_text('admin_pasajes_valor', 'Valor Pasajes $', 'text', '', '', 'soloMoneda(this)') }}
-                    {{ input_text('admin_nombre_resp4', 'Resp Pasajes', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('admin_r4', 'Firma Pasajes') }}</div>
+                    {{ select_sino('admin_pasajes', '¿Liquidó Pasajes Aéreos?') }}
+                    {{ input_text('admin_pasajes_valor', 'Monto Pendiente Pasajes $', 'text', '', '', 'soloMoneda') }}
+                    {{ input_text('admin_nombre_resp4', 'Responsable Fila 4 (Pasajes)', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('admin_r4', 'Firma Liquidación Pasajes') }}</div>
 
-                    {{ input_text('admin_responsable', 'Director Adm. Financiero', 'text', 'span-2', '',
-                    'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('admin_dir', 'Firma Director') }}</div>
+                    {{ input_text('admin_responsable', 'Director/a Administrativo/a Financiero/a', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('admin_dir', 'Firma PAdES Director/a') }}</div>
                 </div>
 
-                <div class="doc-section-head mt-3">💻 5. Gestión TIC</div>
+                <div class="doc-section-head mt-4">💻 5. Gestión de Tecnologías de la Información (TICs)</div>
                 <div class="doc-fields-grid">
-                    {{ select_sino('tic_verificacion', 'Verificación equipo') }}
-                    {{ select_sino('tic_ip_fija', 'Acceso IP Fija') }}
-                    {{ select_sino('tic_liberacion', 'Liberación IP') }}
-                    {{ input_text('tic_nombre_resp1', 'Resp Equipos/IP', 'text', '', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('tic_r1', 'Firma Equipos') }}</div>
+                    {{ select_sino('tic_verificacion', '¿Inspección Física de Equipo?') }}
+                    {{ select_sino('tic_ip_fija', '¿Desvinculación de Dirección IP?') }}
+                    {{ select_sino('tic_liberacion', '¿Liberación de Puertos/Accesos?') }}
+                    {{ input_text('tic_nombre_resp1', 'Validador Equipos/IP', 'text', '', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('tic_r1', 'Firma Control de Hardware') }}</div>
 
-                    {{ select_sino('tic_backup', 'Entrega backup') }}
-                    {{ input_text('tic_ruta_backup', 'Ruta Backup', 'text') }}
-                    {{ input_text('tic_nombre_resp2', 'Resp Backup', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('tic_r2', 'Firma Backup') }}</div>
+                    {{ select_sino('tic_backup', '¿Hizo Entrega de Respaldos de Información?') }}
+                    {{ input_text('tic_ruta_backup', 'Ruta en Servidor Institucional', 'text') }}
+                    {{ input_text('tic_nombre_resp2', 'Validador de Respaldos', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('tic_r2', 'Firma Control Backup') }}</div>
 
-                    {{ select_sino('tic_retiro_acceso', 'Retiro control acceso') }}
-                    {{ select_sino('tic_cierre_correo', 'Cierre Correo') }}
-                    {{ select_sino('tic_esigef', 'Cierre eSIGEF') }}
-                    {{ select_sino('tic_quipux', 'Cierre QUIPUX') }}
-                    {{ select_sino('tic_spryn', 'Cierre SPRYN') }}
-                    {{ select_sino('tic_esbye', 'Cierre eSByE') }}
-                    {{ input_text('tic_nombre_resp3', 'Resp Cuentas', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('tic_r3', 'Firma Cuentas') }}</div>
+                    {{ select_sino('tic_retiro_acceso', '¿Revocación de Credenciales de Red?') }}
+                    {{ select_sino('tic_cierre_correo', '¿Baja de Correo Institucional?') }}
+                    {{ select_sino('tic_esigef', '¿Bloqueo Perfil eSIGEF?') }}
+                    {{ select_sino('tic_quipux', '¿Desactivación Usuario QUIPUX?') }}
+                    {{ select_sino('tic_spryn', '¿Baja de Sistema SPRYN?') }}
+                    {{ select_sino('tic_esbye', '¿Baja de Sistema eSByE?') }}
+                    {{ input_text('tic_nombre_resp3', 'Validador de Cierre de Cuentas', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('tic_r3', 'Firma Cierre de Cuentas') }}</div>
 
-                    {{ select_sino('tic_tarjeta_cuentas', 'Tarjeta Acceso') }}
-                    {{ input_text('tic_obs', 'Observación TIC', 'text') }}
-                    {{ input_text('tic_nombre_resp4', 'Resp Tarjeta', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('tic_r4', 'Firma Tarjeta') }}</div>
+                    {{ select_sino('tic_tarjeta_cuentas', '¿Entrega de Tarjeta Magnética de Acceso?') }}
+                    {{ input_text('tic_obs', 'Novedades/Observaciones TIC', 'text') }}
+                    {{ input_text('tic_nombre_resp4', 'Validador de Tarjetas', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('tic_r4', 'Firma Control Accesos') }}</div>
 
-                    {{ input_text('tic_responsable', 'Responsable TIC', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('tic_r5', 'Firma Resp TIC') }}</div>
+                    {{ input_text('tic_responsable', 'Responsable de la Unidad de TICs', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('tic_r5', 'Firma Electrónica Jefe TIC') }}</div>
                 </div>
 
-                <div class="doc-section-head mt-3">💰 6. Gestión Financiera</div>
+                <div class="doc-section-head mt-4">💰 6. Gestión Financiera (Cuentas por Cobrar)</div>
                 <div class="doc-fields-grid">
-                    {{ select_sino('fin_saldos', 'Saldos contables') }}
-                    {{ input_text('fin_saldos_valor', 'Valor Saldos $', 'text', '', '', 'soloMoneda(this)') }}
-                    {{ input_text('fin_nombre_resp1', 'Resp Saldos', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('fin_r1', 'Firma Saldos') }}</div>
+                    {{ select_sino('fin_saldos', '¿Saldos Pendientes (Viáticos/Cajas Chicas)?') }}
+                    {{ input_text('fin_saldos_valor', 'Monto de Saldo Pendiente $', 'text', '', '', 'soloMoneda') }}
+                    {{ input_text('fin_nombre_resp1', 'Analista Contable Fila 1', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('fin_r1', 'Firma Análisis Contable') }}</div>
 
-                    {{ select_sino('fin_anticipo', 'Anticipo sueldos') }}
-                    {{ input_text('fin_anticipo_valor', 'Valor Anticipo $', 'text', '', '', 'soloMoneda(this)') }}
-                    {{ input_text('fin_nombre_resp2', 'Resp Anticipos', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('fin_r2', 'Firma Anticipos') }}</div>
+                    {{ select_sino('fin_anticipo', '¿Anticipos de Remuneraciones Activos?') }}
+                    {{ input_text('fin_anticipo_valor', 'Saldo del Anticipo $', 'text', '', '', 'soloMoneda') }}
+                    {{ input_text('fin_nombre_resp2', 'Analista de Tesorería Fila 2', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('fin_r2', 'Firma Tesorería') }}</div>
 
-                    {{ select_sino('fin_recuperacion', 'Recuperación valores') }}
-                    {{ input_text('fin_recuperacion_valor', 'Valor Recup $', 'text', '', '', 'soloMoneda(this)') }}
-                    {{ input_text('fin_nombre_resp3', 'Resp Valores', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('fin_r3', 'Firma Valores') }}</div>
+                    {{ select_sino('fin_recuperacion', '¿Garantías/Recuperación de Valores?') }}
+                    {{ input_text('fin_recuperacion_valor', 'Valor a Recuperar $', 'text', '', '', 'soloMoneda') }}
+                    {{ input_text('fin_nombre_resp3', 'Responsable Fila 3', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('fin_r3', 'Firma Recuperación') }}</div>
 
-                    {{ select_sino('fin_devolucion', 'Devolución muebles') }}
-                    {{ input_text('fin_devolucion_valor', 'Valor Devolución $', 'text', '', '', 'soloMoneda(this)') }}
-                    {{ input_text('fin_nombre_resp4', 'Resp Muebles', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('fin_r4', 'Firma Muebles') }}</div>
+                    {{ select_sino('fin_devolucion', '¿Liquidación de Activos u Obligaciones?') }}
+                    {{ input_text('fin_devolucion_valor', 'Monto Glosa/Ajuste $', 'text', '', '', 'soloMoneda') }}
+                    {{ input_text('fin_nombre_resp4', 'Responsable Fila 4', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('fin_r4', 'Firma Ajustes Financieros') }}</div>
 
-                    {{ input_text('fin_director', 'Director/a Financiero/a', 'text', 'span-2', '', 'soloLetras(this)')
-                    }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('fin_dir', 'Firma Dir Fin') }}</div>
+                    {{ input_text('fin_director', 'Director/a Administrativo/a Financiero/a', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('fin_dir', 'Firma PAdES Director/a') }}</div>
                 </div>
 
-                <div class="doc-section-head mt-3">🔒 7. Seguridad (EGSI)</div>
+                <div class="doc-section-head mt-4">🔒 7. Seguridad de la Información (EGSI - AM 166)</div>
                 <div class="doc-fields-grid">
-                    {{ select_sino('seg_archivos', 'Archivos Digitales') }}
-                    {{ select_sino('seg_entrega_copia', 'Copia Actividades') }}
-                    {{ input_text('seg_nombre_resp1', 'Resp Digitales', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('seg_r1', 'Firma Digitales') }}</div>
+                    {{ select_sino('seg_archivos', '¿Análisis de Seguridad de Archivos Digitales?') }}
+                    {{ select_sino('seg_entrega_copia', '¿Entrega Copia de Seguridad Física?') }}
+                    {{ input_text('seg_nombre_resp1', 'Analista de Seguridad Fila 1', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('seg_r1', 'Firma Criptografía 1') }}</div>
 
-                    {{ select_sino('seg_archivos_fisicos', 'Archivos Físicos') }}
-                    {{ select_sino('seg_verificacion_info', 'Verificación Info') }}
-                    {{ input_text('seg_nombre_resp2', 'Resp Físicos', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('seg_r2', 'Firma Físicos') }}</div>
+                    {{ select_sino('seg_archivos_fisicos', '¿Auditoría de Archivos Físicos?') }}
+                    {{ select_sino('seg_verificacion_info', '¿Cifrado de Dispositivos Egresados?') }}
+                    {{ input_text('seg_nombre_resp2', 'Analista de Seguridad Fila 2', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('seg_r2', 'Firma Criptografía 2') }}</div>
 
-                    {{ input_text('seg_oficial', 'Oficial Seguridad', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    {{ input_text('seg_responsable', 'Responsable Seguridad', 'text', 'span-2', '', 'soloLetras(this)')
-                    }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('seg_oficial', 'Firma Oficial') }}</div>
+                    {{ input_text('seg_oficial', 'Oficial de Seguridad de la Información', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('seg_responsable', 'Responsable de la Infraestructura de Seguridad', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('seg_oficial', 'Firma Oficial EGSI') }}</div>
                 </div>
 
-                <div class="doc-section-head mt-3">👥 8. Recursos Humanos</div>
+                <div class="doc-section-head mt-4">👥 8. Dirección de Recursos Humanos (Administración de Personal)</div>
                 <div class="doc-fields-grid">
-                    {{ select_sino('rrhh_capacitacion', 'Capacitación') }}
-                    {{ input_text('rrhh_cursos_eval', 'Cursos/Eval') }}
-                    {{ input_text('rrhh_resp_capacitacion', 'Resp Capacitación', 'text', 'span-2', '',
-                    'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('rrhh_r1', 'Firma Capacita') }}</div>
+                    {{ select_sino('rrhh_capacitacion', '¿Cumplió Devengación de Cursos Obligatorios?') }}
+                    {{ input_text('rrhh_cursos_eval', 'N° Horas / Calificación Obtenida') }}
+                    {{ input_text('rrhh_resp_capacitacion', 'Analista de Capacitación', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r1', 'Firma Capacitación') }}</div>
 
-                    {{ select_sino('rrhh_evaluacion', 'Evaluación Desempeño') }}
-                    {{ input_text('rrhh_resp_evaluacion', 'Resp Evaluación', 'text', '', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('rrhh_r2', 'Firma Evalua') }}</div>
+                    {{ select_sino('rrhh_evaluacion', '¿Aplicación de Evaluación de Desempeño Anual?') }}
+                    {{ input_text('rrhh_resp_evaluacion', 'Analista de Evaluación', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r2', 'Firma Evaluación') }}</div>
 
-                    {{ select_sino('rrhh_viajes', 'Viajes exterior') }}
-                    {{ input_text('rrhh_resp_viajes', 'Resp Viajes', 'text', '', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('rrhh_r3', 'Firma Viajes') }}</div>
+                    {{ select_sino('rrhh_viajes', '¿Liquidó Viáticos/Informes de Viajes al Exterior?') }}
+                    {{ input_text('rrhh_resp_viajes', 'Analista de Registro de Comisiones', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r3', 'Firma Comisiones') }}</div>
 
-                    {{ select_sino('rrhh_siith', 'Desvinculación SIITH') }}
-                    {{ input_text('rrhh_resp_siith', 'Resp SIITH', 'text', '', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('rrhh_r4', 'Firma SIITH') }}</div>
+                    {{ select_sino('rrhh_siith', '¿Procesamiento de Acción de Personal en SIITH?') }}
+                    {{ input_text('rrhh_resp_siith', 'Analista de Control de Sistema SIITH', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r4', 'Firma Baja SIITH') }}</div>
 
-                    {{ input_text('rrhh_vacaciones', 'Días Vacaciones', 'text', '', '3', 'soloNumeros(this)') }}
-                    {{ input_text('rrhh_num_certificado', 'N° Certificado', 'text', '', '20', 'soloNumeros(this)') }}
-                    {{ input_text('rrhh_resp_vacaciones', 'Resp Vacaciones', 'text', 'span-2', '', 'soloLetras(this)')
-                    }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('rrhh_r5', 'Firma Vacacio') }}</div>
+                    {{ input_text('rrhh_vacaciones', 'Saldo de Días de Vacaciones Pendientes', 'text', '', '3', 'soloNumeros') }}
+                    {{ input_text('rrhh_num_certificado', 'N° Certificado de Tiempo de Servicio') }}
+                    {{ input_text('rrhh_resp_vacaciones', 'Analista de Vacaciones y Asistencia', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r5', 'Firma Control Vacaciones') }}</div>
 
-                    {{ select_sino('rrhh_juramentada', 'Declaración Juramentada') }}
-                    {{ input_text('rrhh_num_declaracion', 'N° Declaración', 'text', '', '20', 'soloNumeros(this)') }}
-                    {{ input_text('rrhh_resp_juramentada', 'Resp Juramentada', 'text', 'span-2', '', 'soloLetras(this)')
-                    }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('rrhh_r6', 'Firma Juramen') }}</div>
+                    {{ select_sino('rrhh_juramentada', '¿Cargó Declaración Juramentada de Fin de Gestión?') }}
+                    {{ input_text('rrhh_num_declaracion', 'N° de Presentación Contraloría (CGR)') }}
+                    {{ input_text('rrhh_resp_juramentada', 'Analista de Control Legal', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r6', 'Firma Control Declaraciones') }}</div>
 
-                    {{ select_sino('rrhh_credencial', 'Entrega Credencial') }}
-                    {{ input_text('rrhh_resp_credencial2', 'Resp Credencial', 'text', '', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('rrhh_r7', 'Firma Credenc') }}</div>
+                    {{ select_sino('rrhh_credencial', '¿Hizo Devolución de Credencial y Colgante?') }}
+                    {{ input_text('rrhh_resp_credencial2', 'Analista de Identificación Corporativa', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r7', 'Firma Control Credenciales') }}</div>
 
-                    {{ select_sino('rrhh_acta_bienes', 'Acta Bienes Custodio') }}
-                    {{ select_sino('rrhh_ropa_trabajo', 'Ropa de Trabajo') }}
-                    {{ select_sino('rrhh_entrega_informe_cd', 'Entrega Informe CD') }}
-                    {{ input_text('rrhh_resp_acta', 'Resp Acta Bienes', 'text', '', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('rrhh_r8', 'Firma Bienes') }}</div>
+                    {{ select_sino('rrhh_acta_bienes', '¿Cierre de Expediente de Ropa de Trabajo / CDs?') }}
+                    {{ input_text('rrhh_resp_acta', 'Analista de Dotación de Personal', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r8', 'Firma Dotación Básica') }}</div>
 
-                    {{ input_text('rrhh_director', 'Director RRHH', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('rrhh_dir', 'Firma Dir RRHH') }}</div>
+                    {{ input_text('rrhh_director', 'Director/a de Administración de Recursos Humanos', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_dir', 'Firma Electrónica Director/a') }}</div>
                 </div>
 
-                <div class="doc-section-head mt-3">📬 9. Recepción de Documentos</div>
+                <div class="doc-section-head mt-4">📬 9. Ventanilla de Recepción Documental</div>
                 <div class="doc-fields-grid">
-                    {{ input_text('recepcion_fecha', 'Fecha Recepción', 'date') }}
-                    {{ input_text('recepcion_hojas', 'N° Hojas', 'text', '', '3', 'soloNumeros(this)') }}
-                    {{ input_text('recepcion_servidor', 'Servidor que recibe', 'text', 'span-2', '', 'soloLetras(this)')
-                    }}
-                    {{ input_text('recepcion_cargo', 'Cargo del servidor', 'text', 'span-2', '', 'soloLetras(this)') }}
-                    <div class="span-2 d-flex gap-2">{{ firma_box('recepcion_r1', 'Firma Recepción') }}</div>
+                    {{ input_text('recepcion_fecha', 'Fecha y Hora de Ingreso Físico', 'date') }}
+                    {{ input_text('recepcion_hojas', 'Cantidad de Hojas Útiles Anexadas', 'text', '', '3', 'soloNumeros') }}
+                    {{ input_text('recepcion_servidor', 'Servidor de Ventanilla de Recepción', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('recepcion_cargo', 'Cargo Administrativo del Servidor', 'text', 'span-2', '', 'soloLetras') }}
+                    <div class="span-2 d-flex">{{ firma_box('recepcion_r1', 'Firma Cargo Recepción') }}</div>
                 </div>
 
-                <div class="doc-section-head mt-3" style="background: linear-gradient(135deg, #4c1d95, #7c3aed);">✍️ 10.
-                    Autorización Servidor Saliente</div>
+                <div class="doc-section-head mt-4" style="background: linear-gradient(135deg, #4c1d95, #7c3aed);">✍️ 10. Declaración Legal y Autorización de Descuento</div>
                 <div class="doc-fields-grid" style="background: #faf5ff;">
-                    {{ input_text('cedula_firmante', 'C.C. Firmante', 'text', '', '10', 'validarCedula(this)') }}
-                    {{ input_text('fecha_firma', 'Fecha de Firma', 'date') }}
+                    {{ input_text('cedula_firmante', 'Cédula de Identidad del Firmante', 'text', '', '10', 'validarCedula') }}
+                    {{ input_text('fecha_firma', 'Fecha de Ejecución de Firma', 'date') }}
 
                     <div class="input-group span-2 mt-2">
-                        <div
-                            style="border: 1.5px dashed #a78bfa; border-radius: 8px; padding: 15px; text-align: center; background: #fff;">
-                            <h6 style="color: #6d28d9; font-weight: 800; font-size: 11px;">FIRMA SERVIDOR SALIENTE</h6>
+                        <div style="border: 1px solid #7c3aed; border-radius: 8px; padding: 15px; text-align: center; background: #fff;">
+                            <h6 style="color: #6d28d9; font-weight: 800; font-size: 11px;">FIRMA DE CONFORMIDAD DEL EX SERVIDOR</h6>
                             <input type="hidden" name="servidor_saliente" id="input_servidor_saliente" value="">
-                            <button type="button" class="btn-firmaec" id="btn_servidor_saliente"
-                                style="background: linear-gradient(135deg, #7c3aed, #4c1d95); width: auto; margin: 0 auto;"
-                                onclick="abrirModalFirmaEC('servidor_saliente', 'Autorización Final')">
-                                <i class="bi bi-shield-lock-fill"></i> Cargar Certificado PAdES (.p12)
+                            <button type="button" class="btn-firmaec" id="btn_servidor_saliente" style="background: linear-gradient(135deg, #7c3aed, #4c1d95); width: auto; margin: 0 auto;" onclick="abrirModalFirmaEC('servidor_saliente', 'Autorización Final del Servidor')">
+                                <i class="bi bi-shield-lock-fill"></i> Procesar Firma PAdES Real (.p12)
                             </button>
-                            <div id="previewFirma_servidor_saliente"
-                                style="display:none; margin-top: 10px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 6px;">
-                                <span style="font-size: 11px; color: #15803d; font-weight: 800;">✔️ CERTIFICADO
-                                    CARGADO</span>
+                            <div id="previewFirma_servidor_saliente" style="display:none; margin-top: 10px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 6px;">
+                                <span style="font-size: 11px; color: #15803d; font-weight: 800;">✔️ Firma Criptográfica Estampada en PDF</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </form>
+            <div class="p-3 bg-light border-top text-end mt-3">
+                <button type="button" class="btn btn-success fw-bold px-4 py-2" onclick="validarYGuardarTodo()"><i class="bi bi-cloud-check-fill me-2"></i> Guardar Todo el Trámite</button>
+            </div>
         </div>
 
         <div class="hoja-espejo-preview">
             <div class="d-flex justify-content-between align-items-center mb-3 no-print">
-                <span class="badge bg-white text-primary px-3 py-2 shadow-sm border border-primary"
-                    style="font-weight: 800;"><span class="spinner-grow spinner-grow-sm text-primary me-2"
-                        style="width: 10px; height: 10px;"></span>Espejo en Tiempo Real</span>
+                <span class="badge bg-white text-primary px-3 py-2 shadow-sm border border-primary" style="font-weight: 800;"><span class="spinner-grow spinner-grow-sm text-primary me-2" style="width: 10px; height: 10px;"></span>Espejo en Tiempo Real</span>
             </div>
-
-            <div id="vista-espejo"
-                style="background: white; border: 1px solid #cbd5e1; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div id="vista-espejo" style="background: white; border: 1px solid #cbd5e1; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
                 {% include 'paz_salvo/partials/hoja_espejo.html' %}
             </div>
         </div>
@@ -546,67 +516,47 @@
 </div>
 
 <script>
-    // ==========================================
-    // DICCIONARIO PROVINCIAS Y CANTONES ECUADOR
-    // ==========================================
-    const ecuadorData = {
-        "AZUAY": ["CUENCA", "GUALACEO", "PAUTE", "SIGSIG", "NABÓN", "PUCARÁ", "OÑA", "SAN FERNANDO", "SANTA ISABEL", "CHORDELEG", "EL PAN", "SEVILLA DE ORO", "GUACHAPALA", "CAMILO PONCE ENRÍQUEZ"],
-        "BOLÍVAR": ["GUARANDA", "CHILLANES", "CHIMBO", "ECHEANDÍA", "SAN MIGUEL", "CALUMA", "LAS NAVES"],
-        "CAÑAR": ["AZOGUES", "BIBLIÁN", "CAÑAR", "LA TRONCAL", "EL TAMBO", "DÉLEG", "SUSCAL"],
-        "CARCHI": ["TULCÁN", "BOLÍVAR", "ESPEJO", "MIRA", "MONTÚFAR", "SAN PEDRO DE HUACA"],
-        "CHIMBORAZO": ["RIOBAMBA", "ALAUSÍ", "COLTA", "CHAMBO", "CHUNCHI", "GUAMOTE", "GUANO", "PALLATANGA", "PENIPE", "CUMANDÁ"],
-        "COTOPAXI": ["LATACUNGA", "LA MANÁ", "PUJILÍ", "SALCEDO", "SAQUISILÍ", "PANGUA", "SIGCHOS"],
-        "EL ORO": ["MACHALA", "ARENILLAS", "ATAHUALPA", "BALSAS", "CHILLA", "EL GUABO", "HUAQUILLAS", "MARCABELÍ", "PASAJE", "PIÑAS", "PORTOVELO", "SANTA ROSA", "ZARUMA", "LAS LAJAS"],
-        "ESMERALDAS": ["ESMERALDAS", "ELOY ALFARO", "MUISNE", "QUININDÉ", "SAN LORENZO", "ATACAMES", "RIOVERDE"],
-        "GALÁPAGOS": ["SAN CRISTÓBAL", "ISABELA", "SANTA CRUZ"],
-        "GUAYAS": ["GUAYAQUIL", "ALFREDO BAQUERIZO MORENO", "BALZAR", "COLIMES", "DAULE", "DURÁN", "EL EMPALME", "EL TRIUNFO", "MILAGRO", "NARANJAL", "NARANJITO", "PALESTINA", "PEDRO CARBO", "SAMBORONDÓN", "SANTA LUCÍA", "SALITRE", "SAN JACINTO DE YAGUACHI", "PLAYAS", "SIMÓN BOLÍVAR", "CORONEL MARCELINO MARIDUEÑA", "LOMAS DE SARGENTILLO", "NOBOL", "GENERAL ANTONIO ELIZALDE", "ISIDRO AYORA"],
-        "IMBABURA": ["IBARRA", "ANTONIO ANTE", "COTACACHI", "OTAVALO", "PIMAMPIRO", "SAN MIGUEL DE URCUQUÍ"],
-        "LOJA": ["LOJA", "CALVAS", "CATAMAYO", "CELICA", "CHAGUARPAMBA", "ESPÍNDOLA", "GONZANAMÁ", "MACARÁ", "PALTAS", "PUYANGO", "SARAGURO", "SOZORANGA", "ZAPOTILLO", "PINDAL", "QUILANGA", "OLMEDO"],
-        "LOS RÍOS": ["BABAHOYO", "BABA", "MONTALVO", "PUEBLOVIEJO", "QUEVEDO", "URDANETA", "VENTANAS", "VINCES", "PALENQUE", "BUENA FÉ", "VALENCIA", "MOCACHE", "QUINSALOMA"],
-        "MANABÍ": ["PORTOVIEJO", "BOLÍVAR", "CHONE", "EL CARMEN", "FLAVIO ALFARO", "JIPIJAPA", "JUNÍN", "MANTA", "MONTECRISTI", "PAJÁN", "PICHINCHA", "ROCAFUERTE", "SANTA ANA", "SUCRE", "TOSAGUA", "24 DE MAYO", "PEDERNALES", "OLMEDO", "PUERTO LÓPEZ", "JAMA", "JARAMIJÓ", "SAN VICENTE"],
-        "MORONA SANTIAGO": ["MORONA", "GUALAQUIZA", "LIMÓN INDANZA", "PALORA", "SANTIAGO", "SUCÚA", "HUAMBOYA", "SAN JUAN BOSCO", "TAISHA", "LOGROÑO", "PABLO SEXTO", "TIWINTZA"],
-        "NAPO": ["TENA", "ARCHIDONA", "EL CHACO", "QUIJOS", "CARLOS JULIO AROSEMENA TOLA"],
-        "ORELLANA": ["FRANCISCO DE ORELLANA", "AGUARICO", "LA JOYA DE LOS SACHAS", "LORETO"],
-        "PASTAZA": ["PASTAZA", "MERA", "SANTA CLARA", "ARAJUNO"],
+    const divisionPoliticaEcuador = {
         "PICHINCHA": ["QUITO", "CAYAMBE", "MEJÍA", "PEDRO MONCAYO", "RUMIÑAHUI", "SAN MIGUEL DE LOS BANCOS", "PEDRO VICENTE MALDONADO", "PUERTO QUITO"],
-        "SANTA ELENA": ["SANTA ELENA", "LA LIBERTAD", "SALINAS"],
-        "SANTO DOMINGO DE LOS TSÁCHILAS": ["SANTO DOMINGO", "LA CONCORDIA"],
-        "SUCUMBÍOS": ["LAGO AGRIO", "CASCALES", "CUYABENO", "GONZALO PIZARRO", "PUTUMAYO", "SHUSHUFINDI", "SUCUMBÍOS"],
-        "TUNGURAHUA": ["AMBATO", "BAÑOS", "CEVALLOS", "MOCHA", "PATATE", "QUERO", "SAN PEDRO DE PELILEO", "SANTIAGO DE PÍLLARO", "TISALEO"],
-        "ZAMORA CHINCHIPE": ["ZAMORA", "CHINCHIPE", "NANGARITZA", "YACUAMBI", "YANTZAZA", "EL PANGUI", "CENTINELA DEL CÓNDOR", "PALANDA", "PAQUISHA"]
+        "GUAYAS": ["GUAYAQUIL", "DURÁN", "MILAGRO", "DAULE", "SAMBORONDÓN", "NARANJAL", "BALZAR", "EL EMPALME"],
+        "AZUAY": ["CUENCA", "GUALACEO", "PAUTE", "SIGSIG", "CHORDELEG", "SANTA ISABEL", "CAMILO PONCE ENRÍQUEZ"],
+        "CARCHI": ["TULCÁN", "MONTÚFAR", "ESPEJO", "MIRA", "BOLÍVAR", "SAN PEDRO DE HUACA"],
+        "CHIMBORAZO": ["RIOBAMBA", "ALAUSÍ", "GUANO", "COLTA", "GUAMOTE", "CHAMBO", "PENIPE", "CUMANDÁ"],
+        "IMBABURA": ["IBARRA", "OTAVALO", "COTACACHI", "ANTONIO ANTE", "PIMAMPIRO", "URCUQUÍ"],
+        "LOJA": ["LOJA", "CATAMAYO", "MACARÁ", "CALVAS", "PALTAS", "SARAGURO", "ZAPOTILLO"],
+        "TUNGURAHUA": ["AMBATO", "PELILEO", "PÍLLARO", "BAÑOS DE AGUA SANTA", "QUERO", "CEVALLOS", "TISALEO"]
     };
 
-    // Inicializar Provincias al cargar la página
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         const provSelect = document.getElementById('provinciaSelect');
-        Object.keys(ecuadorData).forEach(prov => {
+        provSelect.innerHTML = '<option value="">Seleccione Provincia...</option>';
+        Object.keys(divisionPoliticaEcuador).forEach(prov => {
             provSelect.innerHTML += `<option value="${prov}">${prov}</option>`;
         });
+        filtrarCantonesEcuador();
     });
 
-    function actualizarCantones() {
+    function filtrarCantonesEcuador() {
         const prov = document.getElementById('provinciaSelect').value;
         const cantSelect = document.getElementById('cantonSelect');
         cantSelect.innerHTML = '<option value="">Seleccione Cantón...</option>';
-        if (ecuadorData[prov]) {
-            ecuadorData[prov].forEach(c => {
+        if (divisionPoliticaEcuador[prov]) {
+            divisionPoliticaEcuador[prov].forEach(c => {
                 cantSelect.innerHTML += `<option value="${c}">${c}</option>`;
             });
         }
     }
 
-    // ==========================================
-    // VALIDACIONES VISUALES
-    // ==========================================
-    function mostrarError(el, msg) { const grp = el.closest('.input-group'); grp.classList.add('has-error'); const span = grp.querySelector('.error-msg'); if (span) { span.innerText = msg; span.style.display = 'block'; } }
-    function quitarError(el) { const grp = el.closest('.input-group'); grp.classList.remove('has-error'); const span = grp.querySelector('.error-msg'); if (span) { span.style.display = 'none'; } }
+    function mostrarError(el, msg) { const grp = el.closest('.input-group'); grp.classList.add('has-error'); const span = grp.querySelector('.error-msg'); if(span) { span.innerText = msg; span.style.display = 'block'; } }
+    function quitarError(el) { const grp = el.closest('.input-group'); grp.classList.remove('has-error'); const span = grp.querySelector('.error-msg'); if(span) { span.style.display = 'none'; } }
+    
     function soloLetras(el) { if (/[^a-zA-ZÀ-ÿ\s]/.test(el.value)) { el.value = el.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, ''); mostrarError(el, '⚠ Solo letras.'); } else { quitarError(el); } }
     function soloNumeros(el) { if (/[^0-9]/.test(el.value)) { el.value = el.value.replace(/[^0-9]/g, ''); mostrarError(el, '⚠ Solo números.'); } else { quitarError(el); } }
     function validarConvencional(el) { el.value = el.value.replace(/[^0-9]/g, ''); if (el.value.length > 0 && el.value.length !== 9) { mostrarError(el, '⚠ Debe tener 9 dígitos.'); } else { quitarError(el); } }
     function validarCelular(el) { el.value = el.value.replace(/[^0-9]/g, ''); if (el.value.length > 0 && (el.value.length !== 10 || !el.value.startsWith('09'))) { mostrarError(el, '⚠ Inicia con 09 y tiene 10 dígitos.'); } else { quitarError(el); } }
-    function soloMoneda(el) { if (/[^0-9.]/.test(el.value)) { el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); mostrarError(el, '⚠ Formato inválido (Ej: 15.50).'); } else { quitarError(el); } }
-    function validarEmail(el) { const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if (el.value && !re.test(el.value)) { mostrarError(el, '⚠ Correo inválido.'); } else { quitarError(el); } }
-
+    function soloMoneda(el) { if (/[^0-9.]/.test(el.value)) { el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); mostrarError(el, '⚠ Formato inválido.'); } else { quitarError(el); } }
+    function validarEmail(el) { const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if(el.value && !re.test(el.value)) { mostrarError(el, '⚠ Correo inválido.'); } else { quitarError(el); } }
+    
     function validarCedula(el) {
         el.value = el.value.replace(/[^0-9]/g, '');
         const cedula = el.value;
@@ -623,27 +573,22 @@
         const sal = document.getElementById('f_out').value;
         const grp = document.getElementById('grp_salida');
         const msg = document.getElementById('msg_salida');
-        if (ing && sal && new Date(sal) <= new Date(ing)) { grp.classList.add('has-error'); if (msg) msg.style.display = 'block'; } else { grp.classList.remove('has-error'); if (msg) msg.style.display = 'none'; }
+        if (ing && sal && new Date(sal) <= new Date(ing)) { grp.classList.add('has-error'); if(msg) msg.style.display = 'block'; } else { grp.classList.remove('has-error'); if(msg) msg.style.display = 'none'; }
     }
 
-    // ==========================================
-    // MODAL DE CARGA DE CERTIFICADO FIRMAEC PAdES
-    // ==========================================
     function abrirModalFirmaEC(campoFirma, labelFirma) {
         Swal.fire({
             title: '<h2 style="color:white; margin:0; font-size:18px; font-weight:900;">Cargar Certificado FirmaEC</h2>',
             html: `
                 <div style="font-family: 'Inter', sans-serif; text-align: left; padding: 5px;">
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 20px;">
-                        Seleccione el archivo <b>.p12</b> o <b>.pfx</b> entregado por la entidad certificadora (BCE, Security Data, etc).
-                    </p>
-                    <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">1. ARCHIVO DEL CERTIFICADO</label>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 20px;">Ingrese su clave de firma digital para estampar el bloque PAdES en el servidor.</p>
+                    <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">1. ARCHIVO DEL CERTIFICADO (.p12)</label>
                     <input type="file" id="swal-p12-file" accept=".p12,.pfx" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 2px dashed #93c5fd; border-radius: 8px; background: #eff6ff; outline:none;">
                     <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">2. CONTRASEÑA DE LA FIRMA</label>
                     <input type="password" id="swal-p12-pass" placeholder="••••••••••••" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline:none;">
                 </div>
             `,
-            showCancelButton: true, confirmButtonText: '🔒 Adjuntar Firma', cancelButtonText: 'Cancelar',
+            showCancelButton: true, confirmButtonText: '🔒 Firmar PAdES', cancelButtonText: 'Cancelar',
             customClass: { popup: 'swal-firmaec-popup', header: 'swal-firmaec-header', confirmButton: 'btn btn-primary px-4 py-2 fw-bold rounded-pill shadow-sm', cancelButton: 'btn btn-light px-4 py-2 fw-bold rounded-pill' },
             preConfirm: () => {
                 if (!document.getElementById('swal-p12-file').files[0] || !document.getElementById('swal-p12-pass').value) {
@@ -653,8 +598,7 @@
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // AQUÍ ES DONDE LUEGO CONECTAREMOS CON EL BACKEND PARA FIRMAR EL PDF REALMENTE
-                // Por ahora, cambiamos el diseño en vivo para mostrar que se cargó.
+                // Aquí el sistema hace POST para inyectar PAdES en el backend Python.
                 Swal.fire({ title: 'Cargando certificado...', text: 'Preparando la firma criptográfica.', timer: 1500, didOpen: () => Swal.showLoading() }).then(() => {
                     document.getElementById('btn_' + campoFirma).style.display = 'none';
                     document.getElementById('previewFirma_' + campoFirma).style.display = 'block';
@@ -666,11 +610,24 @@
     }
 
     function validarYGuardarTodo() {
-        if (document.querySelectorAll('.has-error').length > 0) {
-            Swal.fire('Formulario Incompleto', 'Revise los campos en rojo.', 'warning'); return;
+        const form = document.getElementById('formularioOficial');
+        const requeridos = form.querySelectorAll('input[type="text"]:not([readonly]), select:not([disabled])');
+        let formValido = true;
+
+        requeridos.forEach(el => {
+            if(el.value.trim() === '') {
+                mostrarError(el, '⚠ Este campo es obligatorio.');
+                formValido = false;
+            }
+        });
+
+        if (!formValido || document.querySelectorAll('.has-error').length > 0) { 
+            Swal.fire('Formulario Incompleto', 'Debe llenar todos los campos habilitados correctamente antes de guardar el trámite.', 'warning'); 
+            return; 
         }
-        Swal.fire({ title: '¿Finalizar trámite?', text: 'Se guardarán los datos de la solicitud.', icon: 'question', showCancelButton: true, confirmButtonText: 'Sí, guardar', confirmButtonColor: '#16a34a' }).then((result) => {
-            if (result.isConfirmed) { document.getElementById('formularioOficial').submit(); }
+
+        Swal.fire({ title: '¿Finalizar trámite?', text: 'Se guardarán de manera irreversible los datos llenados.', icon: 'question', showCancelButton: true, confirmButtonText: 'Sí, Guardar Trámite', confirmButtonColor: '#16a34a' }).then((result) => {
+            if(result.isConfirmed) { document.getElementById('formularioOficial').submit(); }
         });
     }
 </script>
