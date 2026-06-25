@@ -155,6 +155,10 @@ def actualizar_espejo():
 # ==========================================
 # 4. RUTA: GENERACIÓN Y DESCARGA DE PDF
 # ==========================================
+import os
+from flask import current_app, send_file, abort, flash, redirect, url_for
+from flask_login import login_required, current_user
+
 @paz_salvo_bp.route('/paz-salvo/descargar-pdf/<int:solicitud_id>')
 @login_required
 def descargar_pdf(solicitud_id):
@@ -173,6 +177,7 @@ def descargar_pdf(solicitud_id):
     # SOLUCIÓN DE LA RUTA: current_app.root_path encuentra la ruta exacta sin duplicar carpetas
     directorio_temp = os.path.join(current_app.root_path, 'static', 'temp')
     os.makedirs(directorio_temp, exist_ok=True) # Crea la carpeta si no existe
+    
     ruta_pdf = os.path.join(directorio_temp, f'PazSalvo_{solicitud.id}.pdf')
     
     log = LogAuditoria(usuario_id=current_user.id, modulo='Reportes', accion='DESCARGA PDF', detalle=f"Descargó borrador PDF del trámite #{solicitud.id}")
@@ -181,14 +186,17 @@ def descargar_pdf(solicitud_id):
     
     try:
         usuario_obj = Usuario.query.get(solicitud.ex_funcionario_id)
-        # Aquí generas el documento
+        # Asegúrate de que esta función esté guardando correctamente el PDF en ruta_pdf
         generar_documento_paz_salvo(solicitud, usuario_obj, respuestas_por_area, ruta_pdf)
     except Exception as e:
         flash(f'Ocurrió un error al generar el PDF: {str(e)}', 'danger')
         return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=solicitud.id))
     
-    return send_file(ruta_pdf, as_attachment=True, download_name=f"Paz_y_Salvo_{solicitud.id}.pdf")
-
+    if os.path.exists(ruta_pdf):
+        return send_file(ruta_pdf, as_attachment=True, download_name=f"Paz_y_Salvo_{solicitud.id}.pdf")
+    else:
+        flash('El archivo PDF aún no se ha generado correctamente en el servidor.', 'danger')
+        return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=solicitud.id))
 
 # ==========================================
 # 5. RUTA: VALIDACIÓN Y SUBIDA DE FIRMA
@@ -232,3 +240,79 @@ def subir_firma_digital(solicitud_id):
         flash(mensaje, 'danger')
             
     return redirect(url_for('dashboard.index'))
+
+
+# ==========================================
+# 6. RUTA: Firma Criptográfica
+# ==========================================
+
+import os
+from flask import request, jsonify, current_app
+from flask_login import login_required, current_user
+# Importaciones para Firma Criptográfica
+from pyhanko.sign import signers
+from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
+from pyhanko.sign.fields import SigFieldSpec, append_signature_field
+
+@paz_salvo_bp.route('/paz-salvo/subir-firma/<int:solicitud_id>', methods=['POST'])
+@login_required
+def subir_firma_pades(solicitud_id):
+    # 1. Recibir los datos del modal
+    if 'pdf_firmado' not in request.files:
+        return jsonify({'mensaje': 'No se adjuntó el certificado .p12'}), 400
+        
+    archivo_p12 = request.files['pdf_firmado']
+    password = request.form.get('password', '')
+    campo_firma = request.form.get('campo', 'Firma_Desconocida')
+
+    try:
+        # 2. Desencriptar el certificado .p12/.pfx usando la contraseña
+        p12_data = archivo_p12.read()
+        signer = signers.SimpleSigner.load_pkcs12(p12_data, bpassword=password.encode('utf-8'))
+    except Exception as e:
+        return jsonify({'mensaje': 'La contraseña es incorrecta o el certificado es inválido.'}), 400
+
+    # 3. Ubicar el PDF a firmar
+    directorio_temp = os.path.join(current_app.root_path, 'static', 'temp')
+    ruta_pdf_original = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}.pdf')
+    
+    # IMPORTANTE: Si ya fue firmado antes por otra persona, debemos seguir firmando SOBRE ese mismo archivo
+    if not os.path.exists(ruta_pdf_original):
+        return jsonify({'mensaje': 'El PDF base no ha sido generado. Primero guarde el formulario o haga clic en PDF.'}), 404
+
+    # 4. Proceso de firma PAdES con pyHanko
+    try:
+        # Abrimos el PDF existente de forma incremental (para no romper firmas anteriores)
+        with open(ruta_pdf_original, 'rb') as inf:
+            w = IncrementalPdfFileWriter(inf)
+            
+            # Añadimos el campo de metadatos invisible para FirmaEC
+            append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma))
+            
+            # Escribimos la firma matemática en el documento
+            with open(ruta_pdf_original, 'r+b') as outf:
+                signers.sign_pdf(
+                    w, signers.PdfSignatureMetadata(field_name=campo_firma),
+                    signer=signer,
+                    outf=outf
+                )
+        
+        # 5. Extraer el nombre real de la persona del certificado (Para guardarlo en BD)
+        nombre_firmante = signer.cert.subject.human_friendly
+        
+        # Opcional: Aquí debes actualizar tu base de datos para registrar que este campo fue firmado
+        # respuesta = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo=campo_firma).first()
+        # respuesta.valor = "FIRMADO"
+        # respuesta.firmado_por = nombre_firmante
+        # db.session.commit()
+
+        return jsonify({
+            'mensaje': 'Documento encriptado y firmado con éxito.',
+            'firmado_por': nombre_firmante
+        }), 200
+
+    except Exception as e:
+        return jsonify({'mensaje': f'Error al estampar la firma en el PDF: {str(e)}'}), 500
+    
+
+    
