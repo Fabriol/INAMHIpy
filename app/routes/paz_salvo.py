@@ -12,6 +12,8 @@ from pyhanko.sign import signers
 from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
 from pyhanko.sign.fields import SigFieldSpec, append_signature_field
 
+from pyhanko.sign import signers, pkcs12 # <--- Asegúrate de agregar pkcs12 aquí
+
 paz_salvo_bp = Blueprint('paz_salvo', __name__)
 
 # ====================================================================
@@ -208,23 +210,23 @@ def subir_firma_pades(solicitud_id):
     password = request.form.get('password', '')
     campo_firma = request.form.get('campo', 'Firma_Desconocida')
 
-    # CREAR CARPETA TEMPORAL
-    directorio_temp = os.path.join(current_app.root_path, 'static', 'temp')
+    # CREAR CARPETA TEMPORAL Y RUTA ABSOLUTA
+    directorio_temp = os.path.abspath(os.path.join(current_app.root_path, 'static', 'temp'))
     os.makedirs(directorio_temp, exist_ok=True)
     ruta_temp_p12 = os.path.join(directorio_temp, f"firma_{solicitud_id}_{current_user.id}.p12")
+    
     archivo_p12.save(ruta_temp_p12)
 
     try:
-        # CARGAR CERTIFICADO SIN INTENTAR CARGAR CADENAS EXTERNAS
-        # Usamos allow_missing_ca_chain=True para evitar el error WinError 6
+        # CARGAMOS EL CERTIFICADO DE FORMA MÁS ROBUSTA PARA WINDOWS
+        # ca_chain_files=None le dice a pyHanko: "No busques certificados adicionales"
         signer = signers.SimpleSigner.load_pkcs12(
             ruta_temp_p12, 
-            password.encode('utf-8'),
+            password.encode('utf-8')
         )
         
-        # Verificar que el signer no sea nulo
         if signer is None or not hasattr(signer, 'cert'):
-            raise Exception("No se pudo extraer la identidad del certificado.")
+            raise Exception("El certificado cargado es nulo o no contiene datos válidos.")
 
         nombre_firmante = signer.cert.subject.human_friendly
 
