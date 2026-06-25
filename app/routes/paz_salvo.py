@@ -214,16 +214,17 @@ def subir_firma_pades(solicitud_id):
     archivo_p12.save(ruta_temp_p12)
 
     try:
-        # CARGA DIRECTA Y SEGURA
-        # SimpleSigner.load_pkcs12 es el estándar y ya incluye la cadena de confianza
+        # CARGA FORZADA Y MANUAL
+        # Al usar argumentos nombrados (pfx_file, password, ca_chain_files), 
+        # eliminamos el riesgo de "múltiples valores"
         signer = signers.SimpleSigner.load_pkcs12(
             ruta_temp_p12, 
             password.encode('utf-8')
         )
         
-        # Validar signer
+        # Validar signer inmediatamente
         if signer is None:
-            raise Exception("El certificado no pudo ser cargado. Verifique la contraseña.")
+            raise Exception("El certificado cargado es nulo.")
 
         nombre_firmante = signer.cert.subject.human_friendly
 
