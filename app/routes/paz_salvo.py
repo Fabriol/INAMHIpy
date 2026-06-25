@@ -7,12 +7,10 @@ import os
 from app.models.base import db, Usuario, Rol, SolicitudPazSalvo, Respuesta, LogAuditoria
 from app.services.pdf_service import generar_documento_paz_salvo
 
-# Librerías criptográficas para la firma PAdES
+# Librerías criptográficas (ESTO ES TODO LO QUE NECESITAS)
 from pyhanko.sign import signers
 from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
 from pyhanko.sign.fields import SigFieldSpec, append_signature_field
-
-from pyhanko.sign import signers, pkcs12 # <--- Asegúrate de agregar pkcs12 aquí
 
 paz_salvo_bp = Blueprint('paz_salvo', __name__)
 
@@ -198,7 +196,7 @@ def descargar_pdf(solicitud_id):
         return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=solicitud.id))
 
 # ====================================================================
-# 6. RUTA: FIRMA CRIPTOGRÁFICA PAdES (VALIDACIÓN REAL)
+# 6. RUTA: FIRMA CRIPTOGRÁFICA PAdES (SOLUCIÓN DIRECTA)
 # ====================================================================
 @paz_salvo_bp.route('/paz-salvo/subir-firma/<int:solicitud_id>', methods=['POST'])
 @login_required
@@ -210,33 +208,30 @@ def subir_firma_pades(solicitud_id):
     password = request.form.get('password', '')
     campo_firma = request.form.get('campo', 'Firma_Desconocida')
 
-    # CREAR CARPETA TEMPORAL Y RUTA ABSOLUTA
     directorio_temp = os.path.abspath(os.path.join(current_app.root_path, 'static', 'temp'))
     os.makedirs(directorio_temp, exist_ok=True)
     ruta_temp_p12 = os.path.join(directorio_temp, f"firma_{solicitud_id}_{current_user.id}.p12")
-    
     archivo_p12.save(ruta_temp_p12)
 
     try:
-        # CARGAMOS EL CERTIFICADO DE FORMA MÁS ROBUSTA PARA WINDOWS
-        # ca_chain_files=None le dice a pyHanko: "No busques certificados adicionales"
+        # CARGA DIRECTA Y SEGURA
+        # SimpleSigner.load_pkcs12 es el estándar y ya incluye la cadena de confianza
         signer = signers.SimpleSigner.load_pkcs12(
             ruta_temp_p12, 
             password.encode('utf-8')
         )
         
-        if signer is None or not hasattr(signer, 'cert'):
-            raise Exception("El certificado cargado es nulo o no contiene datos válidos.")
+        # Validar signer
+        if signer is None:
+            raise Exception("El certificado no pudo ser cargado. Verifique la contraseña.")
 
         nombre_firmante = signer.cert.subject.human_friendly
 
-        # RUTA DEL PDF A FIRMAR
+        # ESTAMPAR FIRMA
         ruta_pdf_original = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}.pdf')
-        
         if not os.path.exists(ruta_pdf_original):
             raise Exception("El PDF base no existe. Genere el PDF primero.")
 
-        # ESTAMPAR FIRMA
         with open(ruta_pdf_original, 'rb') as inf:
             w = IncrementalPdfFileWriter(inf)
             append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma))
@@ -269,6 +264,6 @@ def subir_firma_pades(solicitud_id):
 
     except Exception as e:
         if os.path.exists(ruta_temp_p12): os.remove(ruta_temp_p12)
-        import traceback
-        traceback.print_exc()
+        # Esto nos mostrará el error real en la terminal sin romper el servidor
+        print(f"ERROR DE FIRMA: {str(e)}") 
         return jsonify({'mensaje': f'Error de firma: {str(e)}'}), 500
