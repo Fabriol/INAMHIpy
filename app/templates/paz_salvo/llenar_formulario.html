@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- SweetAlert2 para la validación de FirmaEC -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
@@ -63,8 +64,10 @@
     }
 </style>
 
+<!-- DICCIONARIO REUTILIZABLE PARA JINJA -->
 {% set bloqueados = campos_bloqueados if campos_bloqueados else [] %}
 
+<!-- MACRO DE INPUTS -->
 {% macro input_text(name, label, type='text', width='', max_len='', js_val='', val='') %}
 <div class="input-group {{ width }}" id="grp_{{ name }}">
     <label>{{ label }}</label>
@@ -104,12 +107,14 @@
 
 
 <div class="page fade-in">
+    <!-- PANEL DE HERRAMIENTAS Y ACCIONES DE IMPRESIÓN -->
     <div class="page-header no-print">
         <div>
             <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Trámite Institucional #{{ solicitud.id }}</span>
             <h1 style="font-size: 24px; font-weight: 900; color: #1e3a8a; margin: 0;">Gestión de Liquidación Base</h1>
         </div>
         <div>
+            <!-- BOTONES DE IMPRESIÓN SUPERIORES -->
             <button class="btn btn-lg btn-light border fw-bold shadow-sm me-2 text-dark" onclick="window.print()">
                 <i class="bi bi-printer-fill text-primary me-2"></i> Imprimir Hoja Espejo
             </button>
@@ -119,21 +124,18 @@
         </div>
     </div>
 
-    <!-- =====================================================================
-       PANEL SUPERIOR: DESIGNACIÓN DE PREGUNTAS (EXCLUSIVO ADMINISTRADOR)
-       ===================================================================== -->
+    <!-- PANEL SUPERIOR: DESIGNACIÓN DE PREGUNTAS (EXCLUSIVO ADMINISTRADOR) -->
     {% if current_user.rol.nombre == 'Administrador' %}
     <div class="panel-admin-box no-print fade-in">
         <h5 style="color: var(--blue-900); font-weight: 900; text-transform: uppercase; margin-bottom: 12px;"><i class="bi bi-shield-lock-fill me-2"></i> Panel de Designación Analítica (Campo por Campo)</h5>
-        <p style="font-size: 12px; color: var(--slate-500); margin-bottom: 15px;">Seleccione los campos exactos y asígnelos al servidor correspondiente de cada Dirección Técnica.</p>
+        <p style="font-size: 12px; color: var(--slate-500); margin-bottom: 15px;">Seleccione los campos exactos del formulario y asígnelos al servidor correspondiente.</p>
         
         <form hx-post="/paz-salvo/asignar-campos/{{ solicitud.id }}" hx-target="#live-alert">
             <div class="row g-3 align-items-start">
                 <div class="col-md-7">
-                    <!-- ACORDEÓN DE CAMPOS -->
+                    <!-- ACORDEÓN DE TODOS LOS CAMPOS -->
                     <div class="accordion" id="accordionAdmin" style="box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                         
-                        <!-- SECCIÓN 3 -->
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headSec3">
                                 <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec3" style="font-size: 12px; background: #f0f9ff; color: #0369a1;">
@@ -141,16 +143,36 @@
                                 </button>
                             </h2>
                             <div id="colSec3" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
-                                <div class="accordion-body" style="font-size: 11px; max-height: 150px; overflow-y: auto;">
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tramites_informe"> <label class="form-check-label fw-bold">Informe fin gestión y QUIPUX (Firma 1)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tramites_fe_presentacion"> <label class="form-check-label fw-bold">Fe de presentación y Claves (Firma 2)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tramites_losep"> <label class="form-check-label fw-bold">Archivo LOSEP y Acta Claves (Firma 3)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tramites_admin_contrato"> <label class="form-check-label fw-bold">Gestión de Contratos / Jefe Inmediato (Firma Jefe)</label></div>
+                                <div class="accordion-body" style="font-size: 11px; max-height: 200px; overflow-y: auto;">
+                                    <div class="row">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_informe"> S/N Informe gestión</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_quipux_cero"> S/N QUIPUX cero</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_nombre_resp1"> Resp. Fila 1</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="tramites_r1"> Firma PAdES 1</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_fe_presentacion"> S/N Fe presentación</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_claves_asignadas"> S/N Claves asignadas</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_nombre_resp2"> Resp. Fila 2</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="tramites_r2"> Firma PAdES 2</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_losep"> S/N Archivo LOSEP</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_acta_claves"> S/N Acta Claves</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_nombre_resp3"> Resp. Fila 3</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="tramites_r3"> Firma PAdES 3</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_admin_contrato"> S/N Admin. Contrato</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_desc_contrato"> Desc. Contrato</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_memo"> Memo Admin</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_jefe_inmediato"> Nombre Jefe Inmediato</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_servidor_recibe"> Servidor que Recibe</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_obs"> Observaciones</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tramites_nombre_responsable"> Nombre Jefe de Área</div>
+                                        <div class="col-6 text-danger"><input type="checkbox" name="campos" value="tramites_jefe"> Firma PAdES JEFE</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- SECCIÓN 4 -->
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headSec4">
                                 <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec4" style="font-size: 12px; background: #f1f5f9; color: #334155;">
@@ -158,17 +180,35 @@
                                 </button>
                             </h2>
                             <div id="colSec4" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
-                                <div class="accordion-body" style="font-size: 11px; max-height: 150px; overflow-y: auto;">
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="admin_informe"> <label class="form-check-label fw-bold">Entrega informe actividades (Firma 1)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="admin_bienes"> <label class="form-check-label fw-bold">Bienes, Muebles y Actas (Firma 2)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="admin_deducibles"> <label class="form-check-label fw-bold">Deducibles pendientes (Firma 3)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="admin_pasajes"> <label class="form-check-label fw-bold">Pasajes por justificar (Firma 4)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="admin_responsable"> <label class="form-check-label fw-bold text-danger">Firma Global Director/a Administrativo</label></div>
+                                <div class="accordion-body" style="font-size: 11px; max-height: 200px; overflow-y: auto;">
+                                    <div class="row">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_informe"> S/N Entrega informe</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_nombre_resp1"> Resp. Informe</div>
+                                        <div class="col-12 text-primary"><input type="checkbox" name="campos" value="admin_r1"> Firma PAdES Informe</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_bienes"> S/N Bienes y muebles</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_valor_bienes"> Valor Bienes $</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_acta_bienes"> N° Acta Bienes</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_nombre_resp2"> Resp. Bienes</div>
+                                        <div class="col-12 text-primary"><input type="checkbox" name="campos" value="admin_r2"> Firma PAdES Bienes</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_deducibles"> S/N Deducibles</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_deducibles_valor"> Valor Deducibles $</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_nombre_resp3"> Resp. Deducibles</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="admin_r3"> Firma PAdES Deducibles</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_pasajes"> S/N Pasajes justificar</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_pasajes_valor"> Valor Pasajes $</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_nombre_resp4"> Resp. Pasajes</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="admin_r4"> Firma PAdES Pasajes</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="admin_responsable"> Nombre Director/a Adm</div>
+                                        <div class="col-6 text-danger"><input type="checkbox" name="campos" value="admin_dir"> Firma PAdES Director/a</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- SECCIÓN 5 -->
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headSec5">
                                 <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec5" style="font-size: 12px; background: #faf5ff; color: #7e22ce;">
@@ -176,17 +216,40 @@
                                 </button>
                             </h2>
                             <div id="colSec5" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
-                                <div class="accordion-body" style="font-size: 11px; max-height: 150px; overflow-y: auto;">
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tic_verificacion"> <label class="form-check-label fw-bold">Verificación equipo e IPs (Firma 1)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tic_backup"> <label class="form-check-label fw-bold">Entrega y Rutas de Backup (Firma 2)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tic_retiro_acceso"> <label class="form-check-label fw-bold">Cierre Sistemas: QUIPUX, eSIGEF, SPRYN (Firma 3)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tic_tarjeta_cuentas"> <label class="form-check-label fw-bold">Tarjeta Magnética y Accesos (Firma 4)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="tic_responsable"> <label class="form-check-label fw-bold text-danger">Firma Global Responsable TIC</label></div>
+                                <div class="accordion-body" style="font-size: 11px; max-height: 200px; overflow-y: auto;">
+                                    <div class="row">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_verificacion"> S/N Verificación equipo</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_ip_fija"> S/N Acceso IP Fija</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_liberacion"> S/N Liberación IP</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_nombre_resp1"> Resp. Equipos/IP</div>
+                                        <div class="col-12 text-primary"><input type="checkbox" name="campos" value="tic_r1"> Firma PAdES Equipos</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_backup"> S/N Entrega backup</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_ruta_backup"> Ruta Backup</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_nombre_resp2"> Resp. Backup</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="tic_r2"> Firma PAdES Backup</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_retiro_acceso"> S/N Retiro accesos</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_cierre_correo"> S/N Cierre Correo</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_esigef"> S/N Cierre eSIGEF</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_quipux"> S/N Cierre QUIPUX</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_spryn"> S/N Cierre SPRYN</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_esbye"> S/N Cierre eSByE</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_nombre_resp3"> Resp. Cuentas</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="tic_r3"> Firma PAdES Cuentas</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_tarjeta_cuentas"> S/N Tarjeta Acceso</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_obs"> Novedades TIC</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_nombre_resp4"> Resp. Tarjeta</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="tic_r4"> Firma PAdES Tarjeta</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="tic_responsable"> Nombre Resp. TIC General</div>
+                                        <div class="col-6 text-danger"><input type="checkbox" name="campos" value="tic_r5"> Firma PAdES Resp TIC</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- SECCIÓN 6 -->
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headSec6">
                                 <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec6" style="font-size: 12px; background: #ecfdf5; color: #047857;">
@@ -194,34 +257,95 @@
                                 </button>
                             </h2>
                             <div id="colSec6" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
-                                <div class="accordion-body" style="font-size: 11px; max-height: 150px; overflow-y: auto;">
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="fin_saldos"> <label class="form-check-label fw-bold">Saldos contables (Firma 1)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="fin_anticipo"> <label class="form-check-label fw-bold">Anticipo sueldos (Firma 2)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="fin_recuperacion"> <label class="form-check-label fw-bold">Recuperación de valores (Firma 3)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="fin_devolucion"> <label class="form-check-label fw-bold">Devolución de muebles (Firma 4)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="fin_director"> <label class="form-check-label fw-bold text-danger">Firma Global Director/a Financiero</label></div>
+                                <div class="accordion-body" style="font-size: 11px; max-height: 200px; overflow-y: auto;">
+                                    <div class="row">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_saldos"> S/N Saldos contables</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_saldos_valor"> Valor Saldos $</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_nombre_resp1"> Resp. Saldos</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="fin_r1"> Firma PAdES Saldos</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_anticipo"> S/N Anticipo sueldos</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_anticipo_valor"> Valor Anticipo $</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_nombre_resp2"> Resp. Anticipos</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="fin_r2"> Firma PAdES Anticipos</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_recuperacion"> S/N Recuperación valores</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_recuperacion_valor"> Valor Recuperación $</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_nombre_resp3"> Resp. Valores</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="fin_r3"> Firma PAdES Valores</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_devolucion"> S/N Devolución muebles</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_devolucion_valor"> Valor Devolución $</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_nombre_resp4"> Resp. Muebles</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="fin_r4"> Firma PAdES Muebles</div>
+                                        <hr class="my-1">
+                                        <div class="col-6"><input type="checkbox" name="campos" value="fin_director"> Nombre Director/a Finan.</div>
+                                        <div class="col-6 text-danger"><input type="checkbox" name="campos" value="fin_dir"> Firma PAdES Director/a</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- SECCIONES 7 y 8 (Seguridad y RRHH) -->
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headSec78">
                                 <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec78" style="font-size: 12px; background: #fffbeb; color: #b45309;">
-                                    7 y 8. Seguridad EGSI & Recursos Humanos
+                                    7, 8 y 9. Seguridad, RRHH y Recepción
                                 </button>
                             </h2>
                             <div id="colSec78" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
-                                <div class="accordion-body" style="font-size: 11px; max-height: 150px; overflow-y: auto;">
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="seg_archivos"> <label class="form-check-label fw-bold">Seguridad Archivos Digitales (Firma Seg 1)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="seg_archivos_fisicos"> <label class="form-check-label fw-bold">Seguridad Archivos Físicos (Firma Seg 2)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="seg_oficial"> <label class="form-check-label fw-bold text-danger">Firma Oficial de Seguridad</label></div>
-                                    <hr class="my-1">
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="rrhh_capacitacion"> <label class="form-check-label fw-bold">Capacitación y Evaluación (Firmas RRHH 1 y 2)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="rrhh_viajes"> <label class="form-check-label fw-bold">Viajes y SIITH (Firmas RRHH 3 y 4)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="rrhh_vacaciones"> <label class="form-check-label fw-bold">Vacaciones y Juramentada (Firmas RRHH 5 y 6)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="rrhh_credencial"> <label class="form-check-label fw-bold">Credenciales y Ropa de Trabajo (Firmas RRHH 7 y 8)</label></div>
-                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="campos" value="rrhh_director"> <label class="form-check-label fw-bold text-danger">Firma Global Director/a RRHH</label></div>
+                                <div class="accordion-body" style="font-size: 11px; max-height: 200px; overflow-y: auto;">
+                                    <div class="row">
+                                        <!-- SEGURIDAD -->
+                                        <div class="col-6"><input type="checkbox" name="campos" value="seg_archivos"> S/N Archivos Digitales</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="seg_entrega_copia"> S/N Copia Actividades</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="seg_nombre_resp1"> Resp. Digitales</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="seg_r1"> Firma PAdES Digitales</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="seg_archivos_fisicos"> S/N Archivos Físicos</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="seg_verificacion_info"> S/N Verificación Info</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="seg_nombre_resp2"> Resp. Físicos</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="seg_r2"> Firma PAdES Físicos</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="seg_oficial"> Nombre Oficial Seg.</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="seg_responsable"> Nombre Resp. Seg.</div>
+                                        <div class="col-12 text-danger"><input type="checkbox" name="campos" value="seg_oficial_sig"> Firma PAdES Oficial</div>
+                                        <hr class="my-1">
+                                        <!-- RRHH -->
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_capacitacion"> RRHH: Capacitación S/N</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_cursos_eval"> RRHH: Cursos Info</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_resp_capacitacion"> Resp. Capacitación</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="rrhh_r1"> Firma PAdES Cap.</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_evaluacion"> RRHH: Evaluación S/N</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_resp_evaluacion"> Resp. Evaluación</div>
+                                        <div class="col-12 text-primary"><input type="checkbox" name="campos" value="rrhh_r2"> Firma PAdES Eval.</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_viajes"> RRHH: Viajes S/N</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_resp_viajes"> Resp. Viajes</div>
+                                        <div class="col-12 text-primary"><input type="checkbox" name="campos" value="rrhh_r3"> Firma PAdES Viajes</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_siith"> RRHH: SIITH S/N</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_resp_siith"> Resp. SIITH</div>
+                                        <div class="col-12 text-primary"><input type="checkbox" name="campos" value="rrhh_r4"> Firma PAdES SIITH</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_vacaciones"> RRHH: Días Vacaciones</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_num_certificado"> RRHH: Certificado N°</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_resp_vacaciones"> Resp. Vacaciones</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="rrhh_r5"> Firma PAdES Vac.</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_juramentada"> RRHH: Juramentada S/N</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_num_declaracion"> RRHH: N° Declaración</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_resp_juramentada"> Resp. Juramentada</div>
+                                        <div class="col-6 text-primary"><input type="checkbox" name="campos" value="rrhh_r6"> Firma PAdES Jur.</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_credencial"> RRHH: Credencial S/N</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_resp_credencial2"> Resp. Credencial</div>
+                                        <div class="col-12 text-primary"><input type="checkbox" name="campos" value="rrhh_r7"> Firma PAdES Cred.</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_acta_bienes"> RRHH: Acta Bienes S/N</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_resp_acta"> Resp. Acta</div>
+                                        <div class="col-12 text-primary"><input type="checkbox" name="campos" value="rrhh_r8"> Firma PAdES Act. Bien.</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="rrhh_director"> Nombre Director/a RRHH</div>
+                                        <div class="col-6 text-danger"><input type="checkbox" name="campos" value="rrhh_dir"> Firma PAdES Dir. RRHH</div>
+                                        <hr class="my-1">
+                                        <!-- RECEPCIÓN -->
+                                        <div class="col-6"><input type="checkbox" name="campos" value="recepcion_fecha"> Recepción: Fecha</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="recepcion_hojas"> Recepción: Hojas</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="recepcion_servidor"> Recepción: Servidor</div>
+                                        <div class="col-6"><input type="checkbox" name="campos" value="recepcion_cargo"> Recepción: Cargo</div>
+                                        <div class="col-12 text-primary"><input type="checkbox" name="campos" value="recepcion_r1"> Firma PAdES Recepción</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -245,12 +369,15 @@
     </div>
     {% endif %}
 
+    <!-- DETALLE CENTRAL DE LLENADO -->
     <div class="doc-form-layout">
         
+        <!-- FORMULARIO DE RECOLECCIÓN (IZQUIERDA) -->
         <div class="doc-form-left no-print">
             <form id="formularioOficial" hx-post="/actualizar-espejo" hx-trigger="keyup changed delay:100ms, change" hx-target="#vista-espejo">
                 <input type="hidden" name="solicitud_id" value="{{ solicitud.id }}">
 
+                <!-- SECCIÓN 1 -->
                 <div class="doc-section-head">👤 1. Datos Personales del Servidor Saliente</div>
                 <div class="doc-fields-grid">
                     {{ input_text('nombres_apellidos', 'Nombres y Apellidos Completos', 'text', 'span-2', '100', 'soloLetras', solicitud.ex_funcionario.nombres ~ ' ' ~ solicitud.ex_funcionario.apellidos) }}
@@ -278,6 +405,7 @@
                     {{ input_text('email1', 'Correo Electrónico Principal', 'email', '', '100') }}
                     {{ input_text('email2', 'Correo Electrónico Alternativo', 'email', '', '100') }}
                     
+                    <!-- SELECTS DE FILTRADO GEOGRÁFICO DE ECUADOR -->
                     <div class="input-group">
                         <label>Provincia Ecuatoriana</label>
                         <select name="provincia" id="provinciaSelect" class="doc-input" onchange="filtrarCantonesEcuador()"></select>
@@ -288,6 +416,7 @@
                     </div>
                 </div>
 
+                <!-- SECCIÓN 2 -->
                 <div class="doc-section-head mt-4">🏢 2. Dirección / Unidad de Desempeño</div>
                 <div class="doc-fields-grid">
                     <div class="input-group">
@@ -302,6 +431,7 @@
                     {{ input_text('cargo', 'Cargo Institucional Desempeñado', 'text', 'span-2') }}
                 </div>
 
+                <!-- SECCIÓN 3 -->
                 <div class="doc-section-head mt-4">📋 3. Gestión Documental, Archivo y Trámites</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('tramites_informe', '¿Entrega Informe de Fin de Gestión?') }}
@@ -330,6 +460,7 @@
                     <div class="span-2 d-flex">{{ firma_box('tramites_jefe', 'Firma Electrónica Jefe') }}</div>
                 </div>
 
+                <!-- SECCIÓN 4 -->
                 <div class="doc-section-head mt-4">🏛️ 4. Dirección Administrativa — Bienes e Inventario</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('admin_informe', '¿Validación de Informe de Bienes?') }}
@@ -356,6 +487,7 @@
                     <div class="span-2 d-flex">{{ firma_box('admin_dir', 'Firma PAdES Director/a') }}</div>
                 </div>
 
+                <!-- SECCIÓN 5 -->
                 <div class="doc-section-head mt-4">💻 5. Gestión de Tecnologías de la Información (TICs)</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('tic_verificacion', '¿Inspección Física de Equipo?') }}
@@ -387,6 +519,7 @@
                     <div class="span-2 d-flex">{{ firma_box('tic_r5', 'Firma Electrónica Jefe TIC') }}</div>
                 </div>
 
+                <!-- SECCIÓN 6 -->
                 <div class="doc-section-head mt-4">💰 6. Gestión Financiera (Cuentas por Cobrar)</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('fin_saldos', '¿Saldos Pendientes (Viáticos/Cajas Chicas)?') }}
@@ -413,6 +546,7 @@
                     <div class="span-2 d-flex">{{ firma_box('fin_dir', 'Firma PAdES Director/a') }}</div>
                 </div>
 
+                <!-- SECCIÓN 7 -->
                 <div class="doc-section-head mt-4">🔒 7. Seguridad de la Información (EGSI - AM 166)</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('seg_archivos', '¿Análisis de Seguridad de Archivos Digitales?') }}
@@ -427,9 +561,10 @@
 
                     {{ input_text('seg_oficial', 'Oficial de Seguridad de la Información', 'text', 'span-2', '', 'soloLetras') }}
                     {{ input_text('seg_responsable', 'Responsable de la Infraestructura de Seguridad', 'text', 'span-2', '', 'soloLetras') }}
-                    <div class="span-2 d-flex">{{ firma_box('seg_oficial', 'Firma Oficial EGSI') }}</div>
+                    <div class="span-2 d-flex">{{ firma_box('seg_oficial_sig', 'Firma Oficial EGSI') }}</div>
                 </div>
 
+                <!-- SECCIÓN 8 -->
                 <div class="doc-section-head mt-4">👥 8. Dirección de Recursos Humanos (Administración de Personal)</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('rrhh_capacitacion', '¿Cumplió Devengación de Cursos Obligatorios?') }}
@@ -471,6 +606,7 @@
                     <div class="span-2 d-flex">{{ firma_box('rrhh_dir', 'Firma Electrónica Director/a') }}</div>
                 </div>
 
+                <!-- SECCIÓN 9 -->
                 <div class="doc-section-head mt-4">📬 9. Ventanilla de Recepción Documental</div>
                 <div class="doc-fields-grid">
                     {{ input_text('recepcion_fecha', 'Fecha y Hora de Ingreso Físico', 'date') }}
@@ -480,6 +616,7 @@
                     <div class="span-2 d-flex">{{ firma_box('recepcion_r1', 'Firma Cargo Recepción') }}</div>
                 </div>
 
+                <!-- SECCIÓN 10 -->
                 <div class="doc-section-head mt-4" style="background: linear-gradient(135deg, #4c1d95, #7c3aed);">✍️ 10. Declaración Legal y Autorización de Descuento</div>
                 <div class="doc-fields-grid" style="background: #faf5ff;">
                     {{ input_text('cedula_firmante', 'Cédula de Identidad del Firmante', 'text', '', '10', 'validarCedula') }}
@@ -504,6 +641,7 @@
             </div>
         </div>
 
+        <!-- LADO DERECHO (ESPEJO A4) -->
         <div class="hoja-espejo-preview">
             <div class="d-flex justify-content-between align-items-center mb-3 no-print">
                 <span class="badge bg-white text-primary px-3 py-2 shadow-sm border border-primary" style="font-weight: 800;"><span class="spinner-grow spinner-grow-sm text-primary me-2" style="width: 10px; height: 10px;"></span>Espejo en Tiempo Real</span>
@@ -515,6 +653,7 @@
     </div>
 </div>
 
+<!-- DATA GEOGRÁFICA NATIVA Y SCRIPT DE VALIDACIÓN COMPLETA -->
 <script>
     const divisionPoliticaEcuador = {
         "PICHINCHA": ["QUITO", "CAYAMBE", "MEJÍA", "PEDRO MONCAYO", "RUMIÑAHUI", "SAN MIGUEL DE LOS BANCOS", "PEDRO VICENTE MALDONADO", "PUERTO QUITO"],
@@ -576,34 +715,73 @@
         if (ing && sal && new Date(sal) <= new Date(ing)) { grp.classList.add('has-error'); if(msg) msg.style.display = 'block'; } else { grp.classList.remove('has-error'); if(msg) msg.style.display = 'none'; }
     }
 
+    // ==========================================
+    // VALIDACIÓN ESTRICTA DE CERTIFICADO PAdES REAL
+    // ==========================================
     function abrirModalFirmaEC(campoFirma, labelFirma) {
         Swal.fire({
-            title: '<h2 style="color:white; margin:0; font-size:18px; font-weight:900;">Cargar Certificado FirmaEC</h2>',
+            title: '<h2 style="color:white; margin:0; font-size:18px; font-weight:900;">Validación Criptográfica PAdES</h2>',
             html: `
                 <div style="font-family: 'Inter', sans-serif; text-align: left; padding: 5px;">
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 20px;">Ingrese su clave de firma digital para estampar el bloque PAdES en el servidor.</p>
-                    <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">1. ARCHIVO DEL CERTIFICADO (.p12)</label>
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 20px;">
+                        Por favor, cargue su archivo de firma electrónica <b>.p12</b> o <b>.pfx</b> y su contraseña. 
+                        El sistema lo desencriptará y estampará su firma legal en el PDF.
+                    </p>
+                    <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">1. ARCHIVO DEL CERTIFICADO</label>
                     <input type="file" id="swal-p12-file" accept=".p12,.pfx" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 2px dashed #93c5fd; border-radius: 8px; background: #eff6ff; outline:none;">
                     <label style="font-size: 11px; font-weight: 800; color: #1e3a8a;">2. CONTRASEÑA DE LA FIRMA</label>
                     <input type="password" id="swal-p12-pass" placeholder="••••••••••••" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline:none;">
                 </div>
             `,
-            showCancelButton: true, confirmButtonText: '🔒 Firmar PAdES', cancelButtonText: 'Cancelar',
+            showCancelButton: true, confirmButtonText: '🔒 Inyectar Firma PAdES', cancelButtonText: 'Cancelar',
             customClass: { popup: 'swal-firmaec-popup', header: 'swal-firmaec-header', confirmButton: 'btn btn-primary px-4 py-2 fw-bold rounded-pill shadow-sm', cancelButton: 'btn btn-light px-4 py-2 fw-bold rounded-pill' },
+            showLoaderOnConfirm: true,
             preConfirm: () => {
-                if (!document.getElementById('swal-p12-file').files[0] || !document.getElementById('swal-p12-pass').value) {
-                    Swal.showValidationMessage('Debe seleccionar el certificado y escribir la contraseña.'); return false;
+                const fileInput = document.getElementById('swal-p12-file').files[0];
+                const passInput = document.getElementById('swal-p12-pass').value;
+
+                if (!fileInput || !passInput) {
+                    Swal.showValidationMessage('⚠️ Faltan datos. Adjunte el certificado y la contraseña.');
+                    return false;
                 }
-                return true;
+
+                const formData = new FormData();
+                formData.append('pdf_firmado', fileInput);
+                formData.append('password', passInput);
+                formData.append('campo', campoFirma);
+
+                // LLAMADA AL BACKEND REAL
+                return fetch(`/paz-salvo/subir-firma/{{ solicitud.id }}`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.mensaje || 'Error al validar el certificado.'); });
+                    }
+                    return response.json();
+                })
+                .catch(error => {
+                    Swal.showValidationMessage(`❌ ${error.message}`);
+                });
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Aquí el sistema hace POST para inyectar PAdES en el backend Python.
-                Swal.fire({ title: 'Cargando certificado...', text: 'Preparando la firma criptográfica.', timer: 1500, didOpen: () => Swal.showLoading() }).then(() => {
-                    document.getElementById('btn_' + campoFirma).style.display = 'none';
-                    document.getElementById('previewFirma_' + campoFirma).style.display = 'block';
-                    document.getElementById('input_' + campoFirma).value = 'FIRMADO';
-                    htmx.trigger('#formularioOficial', 'change');
+                document.getElementById('btn_' + campoFirma).style.display = 'none';
+                
+                const nombreExtraido = result.value.firmado_por;
+                const spanName = document.getElementById('name_' + campoFirma);
+                if (spanName) { spanName.innerText = nombreExtraido.toUpperCase(); }
+                
+                document.getElementById('previewFirma_' + campoFirma).style.display = 'block';
+                document.getElementById('input_' + campoFirma).value = 'FIRMADO';
+                
+                htmx.trigger('#formularioOficial', 'change');
+
+                Swal.fire({
+                    title: '¡Firma Exitosa!',
+                    text: `La firma de ${nombreExtraido} fue encriptada en el PDF.`,
+                    icon: 'success'
                 });
             }
         });
