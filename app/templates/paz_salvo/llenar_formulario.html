@@ -6,62 +6,245 @@
 
 <style>
     :root {
-        --blue-50: #eff6ff; --blue-100: #dbeafe; --blue-600: #2563eb; --blue-900: #1e3a8a;
-        --green-50: #f0fdf4; --green-600: #16a34a; 
-        --red-50: #fff1f2; --red-500: #ef4444; --red-600: #dc2626;
-        --slate-50: #f8fafc; --slate-200: #e2e8f0; --slate-300: #cbd5e1; --slate-500: #64748b; --slate-900: #0f172a;
+        --blue-50: #eff6ff;
+        --blue-100: #dbeafe;
+        --blue-600: #2563eb;
+        --blue-900: #1e3a8a;
+        --green-50: #f0fdf4;
+        --green-600: #16a34a;
+        --red-50: #fff1f2;
+        --red-500: #ef4444;
+        --red-600: #dc2626;
+        --slate-50: #f8fafc;
+        --slate-200: #e2e8f0;
+        --slate-300: #cbd5e1;
+        --slate-500: #64748b;
+        --slate-900: #0f172a;
         --grad-header: linear-gradient(90deg, #2563eb, #0ea5e9, #22c55e);
         --blur: blur(18px);
     }
-    
-    .page-header {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 26px 30px; border-radius: 20px; background: rgba(255,255,255,.88); 
-        border: 1px solid rgba(255,255,255,.80); backdrop-filter: var(--blur); 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; overflow: hidden; margin-bottom: 24px;
-    }
-    .page-header::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--grad-header); }
-    
-    .panel-admin-box { background: #fafcff; border: 2px dashed var(--blue-600); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
-    
-    .doc-form-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: flex-start; }
-    .doc-form-left { background: #fff; border: 2px solid var(--blue-900); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
-    .doc-section-head { background: linear-gradient(135deg, var(--blue-900), var(--blue-600)); color: #fff; font-size: 12px; font-weight: 800; text-transform: uppercase; padding: 12px 16px; border-bottom: 1px solid var(--slate-300); }
-    .doc-fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 20px; }
-    .span-2 { grid-column: span 2; }
-    
-    .input-group { display: flex; flex-direction: column; gap: 6px; }
-    .input-group label { font-size: 11px; font-weight: 800; color: var(--slate-500); text-transform: uppercase; }
-    
-    .doc-input {
-        width: 100%; padding: 10px 14px; border: 1.5px solid var(--slate-300);
-        border-radius: 8px; font-size: 13px; font-weight: 700 !important; color: #000 !important;
-        background: #fff !important; text-transform: uppercase; transition: 0.3s;
-    }
-    .doc-input:focus { border-color: var(--blue-600); box-shadow: 0 0 0 4px rgba(37,99,235,.15); outline: none; }
-    .doc-input[type="email"] { text-transform: lowercase; }
-    
-    .has-error .doc-input { border-color: var(--red-500); background: #fff5f5 !important; }
-    .has-error label { color: var(--red-600); }
-    .error-msg { font-size: 10px; color: var(--red-600); font-weight: 700; display: none; margin-top: 2px; }
-    .has-error .error-msg { display: block; }
 
-    .btn-firmaec { background: linear-gradient(135deg, #1e3a8a, #1d4ed8); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px;}
-    .btn-firmaec:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(29,78,216,.3); }
-    .hoja-espejo-preview { background: linear-gradient(135deg, #e8edf8, #d4daf0); border-radius: 20px; padding: 20px; position: sticky; top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    
-    .swal-firmaec-popup { border-radius: 16px !important; padding: 0 !important; overflow: hidden; }
-    .swal-firmaec-header { background: linear-gradient(135deg, #1e3a8a, #0ea5e9); padding: 20px !important; color: white !important; margin: 0 !important; }
-    .swal-firmaec-title { color: white !important; font-size: 18px !important; font-weight: 900 !important; margin: 0 !important; }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 26px 30px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, .88);
+        border: 1px solid rgba(255, 255, 255, .80);
+        backdrop-filter: var(--blur);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 4px;
+        background: var(--grad-header);
+    }
+
+    .panel-admin-box {
+        background: #fafcff;
+        border: 2px dashed var(--blue-600);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .doc-form-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: flex-start;
+    }
+
+    .doc-form-left {
+        background: #fff;
+        border: 2px solid var(--blue-900);
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .doc-section-head {
+        background: linear-gradient(135deg, var(--blue-900), var(--blue-600));
+        color: #fff;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--slate-300);
+    }
+
+    .doc-fields-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        padding: 20px;
+    }
+
+    .span-2 {
+        grid-column: span 2;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .input-group label {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--slate-500);
+        text-transform: uppercase;
+    }
+
+    .doc-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid var(--slate-300);
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700 !important;
+        color: #000 !important;
+        background: #fff !important;
+        text-transform: uppercase;
+        transition: 0.3s;
+    }
+
+    .doc-input:focus {
+        border-color: var(--blue-600);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, .15);
+        outline: none;
+    }
+
+    .doc-input[type="email"] {
+        text-transform: lowercase;
+    }
+
+    .has-error .doc-input {
+        border-color: var(--red-500);
+        background: #fff5f5 !important;
+    }
+
+    .has-error label {
+        color: var(--red-600);
+    }
+
+    .error-msg {
+        font-size: 10px;
+        color: var(--red-600);
+        font-weight: 700;
+        display: none;
+        margin-top: 2px;
+    }
+
+    .has-error .error-msg {
+        display: block;
+    }
+
+    .btn-firmaec {
+        background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .btn-firmaec:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(29, 78, 216, .3);
+    }
+
+    .hoja-espejo-preview {
+        background: linear-gradient(135deg, #e8edf8, #d4daf0);
+        border-radius: 20px;
+        padding: 20px;
+        position: sticky;
+        top: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .swal-firmaec-popup {
+        border-radius: 16px !important;
+        padding: 0 !important;
+        overflow: hidden;
+    }
+
+    .swal-firmaec-header {
+        background: linear-gradient(135deg, #1e3a8a, #0ea5e9);
+        padding: 20px !important;
+        color: white !important;
+        margin: 0 !important;
+    }
+
+    .swal-firmaec-title {
+        color: white !important;
+        font-size: 18px !important;
+        font-weight: 900 !important;
+        margin: 0 !important;
+    }
 
     @media print {
-        @page { size: A4 portrait; margin: 10mm; }
-        body, html { margin: 0 !important; padding: 0 !important; background: #fff !important; }
-        body * { visibility: hidden; }
-        .no-print, .page-header, .panel-admin-box, .doc-form-left { display: none !important; }
-        .hoja-espejo-preview { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; padding: 0 !important; background: transparent !important; box-shadow: none !important; }
-        #vista-espejo, #vista-espejo * { visibility: visible; }
-        #vista-espejo { position: relative; width: 100%; padding: 0; border: none; box-shadow: none; }
+        @page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+
+        body,
+        html {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+        }
+
+        body * {
+            visibility: hidden;
+        }
+
+        .no-print,
+        .page-header,
+        .panel-admin-box,
+        .doc-form-left {
+            display: none !important;
+        }
+
+        .hoja-espejo-preview {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            padding: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        #vista-espejo,
+        #vista-espejo * {
+            visibility: visible;
+        }
+
+        #vista-espejo {
+            position: relative;
+            width: 100%;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+        }
     }
 </style>
 
@@ -70,10 +253,10 @@
 {% macro input_text(name, label, type='text', width='', max_len='', js_val='', val='') %}
 <div class="input-group {{ width }}" id="grp_{{ name }}">
     <label>{{ label }}</label>
-    <input type="{{ type }}" name="{{ name }}" class="doc-input" value="{{ val }}"
-           {% if name in bloqueados %} readonly disabled style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}
-           {% if max_len %}maxlength="{{ max_len }}"{% endif %}
-           oninput="if('{{ js_val }}') { window['{{ js_val }}'](this); } if('{{ type }}' === 'email') { validarEmail(this); }">
+    <input type="{{ type }}" name="{{ name }}" class="doc-input" value="{{ val }}" {% if name in bloqueados %} readonly
+        disabled style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %} {% if max_len
+        %}maxlength="{{ max_len }}" {% endif %}
+        oninput="if('{{ js_val }}') { window['{{ js_val }}'](this); } if('{{ type }}' === 'email') { validarEmail(this); }">
     <span class="error-msg" id="msg_{{ name }}">⚠ Campo requerido o formato incorrecto.</span>
 </div>
 {% endmacro %}
@@ -81,25 +264,33 @@
 {% macro select_sino(name, label, width='') %}
 <div class="input-group {{ width }}" id="grp_{{ name }}">
     <label>{{ label }}</label>
-    <select name="{{ name }}" class="doc-input" {% if name in bloqueados %} disabled style="background-color: #e2e8f0 !important;" {% endif %}>
+    <select name="{{ name }}" class="doc-input" {% if name in bloqueados %} disabled
+        style="background-color: #e2e8f0 !important;" {% endif %}>
         <option value="">—</option>
-        <option value="SI" {% if val == 'SI' %}selected{% endif %}>SÍ</option>
-        <option value="NO" {% if val == 'NO' %}selected{% endif %}>NO</option>
+        <option value="SI" {% if val=='SI' %}selected{% endif %}>SÍ</option>
+        <option value="NO" {% if val=='NO' %}selected{% endif %}>NO</option>
     </select>
 </div>
 {% endmacro %}
 
 {% macro firma_box(campo, label) %}
 <div class="p-3 rounded" style="background: #f8fafc; border: 1.5px dashed #93c5fd; text-align: center; flex: 1;">
-    <span style="font-size: 9px; font-weight: 800; color: #1e40af; display: block; margin-bottom: 8px; text-transform: uppercase;">{{ label }}</span>
-    <input type="hidden" name="{{ campo }}" id="input_{{ campo }}" value="{% if campo in bloqueados %}FIRMADO{% endif %}">
-    
-    <button type="button" class="btn-firmaec" id="btn_{{ campo }}" {% if campo in bloqueados %} style="display:none;" {% endif %} onclick="abrirModalFirmaEC('{{ campo }}', '{{ label }}')">
+    <span
+        style="font-size: 9px; font-weight: 800; color: #1e40af; display: block; margin-bottom: 8px; text-transform: uppercase;">{{
+        label }}</span>
+    <input type="hidden" name="{{ campo }}" id="input_{{ campo }}"
+        value="{% if campo in bloqueados %}FIRMADO{% endif %}">
+
+    <button type="button" class="btn-firmaec" id="btn_{{ campo }}" {% if campo in bloqueados %} style="display:none;" {%
+        endif %} onclick="abrirModalFirmaEC('{{ campo }}', '{{ label }}')">
         <i class="bi bi-shield-lock-fill"></i> Firmar PAdES (.p12)
     </button>
-    
-    <div id="previewFirma_{{ campo }}" {% if campo in bloqueados %} style="display:block;" {% else %} style="display:none;" {% endif %} style="margin-top: 8px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 6px;">
-        <span style="font-size: 10px; color: #15803d; font-weight: 800;"><i class="bi bi-check-circle-fill"></i> Certificado Verificado</span>
+
+    <div id="previewFirma_{{ campo }}" {% if campo in bloqueados %} style="display:block;" {% else %}
+        style="display:none;" {% endif %}
+        style="margin-top: 8px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 6px;">
+        <span style="font-size: 10px; color: #15803d; font-weight: 800;"><i class="bi bi-check-circle-fill"></i>
+            Certificado Verificado</span>
     </div>
 </div>
 {% endmacro %}
@@ -115,7 +306,8 @@
             <button class="btn btn-lg btn-light border fw-bold shadow-sm me-2 text-dark" onclick="window.print()">
                 <i class="bi bi-printer-fill text-primary me-2"></i> Imprimir Hoja Espejo
             </button>
-            <a href="/paz-salvo/descargar-pdf/{{ solicitud.id }}" target="_blank" class="btn btn-lg btn-danger fw-bold shadow-sm">
+            <a href="/paz-salvo/descargar-pdf/{{ solicitud.id }}" target="_blank"
+                class="btn btn-lg btn-danger fw-bold shadow-sm">
                 <i class="bi bi-file-pdf-fill me-2"></i> Descargar PDF Legal
             </a>
         </div>
@@ -123,44 +315,70 @@
 
     {% if current_user.rol.nombre == 'Administrador' %}
     <div class="panel-admin-box no-print fade-in">
-        <h5 style="color: var(--blue-900); font-weight: 900; text-transform: uppercase; margin-bottom: 12px;"><i class="bi bi-shield-lock-fill me-2"></i> Panel de Designación Analítica Completa (1 al 10)</h5>
-        <p style="font-size: 12px; color: var(--slate-500); margin-bottom: 15px;">Seleccione los campos exactos de CUALQUIER sección del formulario y asígnelos al servidor correspondiente.</p>
-        
+        <h5 style="color: var(--blue-900); font-weight: 900; text-transform: uppercase; margin-bottom: 12px;"><i
+                class="bi bi-shield-lock-fill me-2"></i> Panel de Designación Analítica Completa (1 al 10)</h5>
+        <p style="font-size: 12px; color: var(--slate-500); margin-bottom: 15px;">Seleccione los campos exactos de
+            CUALQUIER sección del formulario y asígnelos al servidor correspondiente.</p>
+
         <form hx-post="/paz-salvo/asignar-campos/{{ solicitud.id }}" hx-target="#live-alert">
             <div class="row g-3 align-items-start">
                 <div class="col-md-8">
                     <div class="accordion" id="accordionAdmin" style="box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                        
+
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headSec12">
-                                <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec12" style="font-size: 12px; background: #e0f2fe; color: #0284c7;">
+                                <button class="accordion-button collapsed py-2 fw-bold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#colSec12"
+                                    style="font-size: 12px; background: #e0f2fe; color: #0284c7;">
                                     1 y 2. Datos Personales, Dirección y Unidad
                                 </button>
                             </h2>
                             <div id="colSec12" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
-                                <div class="accordion-body" style="font-size: 11px; max-height: 250px; overflow-y: auto;">
+                                <div class="accordion-body"
+                                    style="font-size: 11px; max-height: 250px; overflow-y: auto;">
                                     <h6 class="text-secondary fw-bold border-bottom pb-1">1. DATOS PERSONALES</h6>
                                     <div class="row mb-3 align-items-center">
-                                        <div class="col-md-4"><input type="checkbox" name="campos" value="nombres_apellidos" class="form-check-input me-1"> Nombres y Apellidos</div>
-                                        <div class="col-md-4"><input type="checkbox" name="campos" value="cedula" class="form-check-input me-1"> Cédula</div>
-                                        <div class="col-md-4"><input type="checkbox" name="campos" value="modalidad" class="form-check-input me-1"> Modalidad</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="fecha_ingreso" class="form-check-input me-1"> Ingreso</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="fecha_salida" class="form-check-input me-1"> Salida</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="direccion" class="form-check-input me-1"> Dirección</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="numero_domicilio" class="form-check-input me-1"> Telf Domicilio</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="celular" class="form-check-input me-1"> Celular</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="emergencia" class="form-check-input me-1"> Contacto Emergencia</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="email1" class="form-check-input me-1"> Email Principal</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="email2" class="form-check-input me-1"> Email 2</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="provincia" class="form-check-input me-1"> Provincia</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="canton" class="form-check-input me-1"> Cantón</div>
+                                        <div class="col-md-4"><input type="checkbox" name="campos"
+                                                value="nombres_apellidos" class="form-check-input me-1"> Nombres y
+                                            Apellidos</div>
+                                        <div class="col-md-4"><input type="checkbox" name="campos" value="cedula"
+                                                class="form-check-input me-1"> Cédula</div>
+                                        <div class="col-md-4"><input type="checkbox" name="campos" value="modalidad"
+                                                class="form-check-input me-1"> Modalidad</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="fecha_ingreso" class="form-check-input me-1"> Ingreso</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="fecha_salida" class="form-check-input me-1"> Salida</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="direccion" class="form-check-input me-1"> Dirección</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="numero_domicilio" class="form-check-input me-1"> Telf Domicilio
+                                        </div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="celular"
+                                                class="form-check-input me-1"> Celular</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="emergencia" class="form-check-input me-1"> Contacto Emergencia
+                                        </div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="email1"
+                                                class="form-check-input me-1"> Email Principal</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="email2"
+                                                class="form-check-input me-1"> Email 2</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="provincia" class="form-check-input me-1"> Provincia</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="canton"
+                                                class="form-check-input me-1"> Cantón</div>
                                     </div>
                                     <h6 class="text-secondary fw-bold border-bottom pb-1">2. DIRECCIÓN / UNIDAD</h6>
                                     <div class="row align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="lugar_trabajo" class="form-check-input me-1"> Lugar Trabajo</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="grupo_ocupacional" class="form-check-input me-1"> Grupo Ocupacional</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="unidad" class="form-check-input me-1"> Dirección/Unidad</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="cargo" class="form-check-input me-1"> Cargo</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="lugar_trabajo"
+                                                class="form-check-input me-1"> Lugar Trabajo</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="grupo_ocupacional" class="form-check-input me-1"> Grupo
+                                            Ocupacional</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="unidad"
+                                                class="form-check-input me-1"> Dirección/Unidad</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="cargo"
+                                                class="form-check-input me-1"> Cargo</div>
                                     </div>
                                 </div>
                             </div>
@@ -168,39 +386,77 @@
 
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headSec3">
-                                <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec3" style="font-size: 12px; background: #f0f9ff; color: #0369a1;">
+                                <button class="accordion-button collapsed py-2 fw-bold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#colSec3"
+                                    style="font-size: 12px; background: #f0f9ff; color: #0369a1;">
                                     3. Trámites y Gestión Documental
                                 </button>
                             </h2>
                             <div id="colSec3" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
-                                <div class="accordion-body" style="font-size: 11px; max-height: 250px; overflow-y: auto;">
+                                <div class="accordion-body"
+                                    style="font-size: 11px; max-height: 250px; overflow-y: auto;">
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_informe" class="form-check-input me-1"> S/N Informe gestión</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_quipux_cero" class="form-check-input me-1"> S/N QUIPUX cero</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_nombre_resp1" class="form-check-input me-1"> Resp. Fila 1</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="tramites_r1" class="form-check-input me-1"> Firma PAdES 1</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_informe" class="form-check-input me-1"> S/N Informe
+                                            gestión</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_quipux_cero" class="form-check-input me-1"> S/N QUIPUX
+                                            cero</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_nombre_resp1" class="form-check-input me-1"> Resp. Fila
+                                            1</div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="tramites_r1" class="form-check-input me-1"> Firma PAdES 1</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_fe_presentacion" class="form-check-input me-1"> S/N Fe presentación</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_claves_asignadas" class="form-check-input me-1"> S/N Claves asignadas</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_nombre_resp2" class="form-check-input me-1"> Resp. Fila 2</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="tramites_r2" class="form-check-input me-1"> Firma PAdES 2</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_fe_presentacion" class="form-check-input me-1"> S/N Fe
+                                            presentación</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_claves_asignadas" class="form-check-input me-1"> S/N
+                                            Claves asignadas</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_nombre_resp2" class="form-check-input me-1"> Resp. Fila
+                                            2</div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="tramites_r2" class="form-check-input me-1"> Firma PAdES 2</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_losep" class="form-check-input me-1"> S/N Archivo LOSEP</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_acta_claves" class="form-check-input me-1"> S/N Acta Claves</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_nombre_resp3" class="form-check-input me-1"> Resp. Fila 3</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="tramites_r3" class="form-check-input me-1"> Firma PAdES 3</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_losep" class="form-check-input me-1"> S/N Archivo LOSEP
+                                        </div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_acta_claves" class="form-check-input me-1"> S/N Acta
+                                            Claves</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_nombre_resp3" class="form-check-input me-1"> Resp. Fila
+                                            3</div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="tramites_r3" class="form-check-input me-1"> Firma PAdES 3</div>
                                     </div>
                                     <div class="row align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_admin_contrato" class="form-check-input me-1"> S/N Admin. Contrato</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_desc_contrato" class="form-check-input me-1"> Desc. Contrato</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_memo" class="form-check-input me-1"> Memo Admin</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_jefe_inmediato" class="form-check-input me-1"> Nombre Jefe Inmediato</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="tramites_servidor_recibe" class="form-check-input me-1"> Servidor que Recibe</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="tramites_obs" class="form-check-input me-1"> Observaciones</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="tramites_nombre_responsable" class="form-check-input me-1"> Nombre Jefe de Área</div>
-                                        <div class="col-md-3 mt-2 text-danger fw-bold"><input type="checkbox" name="campos" value="tramites_jefe" class="form-check-input me-1"> Firma PAdES JEFE</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_admin_contrato" class="form-check-input me-1"> S/N
+                                            Admin. Contrato</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_desc_contrato" class="form-check-input me-1"> Desc.
+                                            Contrato</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tramites_memo"
+                                                class="form-check-input me-1"> Memo Admin</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tramites_jefe_inmediato" class="form-check-input me-1"> Nombre
+                                            Jefe Inmediato</div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="tramites_servidor_recibe" class="form-check-input me-1"> Servidor
+                                            que Recibe</div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="tramites_obs" class="form-check-input me-1"> Observaciones</div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="tramites_nombre_responsable" class="form-check-input me-1">
+                                            Nombre Jefe de Área</div>
+                                        <div class="col-md-3 mt-2 text-danger fw-bold"><input type="checkbox"
+                                                name="campos" value="tramites_jefe" class="form-check-input me-1"> Firma
+                                            PAdES JEFE</div>
                                     </div>
                                 </div>
                             </div>
@@ -208,39 +464,70 @@
 
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headSec4">
-                                <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec4" style="font-size: 12px; background: #f1f5f9; color: #334155;">
+                                <button class="accordion-button collapsed py-2 fw-bold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#colSec4"
+                                    style="font-size: 12px; background: #f1f5f9; color: #334155;">
                                     4. Gestión Administrativa
                                 </button>
                             </h2>
                             <div id="colSec4" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
-                                <div class="accordion-body" style="font-size: 11px; max-height: 250px; overflow-y: auto;">
+                                <div class="accordion-body"
+                                    style="font-size: 11px; max-height: 250px; overflow-y: auto;">
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-4"><input type="checkbox" name="campos" value="admin_informe" class="form-check-input me-1"> S/N Entrega informe</div>
-                                        <div class="col-md-4"><input type="checkbox" name="campos" value="admin_nombre_resp1" class="form-check-input me-1"> Resp. Informe</div>
-                                        <div class="col-md-4 text-primary"><input type="checkbox" name="campos" value="admin_r1" class="form-check-input me-1"> Firma Informe</div>
+                                        <div class="col-md-4"><input type="checkbox" name="campos" value="admin_informe"
+                                                class="form-check-input me-1"> S/N Entrega informe</div>
+                                        <div class="col-md-4"><input type="checkbox" name="campos"
+                                                value="admin_nombre_resp1" class="form-check-input me-1"> Resp. Informe
+                                        </div>
+                                        <div class="col-md-4 text-primary"><input type="checkbox" name="campos"
+                                                value="admin_r1" class="form-check-input me-1"> Firma Informe</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_bienes" class="form-check-input me-1"> S/N Bienes y muebles</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_valor_bienes" class="form-check-input me-1"> Valor Bienes $</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_acta_bienes" class="form-check-input me-1"> N° Acta Bienes</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_nombre_resp2" class="form-check-input me-1"> Resp. Bienes</div>
-                                        <div class="col-md-12 text-primary mt-2"><input type="checkbox" name="campos" value="admin_r2" class="form-check-input me-1"> Firma Bienes</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_bienes"
+                                                class="form-check-input me-1"> S/N Bienes y muebles</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="admin_valor_bienes" class="form-check-input me-1"> Valor Bienes $
+                                        </div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="admin_acta_bienes" class="form-check-input me-1"> N° Acta Bienes
+                                        </div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="admin_nombre_resp2" class="form-check-input me-1"> Resp. Bienes
+                                        </div>
+                                        <div class="col-md-12 text-primary mt-2"><input type="checkbox" name="campos"
+                                                value="admin_r2" class="form-check-input me-1"> Firma Bienes</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_deducibles" class="form-check-input me-1"> S/N Deducibles</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_deducibles_valor" class="form-check-input me-1"> Valor Deducibles $</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_nombre_resp3" class="form-check-input me-1"> Resp. Deducibles</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="admin_r3" class="form-check-input me-1"> Firma Deducibles</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="admin_deducibles" class="form-check-input me-1"> S/N Deducibles
+                                        </div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="admin_deducibles_valor" class="form-check-input me-1"> Valor
+                                            Deducibles $</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="admin_nombre_resp3" class="form-check-input me-1"> Resp.
+                                            Deducibles</div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="admin_r3" class="form-check-input me-1"> Firma Deducibles</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_pasajes" class="form-check-input me-1"> S/N Pasajes justificar</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_pasajes_valor" class="form-check-input me-1"> Valor Pasajes $</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_nombre_resp4" class="form-check-input me-1"> Resp. Pasajes</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="admin_r4" class="form-check-input me-1"> Firma Pasajes</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="admin_pasajes"
+                                                class="form-check-input me-1"> S/N Pasajes justificar</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="admin_pasajes_valor" class="form-check-input me-1"> Valor Pasajes
+                                            $</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="admin_nombre_resp4" class="form-check-input me-1"> Resp. Pasajes
+                                        </div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="admin_r4" class="form-check-input me-1"> Firma Pasajes</div>
                                     </div>
                                     <div class="row align-items-center">
-                                        <div class="col-md-6"><input type="checkbox" name="campos" value="admin_responsable" class="form-check-input me-1"> Nombre Director/a Administrativo</div>
-                                        <div class="col-md-6 text-danger fw-bold"><input type="checkbox" name="campos" value="admin_dir" class="form-check-input me-1"> Firma Director/a</div>
+                                        <div class="col-md-6"><input type="checkbox" name="campos"
+                                                value="admin_responsable" class="form-check-input me-1"> Nombre
+                                            Director/a Administrativo</div>
+                                        <div class="col-md-6 text-danger fw-bold"><input type="checkbox" name="campos"
+                                                value="admin_dir" class="form-check-input me-1"> Firma Director/a</div>
                                     </div>
                                 </div>
                             </div>
@@ -248,44 +535,79 @@
 
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headSec5">
-                                <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec5" style="font-size: 12px; background: #faf5ff; color: #7e22ce;">
+                                <button class="accordion-button collapsed py-2 fw-bold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#colSec5"
+                                    style="font-size: 12px; background: #faf5ff; color: #7e22ce;">
                                     5. TIC (Tecnologías de Información)
                                 </button>
                             </h2>
                             <div id="colSec5" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
-                                <div class="accordion-body" style="font-size: 11px; max-height: 250px; overflow-y: auto;">
+                                <div class="accordion-body"
+                                    style="font-size: 11px; max-height: 250px; overflow-y: auto;">
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tic_verificacion" class="form-check-input me-1"> S/N Verific. equipo</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tic_ip_fija" class="form-check-input me-1"> S/N Acceso IP</div>
-                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_liberacion" class="form-check-input me-1"> S/N Lib. IP</div>
-                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_nombre_resp1" class="form-check-input me-1"> Resp. Equipos</div>
-                                        <div class="col-md-2 text-primary"><input type="checkbox" name="campos" value="tic_r1" class="form-check-input me-1"> Firma Equipos</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tic_verificacion" class="form-check-input me-1"> S/N Verific.
+                                            equipo</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tic_ip_fija"
+                                                class="form-check-input me-1"> S/N Acceso IP</div>
+                                        <div class="col-md-2"><input type="checkbox" name="campos"
+                                                value="tic_liberacion" class="form-check-input me-1"> S/N Lib. IP</div>
+                                        <div class="col-md-2"><input type="checkbox" name="campos"
+                                                value="tic_nombre_resp1" class="form-check-input me-1"> Resp. Equipos
+                                        </div>
+                                        <div class="col-md-2 text-primary"><input type="checkbox" name="campos"
+                                                value="tic_r1" class="form-check-input me-1"> Firma Equipos</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tic_backup" class="form-check-input me-1"> S/N Entrega backup</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tic_ruta_backup" class="form-check-input me-1"> Ruta Backup</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tic_nombre_resp2" class="form-check-input me-1"> Resp. Backup</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="tic_r2" class="form-check-input me-1"> Firma Backup</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tic_backup"
+                                                class="form-check-input me-1"> S/N Entrega backup</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tic_ruta_backup" class="form-check-input me-1"> Ruta Backup</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tic_nombre_resp2" class="form-check-input me-1"> Resp. Backup
+                                        </div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="tic_r2" class="form-check-input me-1"> Firma Backup</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_retiro_acceso" class="form-check-input me-1"> S/N Retiro accesos</div>
-                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_cierre_correo" class="form-check-input me-1"> S/N Cierre Correo</div>
-                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_esigef" class="form-check-input me-1"> S/N Cierre eSIGEF</div>
-                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_quipux" class="form-check-input me-1"> S/N Cierre QUIPUX</div>
-                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_spryn" class="form-check-input me-1"> S/N Cierre SPRYN</div>
-                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_esbye" class="form-check-input me-1"> S/N Cierre eSByE</div>
-                                        <div class="col-md-6 mt-2"><input type="checkbox" name="campos" value="tic_nombre_resp3" class="form-check-input me-1"> Resp. Cuentas</div>
-                                        <div class="col-md-6 mt-2 text-primary"><input type="checkbox" name="campos" value="tic_r3" class="form-check-input me-1"> Firma Cuentas</div>
+                                        <div class="col-md-2"><input type="checkbox" name="campos"
+                                                value="tic_retiro_acceso" class="form-check-input me-1"> S/N Retiro
+                                            accesos</div>
+                                        <div class="col-md-2"><input type="checkbox" name="campos"
+                                                value="tic_cierre_correo" class="form-check-input me-1"> S/N Cierre
+                                            Correo</div>
+                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_esigef"
+                                                class="form-check-input me-1"> S/N Cierre eSIGEF</div>
+                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_quipux"
+                                                class="form-check-input me-1"> S/N Cierre QUIPUX</div>
+                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_spryn"
+                                                class="form-check-input me-1"> S/N Cierre SPRYN</div>
+                                        <div class="col-md-2"><input type="checkbox" name="campos" value="tic_esbye"
+                                                class="form-check-input me-1"> S/N Cierre eSByE</div>
+                                        <div class="col-md-6 mt-2"><input type="checkbox" name="campos"
+                                                value="tic_nombre_resp3" class="form-check-input me-1"> Resp. Cuentas
+                                        </div>
+                                        <div class="col-md-6 mt-2 text-primary"><input type="checkbox" name="campos"
+                                                value="tic_r3" class="form-check-input me-1"> Firma Cuentas</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tic_tarjeta_cuentas" class="form-check-input me-1"> S/N Tarjeta Acceso</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tic_obs" class="form-check-input me-1"> Novedades TIC</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tic_nombre_resp4" class="form-check-input me-1"> Resp. Tarjeta</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="tic_r4" class="form-check-input me-1"> Firma Tarjeta</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tic_tarjeta_cuentas" class="form-check-input me-1"> S/N Tarjeta
+                                            Acceso</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="tic_obs"
+                                                class="form-check-input me-1"> Novedades TIC</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="tic_nombre_resp4" class="form-check-input me-1"> Resp. Tarjeta
+                                        </div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="tic_r4" class="form-check-input me-1"> Firma Tarjeta</div>
                                     </div>
                                     <div class="row align-items-center">
-                                        <div class="col-md-6"><input type="checkbox" name="campos" value="tic_responsable" class="form-check-input me-1"> Nombre Resp. TIC General</div>
-                                        <div class="col-md-6 text-danger fw-bold"><input type="checkbox" name="campos" value="tic_r5" class="form-check-input me-1"> Firma Resp TIC</div>
+                                        <div class="col-md-6"><input type="checkbox" name="campos"
+                                                value="tic_responsable" class="form-check-input me-1"> Nombre Resp. TIC
+                                            General</div>
+                                        <div class="col-md-6 text-danger fw-bold"><input type="checkbox" name="campos"
+                                                value="tic_r5" class="form-check-input me-1"> Firma Resp TIC</div>
                                     </div>
                                 </div>
                             </div>
@@ -293,39 +615,70 @@
 
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headSec6">
-                                <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec6" style="font-size: 12px; background: #ecfdf5; color: #047857;">
+                                <button class="accordion-button collapsed py-2 fw-bold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#colSec6"
+                                    style="font-size: 12px; background: #ecfdf5; color: #047857;">
                                     6. Gestión Financiera
                                 </button>
                             </h2>
                             <div id="colSec6" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
-                                <div class="accordion-body" style="font-size: 11px; max-height: 250px; overflow-y: auto;">
+                                <div class="accordion-body"
+                                    style="font-size: 11px; max-height: 250px; overflow-y: auto;">
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_saldos" class="form-check-input me-1"> S/N Saldos contables</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_saldos_valor" class="form-check-input me-1"> Valor Saldos $</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_nombre_resp1" class="form-check-input me-1"> Resp. Saldos</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="fin_r1" class="form-check-input me-1"> Firma Saldos</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_saldos"
+                                                class="form-check-input me-1"> S/N Saldos contables</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="fin_saldos_valor" class="form-check-input me-1"> Valor Saldos $
+                                        </div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="fin_nombre_resp1" class="form-check-input me-1"> Resp. Saldos
+                                        </div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="fin_r1" class="form-check-input me-1"> Firma Saldos</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_anticipo" class="form-check-input me-1"> S/N Anticipo sueldos</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_anticipo_valor" class="form-check-input me-1"> Valor Anticipo $</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_nombre_resp2" class="form-check-input me-1"> Resp. Anticipos</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="fin_r2" class="form-check-input me-1"> Firma Anticipos</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_anticipo"
+                                                class="form-check-input me-1"> S/N Anticipo sueldos</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="fin_anticipo_valor" class="form-check-input me-1"> Valor Anticipo
+                                            $</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="fin_nombre_resp2" class="form-check-input me-1"> Resp. Anticipos
+                                        </div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="fin_r2" class="form-check-input me-1"> Firma Anticipos</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_recuperacion" class="form-check-input me-1"> S/N Recup. valores</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_recuperacion_valor" class="form-check-input me-1"> Valor Recup. $</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_nombre_resp3" class="form-check-input me-1"> Resp. Valores</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="fin_r3" class="form-check-input me-1"> Firma Valores</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="fin_recuperacion" class="form-check-input me-1"> S/N Recup.
+                                            valores</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="fin_recuperacion_valor" class="form-check-input me-1"> Valor
+                                            Recup. $</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="fin_nombre_resp3" class="form-check-input me-1"> Resp. Valores
+                                        </div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="fin_r3" class="form-check-input me-1"> Firma Valores</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_devolucion" class="form-check-input me-1"> S/N Dev. muebles</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_devolucion_valor" class="form-check-input me-1"> Valor Devolución $</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="fin_nombre_resp4" class="form-check-input me-1"> Resp. Muebles</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="fin_r4" class="form-check-input me-1"> Firma Muebles</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="fin_devolucion" class="form-check-input me-1"> S/N Dev. muebles
+                                        </div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="fin_devolucion_valor" class="form-check-input me-1"> Valor
+                                            Devolución $</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="fin_nombre_resp4" class="form-check-input me-1"> Resp. Muebles
+                                        </div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="fin_r4" class="form-check-input me-1"> Firma Muebles</div>
                                     </div>
                                     <div class="row align-items-center">
-                                        <div class="col-md-6"><input type="checkbox" name="campos" value="fin_director" class="form-check-input me-1"> Nombre Director/a Finan.</div>
-                                        <div class="col-md-6 text-danger fw-bold"><input type="checkbox" name="campos" value="fin_dir" class="form-check-input me-1"> Firma Director/a</div>
+                                        <div class="col-md-6"><input type="checkbox" name="campos" value="fin_director"
+                                                class="form-check-input me-1"> Nombre Director/a Finan.</div>
+                                        <div class="col-md-6 text-danger fw-bold"><input type="checkbox" name="campos"
+                                                value="fin_dir" class="form-check-input me-1"> Firma Director/a</div>
                                     </div>
                                 </div>
                             </div>
@@ -333,71 +686,154 @@
 
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headSec78">
-                                <button class="accordion-button collapsed py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#colSec78" style="font-size: 12px; background: #fffbeb; color: #b45309;">
+                                <button class="accordion-button collapsed py-2 fw-bold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#colSec78"
+                                    style="font-size: 12px; background: #fffbeb; color: #b45309;">
                                     7, 8, 9 y 10. Seguridad, RRHH, Recepción y Cierre
                                 </button>
                             </h2>
                             <div id="colSec78" class="accordion-collapse collapse" data-bs-parent="#accordionAdmin">
-                                <div class="accordion-body" style="font-size: 11px; max-height: 250px; overflow-y: auto;">
+                                <div class="accordion-body"
+                                    style="font-size: 11px; max-height: 250px; overflow-y: auto;">
                                     <h6 class="text-secondary fw-bold border-bottom pb-1">7. SEGURIDAD EGSI</h6>
                                     <div class="row mb-3 align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="seg_archivos" class="form-check-input me-1"> Archivos Digitales</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="seg_entrega_copia" class="form-check-input me-1"> Copia Actividades</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="seg_nombre_resp1" class="form-check-input me-1"> Resp. Digitales</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="seg_r1" class="form-check-input me-1"> Firma Digitales</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="seg_archivos_fisicos" class="form-check-input me-1"> Archivos Físicos</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="seg_verificacion_info" class="form-check-input me-1"> Verificación Info</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="seg_nombre_resp2" class="form-check-input me-1"> Resp. Físicos</div>
-                                        <div class="col-md-3 mt-2 text-primary"><input type="checkbox" name="campos" value="seg_r2" class="form-check-input me-1"> Firma Físicos</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="seg_oficial" class="form-check-input me-1"> Nombre Oficial Seg.</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="seg_responsable" class="form-check-input me-1"> Nombre Resp. Seg.</div>
-                                        <div class="col-md-4 mt-2 text-danger fw-bold"><input type="checkbox" name="campos" value="seg_oficial_sig" class="form-check-input me-1"> Firma Oficial</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos" value="seg_archivos"
+                                                class="form-check-input me-1"> Archivos Digitales</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="seg_entrega_copia" class="form-check-input me-1"> Copia
+                                            Actividades</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="seg_nombre_resp1" class="form-check-input me-1"> Resp. Digitales
+                                        </div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="seg_r1" class="form-check-input me-1"> Firma Digitales</div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="seg_archivos_fisicos" class="form-check-input me-1"> Archivos
+                                            Físicos</div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="seg_verificacion_info" class="form-check-input me-1">
+                                            Verificación Info</div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="seg_nombre_resp2" class="form-check-input me-1"> Resp. Físicos
+                                        </div>
+                                        <div class="col-md-3 mt-2 text-primary"><input type="checkbox" name="campos"
+                                                value="seg_r2" class="form-check-input me-1"> Firma Físicos</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="seg_oficial" class="form-check-input me-1"> Nombre Oficial Seg.
+                                        </div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="seg_responsable" class="form-check-input me-1"> Nombre Resp. Seg.
+                                        </div>
+                                        <div class="col-md-4 mt-2 text-danger fw-bold"><input type="checkbox"
+                                                name="campos" value="seg_oficial_sig" class="form-check-input me-1">
+                                            Firma Oficial</div>
                                     </div>
-                                    
+
                                     <h6 class="text-secondary fw-bold border-bottom pb-1">8. RECURSOS HUMANOS</h6>
                                     <div class="row mb-3 align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="rrhh_capacitacion" class="form-check-input me-1"> S/N Capacitación</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="rrhh_cursos_eval" class="form-check-input me-1"> Cursos Info</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="rrhh_resp_capacitacion" class="form-check-input me-1"> Resp. Capacitación</div>
-                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos" value="rrhh_r1" class="form-check-input me-1"> Firma Capacitación</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="rrhh_evaluacion" class="form-check-input me-1"> S/N Evaluación</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="rrhh_resp_evaluacion" class="form-check-input me-1"> Resp. Evaluación</div>
-                                        <div class="col-md-4 mt-2 text-primary"><input type="checkbox" name="campos" value="rrhh_r2" class="form-check-input me-1"> Firma Evaluación</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="rrhh_viajes" class="form-check-input me-1"> S/N Viajes</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="rrhh_resp_viajes" class="form-check-input me-1"> Resp. Viajes</div>
-                                        <div class="col-md-4 mt-2 text-primary"><input type="checkbox" name="campos" value="rrhh_r3" class="form-check-input me-1"> Firma Viajes</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="rrhh_siith" class="form-check-input me-1"> S/N SIITH</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="rrhh_resp_siith" class="form-check-input me-1"> Resp. SIITH</div>
-                                        <div class="col-md-4 mt-2 text-primary"><input type="checkbox" name="campos" value="rrhh_r4" class="form-check-input me-1"> Firma SIITH</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="rrhh_vacaciones" class="form-check-input me-1"> Días Vacaciones</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="rrhh_num_certificado" class="form-check-input me-1"> Certificado N°</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="rrhh_resp_vacaciones" class="form-check-input me-1"> Resp. Vacaciones</div>
-                                        <div class="col-md-3 mt-2 text-primary"><input type="checkbox" name="campos" value="rrhh_r5" class="form-check-input me-1"> Firma Vacaciones</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="rrhh_juramentada" class="form-check-input me-1"> S/N Juramentada</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="rrhh_num_declaracion" class="form-check-input me-1"> N° Declaración</div>
-                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos" value="rrhh_resp_juramentada" class="form-check-input me-1"> Resp. Juramentada</div>
-                                        <div class="col-md-3 mt-2 text-primary"><input type="checkbox" name="campos" value="rrhh_r6" class="form-check-input me-1"> Firma Juramentada</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="rrhh_credencial" class="form-check-input me-1"> S/N Credencial</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="rrhh_resp_credencial2" class="form-check-input me-1"> Resp. Credencial</div>
-                                        <div class="col-md-4 mt-2 text-primary"><input type="checkbox" name="campos" value="rrhh_r7" class="form-check-input me-1"> Firma Credencial</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="rrhh_acta_bienes" class="form-check-input me-1"> S/N Acta Bienes</div>
-                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos" value="rrhh_resp_acta" class="form-check-input me-1"> Resp. Acta</div>
-                                        <div class="col-md-4 mt-2 text-primary"><input type="checkbox" name="campos" value="rrhh_r8" class="form-check-input me-1"> Firma Act. Bienes</div>
-                                        <div class="col-md-6 mt-2"><input type="checkbox" name="campos" value="rrhh_director" class="form-check-input me-1"> Nombre Director/a RRHH</div>
-                                        <div class="col-md-6 mt-2 text-danger fw-bold"><input type="checkbox" name="campos" value="rrhh_dir" class="form-check-input me-1"> Firma Dir. RRHH</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="rrhh_capacitacion" class="form-check-input me-1"> S/N
+                                            Capacitación</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="rrhh_cursos_eval" class="form-check-input me-1"> Cursos Info
+                                        </div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="rrhh_resp_capacitacion" class="form-check-input me-1"> Resp.
+                                            Capacitación</div>
+                                        <div class="col-md-3 text-primary"><input type="checkbox" name="campos"
+                                                value="rrhh_r1" class="form-check-input me-1"> Firma Capacitación</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_evaluacion" class="form-check-input me-1"> S/N Evaluación
+                                        </div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_resp_evaluacion" class="form-check-input me-1"> Resp.
+                                            Evaluación</div>
+                                        <div class="col-md-4 mt-2 text-primary"><input type="checkbox" name="campos"
+                                                value="rrhh_r2" class="form-check-input me-1"> Firma Evaluación</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_viajes" class="form-check-input me-1"> S/N Viajes</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_resp_viajes" class="form-check-input me-1"> Resp. Viajes
+                                        </div>
+                                        <div class="col-md-4 mt-2 text-primary"><input type="checkbox" name="campos"
+                                                value="rrhh_r3" class="form-check-input me-1"> Firma Viajes</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_siith" class="form-check-input me-1"> S/N SIITH</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_resp_siith" class="form-check-input me-1"> Resp. SIITH</div>
+                                        <div class="col-md-4 mt-2 text-primary"><input type="checkbox" name="campos"
+                                                value="rrhh_r4" class="form-check-input me-1"> Firma SIITH</div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_vacaciones" class="form-check-input me-1"> Días Vacaciones
+                                        </div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_num_certificado" class="form-check-input me-1"> Certificado
+                                            N°</div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_resp_vacaciones" class="form-check-input me-1"> Resp.
+                                            Vacaciones</div>
+                                        <div class="col-md-3 mt-2 text-primary"><input type="checkbox" name="campos"
+                                                value="rrhh_r5" class="form-check-input me-1"> Firma Vacaciones</div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_juramentada" class="form-check-input me-1"> S/N Juramentada
+                                        </div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_num_declaracion" class="form-check-input me-1"> N°
+                                            Declaración</div>
+                                        <div class="col-md-3 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_resp_juramentada" class="form-check-input me-1"> Resp.
+                                            Juramentada</div>
+                                        <div class="col-md-3 mt-2 text-primary"><input type="checkbox" name="campos"
+                                                value="rrhh_r6" class="form-check-input me-1"> Firma Juramentada</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_credencial" class="form-check-input me-1"> S/N Credencial
+                                        </div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_resp_credencial2" class="form-check-input me-1"> Resp.
+                                            Credencial</div>
+                                        <div class="col-md-4 mt-2 text-primary"><input type="checkbox" name="campos"
+                                                value="rrhh_r7" class="form-check-input me-1"> Firma Credencial</div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_acta_bienes" class="form-check-input me-1"> S/N Acta Bienes
+                                        </div>
+                                        <div class="col-md-4 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_resp_acta" class="form-check-input me-1"> Resp. Acta</div>
+                                        <div class="col-md-4 mt-2 text-primary"><input type="checkbox" name="campos"
+                                                value="rrhh_r8" class="form-check-input me-1"> Firma Act. Bienes</div>
+                                        <div class="col-md-6 mt-2"><input type="checkbox" name="campos"
+                                                value="rrhh_director" class="form-check-input me-1"> Nombre Director/a
+                                            RRHH</div>
+                                        <div class="col-md-6 mt-2 text-danger fw-bold"><input type="checkbox"
+                                                name="campos" value="rrhh_dir" class="form-check-input me-1"> Firma Dir.
+                                            RRHH</div>
                                     </div>
 
                                     <h6 class="text-secondary fw-bold border-bottom pb-1">9. RECEPCIÓN Y 10. CIERRE</h6>
                                     <div class="row align-items-center">
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="recepcion_fecha" class="form-check-input me-1"> Recepción: Fecha</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="recepcion_hojas" class="form-check-input me-1"> Recepción: Hojas</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="recepcion_servidor" class="form-check-input me-1"> Recepción: Servidor</div>
-                                        <div class="col-md-3"><input type="checkbox" name="campos" value="recepcion_cargo" class="form-check-input me-1"> Recepción: Cargo</div>
-                                        <div class="col-md-12 text-primary mt-2 mb-2 pb-2 border-bottom"><input type="checkbox" name="campos" value="recepcion_r1" class="form-check-input me-1"> Firma Recepción</div>
-                                        
-                                        <div class="col-md-4"><input type="checkbox" name="campos" value="cedula_firmante" class="form-check-input me-1"> C.C. Ex Funcionario</div>
-                                        <div class="col-md-4"><input type="checkbox" name="campos" value="fecha_firma" class="form-check-input me-1"> Fecha Cierre</div>
-                                        <div class="col-md-4 text-danger fw-bold"><input type="checkbox" name="campos" value="servidor_saliente" class="form-check-input me-1"> Firma FINAL Servidor</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="recepcion_fecha" class="form-check-input me-1"> Recepción: Fecha
+                                        </div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="recepcion_hojas" class="form-check-input me-1"> Recepción: Hojas
+                                        </div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="recepcion_servidor" class="form-check-input me-1"> Recepción:
+                                            Servidor</div>
+                                        <div class="col-md-3"><input type="checkbox" name="campos"
+                                                value="recepcion_cargo" class="form-check-input me-1"> Recepción: Cargo
+                                        </div>
+                                        <div class="col-md-12 text-primary mt-2 mb-2 pb-2 border-bottom"><input
+                                                type="checkbox" name="campos" value="recepcion_r1"
+                                                class="form-check-input me-1"> Firma Recepción</div>
+
+                                        <div class="col-md-4"><input type="checkbox" name="campos"
+                                                value="cedula_firmante" class="form-check-input me-1"> C.C. Ex
+                                            Funcionario</div>
+                                        <div class="col-md-4"><input type="checkbox" name="campos" value="fecha_firma"
+                                                class="form-check-input me-1"> Fecha Cierre</div>
+                                        <div class="col-md-4 text-danger fw-bold"><input type="checkbox" name="campos"
+                                                value="servidor_saliente" class="form-check-input me-1"> Firma FINAL
+                                            Servidor</div>
                                     </div>
                                 </div>
                             </div>
@@ -408,13 +844,15 @@
 
                 <div class="col-md-4">
                     <label class="fw-bold small text-secondary mb-1">SERVIDOR PÚBLICO DESTINATARIO</label>
-                    <select name="usuario_asignado_id" class="form-select mb-3 shadow-sm border-primary" style="padding: 10px;" required>
+                    <select name="usuario_asignado_id" class="form-select mb-3 shadow-sm border-primary"
+                        style="padding: 10px;" required>
                         <option value="">— Seleccione Servidor —</option>
                         {% for u in usuarios_disponibles %}
                         <option value="{{ u.id }}">{{ u.apellidos }} {{ u.nombres }} ({{ u.rol.nombre }})</option>
                         {% endfor %}
                     </select>
-                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow"><i class="bi bi-person-plus-fill me-2"></i> Delegar Seleccionados</button>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow"><i
+                            class="bi bi-person-plus-fill me-2"></i> Delegar Seleccionados</button>
                 </div>
             </div>
         </form>
@@ -423,19 +861,23 @@
     {% endif %}
 
     <div class="doc-form-layout">
-        
+
         <div class="doc-form-left no-print">
-            <form id="formularioOficial" hx-post="/actualizar-espejo" hx-trigger="keyup changed delay:100ms, change" hx-target="#vista-espejo">
+            <form id="formularioOficial" hx-post="/actualizar-espejo" hx-trigger="keyup changed delay:100ms, change"
+                hx-target="#vista-espejo">
                 <input type="hidden" name="solicitud_id" value="{{ solicitud.id }}">
 
                 <div class="doc-section-head">👤 1. Datos Personales del Servidor Saliente</div>
                 <div class="doc-fields-grid">
-                    {{ input_text('nombres_apellidos', 'Nombres y Apellidos Completos', 'text', 'span-2', '100', 'soloLetras', solicitud.ex_funcionario.nombres ~ ' ' ~ solicitud.ex_funcionario.apellidos) }}
-                    {{ input_text('cedula', 'Cédula de Ciudadanía', 'text', '', '10', 'validarCedula', solicitud.ex_funcionario.cedula) }}
-                    
+                    {{ input_text('nombres_apellidos', 'Nombres y Apellidos Completos', 'text', 'span-2', '100',
+                    'soloLetras', solicitud.ex_funcionario.nombres ~ ' ' ~ solicitud.ex_funcionario.apellidos) }}
+                    {{ input_text('cedula', 'Cédula de Ciudadanía', 'text', '', '10', 'validarCedula',
+                    solicitud.ex_funcionario.cedula) }}
+
                     <div class="input-group" id="grp_modalidad">
                         <label>Modalidad Laboral</label>
-                        <select name="modalidad" class="doc-input" {% if 'modalidad' in bloqueados %} disabled {% endif %}>
+                        <select name="modalidad" class="doc-input" {% if 'modalidad' in bloqueados %} disabled {% endif
+                            %}>
                             <option value="">Seleccione...</option>
                             <option value="PERMANENTE">Nombramiento Permanente</option>
                             <option value="PROVISIONAL">Nombramiento Provisional</option>
@@ -447,17 +889,18 @@
                     {{ input_text('fecha_ingreso', 'Fecha de Ingreso Institucional', 'date', '', '', 'validarFechas') }}
                     {{ input_text('fecha_salida', 'Fecha de Salida Efectiva', 'date', '', '', 'validarFechas') }}
                     {{ input_text('direccion', 'Dirección Domiciliaria', 'text', 'span-2', '200') }}
-                    
+
                     {{ input_text('numero_domicilio', 'Teléfono Fijo Casa', 'text', '', '9', 'validarConvencional') }}
                     {{ input_text('celular', 'Teléfono Celular', 'text', '', '10', 'validarCelular') }}
                     {{ input_text('emergencia', 'Contacto de Emergencia', 'text', '', '10', 'validarCelular') }}
-                    
+
                     {{ input_text('email1', 'Correo Electrónico Principal', 'email', '', '100') }}
                     {{ input_text('email2', 'Correo Electrónico Alternativo', 'email', '', '100') }}
-                    
+
                     <div class="input-group">
                         <label>Provincia Ecuatoriana</label>
-                        <select name="provincia" id="provinciaSelect" class="doc-input" onchange="filtrarCantonesEcuador()"></select>
+                        <select name="provincia" id="provinciaSelect" class="doc-input"
+                            onchange="filtrarCantonesEcuador()"></select>
                     </div>
                     <div class="input-group">
                         <label>Cantón Asignado</label>
@@ -469,11 +912,21 @@
                 <div class="doc-fields-grid">
                     <div class="input-group">
                         <label>Lugar de Dependencia</label>
-                        <select name="lugar_trabajo" class="doc-input"><option value="">—</option><option value="PLANTA CENTRAL">Planta Central</option><option value="DESCONCENTRADO">Procesos Desconcentrados</option></select>
+                        <select name="lugar_trabajo" class="doc-input">
+                            <option value="">—</option>
+                            <option value="PLANTA CENTRAL">Planta Central</option>
+                            <option value="DESCONCENTRADO">Procesos Desconcentrados</option>
+                        </select>
                     </div>
                     <div class="input-group">
                         <label>Grupo Ocupacional LOSEP</label>
-                        <select name="grupo_ocupacional" class="doc-input"><option value="">—</option><option value="NJS">NJS (Jerárquico)</option><option value="SRVS">SRVS (Servicios)</option><option value="SP">SP (Servidor Público)</option><option value="SPA">SPA (Apoyo)</option></select>
+                        <select name="grupo_ocupacional" class="doc-input">
+                            <option value="">—</option>
+                            <option value="NJS">NJS (Jerárquico)</option>
+                            <option value="SRVS">SRVS (Servicios)</option>
+                            <option value="SP">SP (Servidor Público)</option>
+                            <option value="SPA">SPA (Apoyo)</option>
+                        </select>
                     </div>
                     {{ input_text('unidad', 'Dirección Técnica / Unidad', 'text', 'span-2') }}
                     {{ input_text('cargo', 'Cargo Institucional Desempeñado', 'text', 'span-2') }}
@@ -483,27 +936,33 @@
                 <div class="doc-fields-grid">
                     {{ select_sino('tramites_informe', '¿Entrega Informe de Fin de Gestión?') }}
                     {{ select_sino('tramites_quipux_cero', '¿Bandeja de QUIPUX en Cero?') }}
-                    {{ input_text('tramites_nombre_resp1', 'Servidor Validador Fila 1', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('tramites_nombre_resp1', 'Servidor Validador Fila 1', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('tramites_r1', 'Firma Responsable Fila 1') }}</div>
-                    
+
                     {{ select_sino('tramites_fe_presentacion', '¿Posee Fe de Presentación?') }}
                     {{ select_sino('tramites_claves_asignadas', '¿Retiro de Claves de Sistemas?') }}
-                    {{ input_text('tramites_nombre_resp2', 'Servidor Validador Fila 2', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('tramites_nombre_resp2', 'Servidor Validador Fila 2', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('tramites_r2', 'Firma Responsable Fila 2') }}</div>
 
                     {{ select_sino('tramites_losep', '¿Entrega de Expediente Físico LOSEP?') }}
                     {{ select_sino('tramites_acta_claves', '¿Acta de Entrega de Claves?') }}
-                    {{ input_text('tramites_nombre_resp3', 'Servidor Validador Fila 3', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('tramites_nombre_resp3', 'Servidor Validador Fila 3', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('tramites_r3', 'Firma Responsable Fila 3') }}</div>
 
                     {{ select_sino('tramites_admin_contrato', '¿Fue Administrador de Contratos?') }}
                     {{ input_text('tramites_desc_contrato', 'Detalle de Contratos a Cargo') }}
                     {{ input_text('tramites_memo', 'N° Memorando de Relevo', 'text', 'span-2') }}
-                    
-                    {{ input_text('tramites_jefe_inmediato', 'Nombre del Jefe Inmediato Superior', 'text', 'span-2', '', 'soloLetras') }}
-                    {{ input_text('tramites_servidor_recibe', 'Servidor que recibe custodia', 'text', 'span-2', '', 'soloLetras') }}
+
+                    {{ input_text('tramites_jefe_inmediato', 'Nombre del Jefe Inmediato Superior', 'text', 'span-2', '',
+                    'soloLetras') }}
+                    {{ input_text('tramites_servidor_recibe', 'Servidor que recibe custodia', 'text', 'span-2', '',
+                    'soloLetras') }}
                     {{ input_text('tramites_obs', 'Observaciones de la Gestión Documental', 'text', 'span-2') }}
-                    {{ input_text('tramites_nombre_responsable', 'Responsable de Gestión de Trámites (Jefe)', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('tramites_nombre_responsable', 'Responsable de Gestión de Trámites (Jefe)', 'text',
+                    'span-2', '', 'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('tramites_jefe', 'Firma Electrónica Jefe') }}</div>
                 </div>
 
@@ -514,22 +973,27 @@
                     <div class="span-2 d-flex">{{ firma_box('admin_r1', 'Firma Validación Informe') }}</div>
 
                     {{ select_sino('admin_bienes', '¿Devolución de Bienes Larga Duración?') }}
-                    {{ input_text('admin_valor_bienes', 'Valorización por Pérdida/Faltante $', 'text', '', '', 'soloMoneda') }}
+                    {{ input_text('admin_valor_bienes', 'Valorización por Pérdida/Faltante $', 'text', '', '',
+                    'soloMoneda') }}
                     {{ input_text('admin_acta_bienes', 'N° Acta de Entrega Recepción', 'text', 'span-2') }}
-                    {{ input_text('admin_nombre_resp2', 'Responsable Fila 2 (Bienes)', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('admin_nombre_resp2', 'Responsable Fila 2 (Bienes)', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('admin_r2', 'Firma Custodio Bienes') }}</div>
 
                     {{ select_sino('admin_deducibles', '¿Registra Valores Deducibles?') }}
                     {{ input_text('admin_deducibles_valor', 'Monto a Descontar $', 'text', '', '', 'soloMoneda') }}
-                    {{ input_text('admin_nombre_resp3', 'Responsable Fila 3 (Deducibles)', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('admin_nombre_resp3', 'Responsable Fila 3 (Deducibles)', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('admin_r3', 'Firma Deducibles') }}</div>
 
                     {{ select_sino('admin_pasajes', '¿Liquidó Pasajes Aéreos?') }}
                     {{ input_text('admin_pasajes_valor', 'Monto Pendiente Pasajes $', 'text', '', '', 'soloMoneda') }}
-                    {{ input_text('admin_nombre_resp4', 'Responsable Fila 4 (Pasajes)', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('admin_nombre_resp4', 'Responsable Fila 4 (Pasajes)', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('admin_r4', 'Firma Liquidación Pasajes') }}</div>
 
-                    {{ input_text('admin_responsable', 'Director/a Administrativo/a Financiero/a', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('admin_responsable', 'Director/a Administrativo/a Financiero/a', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('admin_dir', 'Firma PAdES Director/a') }}</div>
                 </div>
 
@@ -552,7 +1016,8 @@
                     {{ select_sino('tic_quipux', '¿Desactivación Usuario QUIPUX?') }}
                     {{ select_sino('tic_spryn', '¿Baja de Sistema SPRYN?') }}
                     {{ select_sino('tic_esbye', '¿Baja de Sistema eSByE?') }}
-                    {{ input_text('tic_nombre_resp3', 'Validador de Cierre de Cuentas', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('tic_nombre_resp3', 'Validador de Cierre de Cuentas', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('tic_r3', 'Firma Cierre de Cuentas') }}</div>
 
                     {{ select_sino('tic_tarjeta_cuentas', '¿Entrega de Tarjeta Magnética de Acceso?') }}
@@ -560,7 +1025,8 @@
                     {{ input_text('tic_nombre_resp4', 'Validador de Tarjetas', 'text', 'span-2', '', 'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('tic_r4', 'Firma Control Accesos') }}</div>
 
-                    {{ input_text('tic_responsable', 'Responsable de la Unidad de TICs', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('tic_responsable', 'Responsable de la Unidad de TICs', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('tic_r5', 'Firma Electrónica Jefe TIC') }}</div>
                 </div>
 
@@ -573,7 +1039,8 @@
 
                     {{ select_sino('fin_anticipo', '¿Anticipos de Remuneraciones Activos?') }}
                     {{ input_text('fin_anticipo_valor', 'Saldo del Anticipo $', 'text', '', '', 'soloMoneda') }}
-                    {{ input_text('fin_nombre_resp2', 'Analista de Tesorería Fila 2', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('fin_nombre_resp2', 'Analista de Tesorería Fila 2', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('fin_r2', 'Firma Tesorería') }}</div>
 
                     {{ select_sino('fin_recuperacion', '¿Garantías/Recuperación de Valores?') }}
@@ -586,7 +1053,8 @@
                     {{ input_text('fin_nombre_resp4', 'Responsable Fila 4', 'text', 'span-2', '', 'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('fin_r4', 'Firma Ajustes Financieros') }}</div>
 
-                    {{ input_text('fin_director', 'Director/a Administrativo/a Financiero/a', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('fin_director', 'Director/a Administrativo/a Financiero/a', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('fin_dir', 'Firma PAdES Director/a') }}</div>
                 </div>
 
@@ -594,98 +1062,128 @@
                 <div class="doc-fields-grid">
                     {{ select_sino('seg_archivos', '¿Análisis de Seguridad de Archivos Digitales?') }}
                     {{ select_sino('seg_entrega_copia', '¿Entrega Copia de Seguridad Física?') }}
-                    {{ input_text('seg_nombre_resp1', 'Analista de Seguridad Fila 1', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('seg_nombre_resp1', 'Analista de Seguridad Fila 1', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('seg_r1', 'Firma Criptografía 1') }}</div>
 
                     {{ select_sino('seg_archivos_fisicos', '¿Auditoría de Archivos Físicos?') }}
                     {{ select_sino('seg_verificacion_info', '¿Cifrado de Dispositivos Egresados?') }}
-                    {{ input_text('seg_nombre_resp2', 'Analista de Seguridad Fila 2', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('seg_nombre_resp2', 'Analista de Seguridad Fila 2', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('seg_r2', 'Firma Criptografía 2') }}</div>
 
-                    {{ input_text('seg_oficial', 'Oficial de Seguridad de la Información', 'text', 'span-2', '', 'soloLetras') }}
-                    {{ input_text('seg_responsable', 'Responsable de la Infraestructura de Seguridad', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('seg_oficial', 'Oficial de Seguridad de la Información', 'text', 'span-2', '',
+                    'soloLetras') }}
+                    {{ input_text('seg_responsable', 'Responsable de la Infraestructura de Seguridad', 'text', 'span-2',
+                    '', 'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('seg_oficial_sig', 'Firma Oficial EGSI') }}</div>
                 </div>
 
-                <div class="doc-section-head mt-4">👥 8. Dirección de Recursos Humanos (Administración de Personal)</div>
+                <div class="doc-section-head mt-4">👥 8. Dirección de Recursos Humanos (Administración de Personal)
+                </div>
                 <div class="doc-fields-grid">
                     {{ select_sino('rrhh_capacitacion', '¿Cumplió Devengación de Cursos Obligatorios?') }}
                     {{ input_text('rrhh_cursos_eval', 'N° Horas / Calificación Obtenida') }}
-                    {{ input_text('rrhh_resp_capacitacion', 'Analista de Capacitación', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('rrhh_resp_capacitacion', 'Analista de Capacitación', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r1', 'Firma Capacitación') }}</div>
 
                     {{ select_sino('rrhh_evaluacion', '¿Aplicación de Evaluación de Desempeño Anual?') }}
-                    {{ input_text('rrhh_resp_evaluacion', 'Analista de Evaluación', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('rrhh_resp_evaluacion', 'Analista de Evaluación', 'text', 'span-2', '', 'soloLetras')
+                    }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r2', 'Firma Evaluación') }}</div>
 
                     {{ select_sino('rrhh_viajes', '¿Liquidó Viáticos/Informes de Viajes al Exterior?') }}
-                    {{ input_text('rrhh_resp_viajes', 'Analista de Registro de Comisiones', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('rrhh_resp_viajes', 'Analista de Registro de Comisiones', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r3', 'Firma Comisiones') }}</div>
 
                     {{ select_sino('rrhh_siith', '¿Procesamiento de Acción de Personal en SIITH?') }}
-                    {{ input_text('rrhh_resp_siith', 'Analista de Control de Sistema SIITH', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('rrhh_resp_siith', 'Analista de Control de Sistema SIITH', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r4', 'Firma Baja SIITH') }}</div>
 
-                    {{ input_text('rrhh_vacaciones', 'Saldo de Días de Vacaciones Pendientes', 'text', '', '3', 'soloNumeros') }}
+                    {{ input_text('rrhh_vacaciones', 'Saldo de Días de Vacaciones Pendientes', 'text', '', '3',
+                    'soloNumeros') }}
                     {{ input_text('rrhh_num_certificado', 'N° Certificado de Tiempo de Servicio') }}
-                    {{ input_text('rrhh_resp_vacaciones', 'Analista de Vacaciones y Asistencia', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('rrhh_resp_vacaciones', 'Analista de Vacaciones y Asistencia', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r5', 'Firma Control Vacaciones') }}</div>
 
                     {{ select_sino('rrhh_juramentada', '¿Cargó Declaración Juramentada de Fin de Gestión?') }}
                     {{ input_text('rrhh_num_declaracion', 'N° de Presentación Contraloría (CGR)') }}
-                    {{ input_text('rrhh_resp_juramentada', 'Analista de Control Legal', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('rrhh_resp_juramentada', 'Analista de Control Legal', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r6', 'Firma Control Declaraciones') }}</div>
 
                     {{ select_sino('rrhh_credencial', '¿Hizo Devolución de Credencial y Colgante?') }}
-                    {{ input_text('rrhh_resp_credencial2', 'Analista de Identificación Corporativa', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('rrhh_resp_credencial2', 'Analista de Identificación Corporativa', 'text', 'span-2',
+                    '', 'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r7', 'Firma Control Credenciales') }}</div>
 
                     {{ select_sino('rrhh_acta_bienes', '¿Cierre de Expediente de Ropa de Trabajo / CDs?') }}
-                    {{ input_text('rrhh_resp_acta', 'Analista de Dotación de Personal', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('rrhh_resp_acta', 'Analista de Dotación de Personal', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r8', 'Firma Dotación Básica') }}</div>
 
-                    {{ input_text('rrhh_director', 'Director/a de Administración de Recursos Humanos', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('rrhh_director', 'Director/a de Administración de Recursos Humanos', 'text', 'span-2',
+                    '', 'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_dir', 'Firma Electrónica Director/a') }}</div>
                 </div>
 
                 <div class="doc-section-head mt-4">📬 9. Ventanilla de Recepción Documental</div>
                 <div class="doc-fields-grid">
                     {{ input_text('recepcion_fecha', 'Fecha y Hora de Ingreso Físico', 'date') }}
-                    {{ input_text('recepcion_hojas', 'Cantidad de Hojas Útiles Anexadas', 'text', '', '3', 'soloNumeros') }}
-                    {{ input_text('recepcion_servidor', 'Servidor de Ventanilla de Recepción', 'text', 'span-2', '', 'soloLetras') }}
-                    {{ input_text('recepcion_cargo', 'Cargo Administrativo del Servidor', 'text', 'span-2', '', 'soloLetras') }}
+                    {{ input_text('recepcion_hojas', 'Cantidad de Hojas Útiles Anexadas', 'text', '', '3',
+                    'soloNumeros') }}
+                    {{ input_text('recepcion_servidor', 'Servidor de Ventanilla de Recepción', 'text', 'span-2', '',
+                    'soloLetras') }}
+                    {{ input_text('recepcion_cargo', 'Cargo Administrativo del Servidor', 'text', 'span-2', '',
+                    'soloLetras') }}
                     <div class="span-2 d-flex">{{ firma_box('recepcion_r1', 'Firma Cargo Recepción') }}</div>
                 </div>
 
-                <div class="doc-section-head mt-4" style="background: linear-gradient(135deg, #4c1d95, #7c3aed);">✍️ 10. Declaración Legal y Autorización de Descuento</div>
+                <div class="doc-section-head mt-4" style="background: linear-gradient(135deg, #4c1d95, #7c3aed);">✍️ 10.
+                    Declaración Legal y Autorización de Descuento</div>
                 <div class="doc-fields-grid" style="background: #faf5ff;">
-                    {{ input_text('cedula_firmante', 'Cédula de Identidad del Firmante', 'text', '', '10', 'validarCedula') }}
+                    {{ input_text('cedula_firmante', 'Cédula de Identidad del Firmante', 'text', '', '10',
+                    'validarCedula') }}
                     {{ input_text('fecha_firma', 'Fecha de Ejecución de Firma', 'date') }}
 
                     <div class="input-group span-2 mt-2">
-                        <div style="border: 1px solid #7c3aed; border-radius: 8px; padding: 15px; text-align: center; background: #fff;">
-                            <h6 style="color: #6d28d9; font-weight: 800; font-size: 11px;">FIRMA DE CONFORMIDAD DEL EX SERVIDOR</h6>
+                        <div
+                            style="border: 1px solid #7c3aed; border-radius: 8px; padding: 15px; text-align: center; background: #fff;">
+                            <h6 style="color: #6d28d9; font-weight: 800; font-size: 11px;">FIRMA DE CONFORMIDAD DEL EX
+                                SERVIDOR</h6>
                             <input type="hidden" name="servidor_saliente" id="input_servidor_saliente" value="">
-                            <button type="button" class="btn-firmaec" id="btn_servidor_saliente" style="background: linear-gradient(135deg, #7c3aed, #4c1d95); width: auto; margin: 0 auto;" onclick="abrirModalFirmaEC('servidor_saliente', 'Autorización Final del Servidor')">
+                            <button type="button" class="btn-firmaec" id="btn_servidor_saliente"
+                                style="background: linear-gradient(135deg, #7c3aed, #4c1d95); width: auto; margin: 0 auto;"
+                                onclick="abrirModalFirmaEC('servidor_saliente', 'Autorización Final del Servidor')">
                                 <i class="bi bi-shield-lock-fill"></i> Procesar Firma PAdES Real (.p12)
                             </button>
-                            <div id="previewFirma_servidor_saliente" style="display:none; margin-top: 10px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 6px;">
-                                <span style="font-size: 11px; color: #15803d; font-weight: 800;"><i class="bi bi-check-circle-fill"></i> Firma Criptográfica Estampada en PDF</span>
+                            <div id="previewFirma_servidor_saliente"
+                                style="display:none; margin-top: 10px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 6px;">
+                                <span style="font-size: 11px; color: #15803d; font-weight: 800;"><i
+                                        class="bi bi-check-circle-fill"></i> Firma Criptográfica Estampada en PDF</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </form>
             <div class="p-3 bg-light border-top text-end mt-3">
-                <button type="button" class="btn btn-success fw-bold px-4 py-2" onclick="validarYGuardarTodo()"><i class="bi bi-cloud-check-fill me-2"></i> Guardar Todo el Trámite</button>
+                <button type="button" class="btn btn-success fw-bold px-4 py-2" onclick="validarYGuardarTodo()"><i
+                        class="bi bi-cloud-check-fill me-2"></i> Guardar Todo el Trámite</button>
             </div>
         </div>
 
         <div class="hoja-espejo-preview">
             <div class="d-flex justify-content-between align-items-center mb-3 no-print">
-                <span class="badge bg-white text-primary px-3 py-2 shadow-sm border border-primary" style="font-weight: 800;"><span class="spinner-grow spinner-grow-sm text-primary me-2" style="width: 10px; height: 10px;"></span>Espejo en Tiempo Real</span>
+                <span class="badge bg-white text-primary px-3 py-2 shadow-sm border border-primary"
+                    style="font-weight: 800;"><span class="spinner-grow spinner-grow-sm text-primary me-2"
+                        style="width: 10px; height: 10px;"></span>Espejo en Tiempo Real</span>
             </div>
-            <div id="vista-espejo" style="background: white; border: 1px solid #cbd5e1; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div id="vista-espejo"
+                style="background: white; border: 1px solid #cbd5e1; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
                 {% include 'paz_salvo/partials/hoja_espejo.html' %}
             </div>
         </div>
@@ -704,7 +1202,7 @@
         "TUNGURAHUA": ["AMBATO", "PELILEO", "PÍLLARO", "BAÑOS DE AGUA SANTA", "QUERO", "CEVALLOS", "TISALEO"]
     };
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const provSelect = document.getElementById('provinciaSelect');
         provSelect.innerHTML = '<option value="">Seleccione Provincia...</option>';
         Object.keys(divisionPoliticaEcuador).forEach(prov => {
@@ -724,16 +1222,16 @@
         }
     }
 
-    function mostrarError(el, msg) { const grp = el.closest('.input-group'); grp.classList.add('has-error'); const span = grp.querySelector('.error-msg'); if(span) { span.innerText = msg; span.style.display = 'block'; } }
-    function quitarError(el) { const grp = el.closest('.input-group'); grp.classList.remove('has-error'); const span = grp.querySelector('.error-msg'); if(span) { span.style.display = 'none'; } }
-    
+    function mostrarError(el, msg) { const grp = el.closest('.input-group'); grp.classList.add('has-error'); const span = grp.querySelector('.error-msg'); if (span) { span.innerText = msg; span.style.display = 'block'; } }
+    function quitarError(el) { const grp = el.closest('.input-group'); grp.classList.remove('has-error'); const span = grp.querySelector('.error-msg'); if (span) { span.style.display = 'none'; } }
+
     function soloLetras(el) { if (/[^a-zA-ZÀ-ÿ\s]/.test(el.value)) { el.value = el.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, ''); mostrarError(el, '⚠ Solo letras.'); } else { quitarError(el); } }
     function soloNumeros(el) { if (/[^0-9]/.test(el.value)) { el.value = el.value.replace(/[^0-9]/g, ''); mostrarError(el, '⚠ Solo números.'); } else { quitarError(el); } }
     function validarConvencional(el) { el.value = el.value.replace(/[^0-9]/g, ''); if (el.value.length > 0 && el.value.length !== 9) { mostrarError(el, '⚠ Debe tener 9 dígitos.'); } else { quitarError(el); } }
     function validarCelular(el) { el.value = el.value.replace(/[^0-9]/g, ''); if (el.value.length > 0 && (el.value.length !== 10 || !el.value.startsWith('09'))) { mostrarError(el, '⚠ Inicia con 09 y tiene 10 dígitos.'); } else { quitarError(el); } }
     function soloMoneda(el) { if (/[^0-9.]/.test(el.value)) { el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); mostrarError(el, '⚠ Formato inválido.'); } else { quitarError(el); } }
-    function validarEmail(el) { const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if(el.value && !re.test(el.value)) { mostrarError(el, '⚠ Correo inválido.'); } else { quitarError(el); } }
-    
+    function validarEmail(el) { const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if (el.value && !re.test(el.value)) { mostrarError(el, '⚠ Correo inválido.'); } else { quitarError(el); } }
+
     function validarCedula(el) {
         el.value = el.value.replace(/[^0-9]/g, '');
         const cedula = el.value;
@@ -750,7 +1248,7 @@
         const sal = document.getElementById('f_out').value;
         const grp = document.getElementById('grp_salida');
         const msg = document.getElementById('msg_salida');
-        if (ing && sal && new Date(sal) <= new Date(ing)) { grp.classList.add('has-error'); if(msg) msg.style.display = 'block'; } else { grp.classList.remove('has-error'); if(msg) msg.style.display = 'none'; }
+        if (ing && sal && new Date(sal) <= new Date(ing)) { grp.classList.add('has-error'); if (msg) msg.style.display = 'block'; } else { grp.classList.remove('has-error'); if (msg) msg.style.display = 'none'; }
     }
 
     function abrirModalFirmaEC(campoFirma, labelFirma) {
@@ -769,7 +1267,12 @@
                     
                     <div>
                         <label style="font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 6px; display: block;">2. Contraseña del Certificado</label>
-                        <input type="password" id="swal-p12-pass" placeholder="••••••••••••••••" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline:none; transition: 0.3s;" onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                        <div style="position: relative;">
+                            <input type="password" id="swal-p12-pass" placeholder="••••••••••••••••" style="width: 100%; padding: 12px; padding-right: 45px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline:none; transition: 0.3s;" onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none'">
+                            <button type="button" onclick="const p = document.getElementById('swal-p12-pass'); const i = this.querySelector('i'); if(p.type === 'password'){ p.type='text'; i.classList.remove('bi-eye-slash-fill'); i.classList.add('bi-eye-fill'); } else { p.type='password'; i.classList.remove('bi-eye-fill'); i.classList.add('bi-eye-slash-fill'); }" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; padding: 0;">
+                                <i class="bi bi-eye-slash-fill" style="font-size: 18px;"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `,
@@ -794,27 +1297,27 @@
                     method: 'POST',
                     body: formData
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw new Error(err.mensaje || 'Error al validar el certificado.'); });
-                    }
-                    return response.json();
-                })
-                .catch(error => {
-                    Swal.showValidationMessage(`❌ ${error.message}`);
-                });
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw new Error(err.mensaje || 'Error al validar el certificado.'); });
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`❌ ${error.message}`);
+                    });
             }
         }).then((result) => {
             if (result.isConfirmed) {
                 document.getElementById('btn_' + campoFirma).style.display = 'none';
-                
+
                 const nombreExtraido = result.value.firmado_por;
                 const spanName = document.getElementById('name_' + campoFirma);
                 if (spanName) { spanName.innerText = nombreExtraido.toUpperCase(); }
-                
+
                 document.getElementById('previewFirma_' + campoFirma).style.display = 'block';
                 document.getElementById('input_' + campoFirma).value = 'FIRMADO';
-                
+
                 htmx.trigger('#formularioOficial', 'change');
 
                 Swal.fire({
@@ -833,19 +1336,19 @@
         let formValido = true;
 
         requeridos.forEach(el => {
-            if(el.value.trim() === '') {
+            if (el.value.trim() === '') {
                 mostrarError(el, '⚠ Este campo es obligatorio.');
                 formValido = false;
             }
         });
 
-        if (!formValido || document.querySelectorAll('.has-error').length > 0) { 
-            Swal.fire('Formulario Incompleto', 'Debe llenar todos los campos habilitados correctamente antes de guardar el trámite.', 'warning'); 
-            return; 
+        if (!formValido || document.querySelectorAll('.has-error').length > 0) {
+            Swal.fire('Formulario Incompleto', 'Debe llenar todos los campos habilitados correctamente antes de guardar el trámite.', 'warning');
+            return;
         }
 
         Swal.fire({ title: '¿Finalizar trámite?', text: 'Se guardarán de manera irreversible los datos llenados.', icon: 'question', showCancelButton: true, confirmButtonText: 'Sí, Guardar Trámite', confirmButtonColor: '#16a34a' }).then((result) => {
-            if(result.isConfirmed) { document.getElementById('formularioOficial').submit(); }
+            if (result.isConfirmed) { document.getElementById('formularioOficial').submit(); }
         });
     }
 </script>

@@ -195,7 +195,7 @@ def descargar_pdf(solicitud_id):
         return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=solicitud.id))
 
 # ====================================================================
-# 6. RUTA: FIRMA CRIPTOGRÁFICA PAdES (ADAPTACIÓN MULTIVERSIÓN)
+# 6. RUTA: FIRMA CRIPTOGRÁFICA PAdES (VICTORIA FINAL)
 # ====================================================================
 @paz_salvo_bp.route('/paz-salvo/subir-firma/<int:solicitud_id>', methods=['POST'])
 @login_required
@@ -213,50 +213,38 @@ def subir_firma_pades(solicitud_id):
     archivo_p12.save(ruta_temp_p12)
 
     try:
-        # ESTRATEGIA MULTI-VERSIÓN:
-        # pyHanko ha cambiado el nombre del parámetro de la contraseña varias veces.
-        # Este bucle prueba todos los nombres conocidos hasta encontrar el correcto,
-        # evitando el "WinError 6" y los conflictos de argumentos.
-        p12_password = password.encode('utf-8')
-        signer = None
-        
-        opciones_kwargs = [
-            {'passphrase': p12_password},
-            {'key_passphrase': p12_password},
-            {'bpassword': p12_password},
-            {'password': p12_password}
-        ]
-        
-        for kwargs in opciones_kwargs:
-            try:
-                # Cargamos el certificado con el argumento actual
-                signer = signers.SimpleSigner.load_pkcs12(ruta_temp_p12, **kwargs)
-                break # ¡Si no da error, encontramos el nombre correcto! Salimos del bucle.
-            except TypeError as e:
-                if "unexpected keyword argument" in str(e):
-                    continue # Falló este nombre, la librería intenta con el siguiente
-                raise e # Si es otro error de tipo, lo mostramos
+        # EL PARÁMETRO CORRECTO ES 'passphrase' (Sugerido por el mismo Python)
+        signer = signers.SimpleSigner.load_pkcs12(
+            ruta_temp_p12, 
+            passphrase=password.encode('utf-8')
+        )
         
         if signer is None:
-            raise Exception("La contraseña es incorrecta o el certificado está dañado.")
+            raise Exception("El certificado no pudo ser cargado.")
 
-        nombre_firmante = signer.cert.subject.human_friendly
-
-        # ESTAMPAR FIRMA
+        # Ya comprobamos que en tu versión se usa .signing_cert
+        nombre_firmante = signer.signing_cert.subject.human_friendly
+# 3. ESTAMPAR FIRMA
         ruta_pdf_original = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}.pdf')
         if not os.path.exists(ruta_pdf_original):
             raise Exception("El PDF base no existe. Genere el PDF primero.")
 
+        # PASO A: Leer y firmar en la memoria RAM
         with open(ruta_pdf_original, 'rb') as inf:
             w = IncrementalPdfFileWriter(inf)
             append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma))
             
-            with open(ruta_pdf_original, 'r+b') as outf:
-                signers.sign_pdf(
-                    w, signers.PdfSignatureMetadata(field_name=campo_firma),
-                    signer=signer,
-                    outf=outf
-                )
+            # Sin argumentos extra, pyHanko devuelve el PDF firmado en memoria (BytesIO)
+            pdf_en_memoria = signers.sign_pdf(
+                w, 
+                signers.PdfSignatureMetadata(field_name=campo_firma),
+                signer=signer
+            )
+
+        # PASO B: Escribir los bytes firmados sobrescribiendo el archivo original de forma segura
+        with open(ruta_pdf_original, 'wb') as outf:
+            pdf_en_memoria.seek(0)
+            outf.write(pdf_en_memoria.read())
 
         # ACTUALIZAR BD
         respuesta_firma = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo_firma).first()
