@@ -7,13 +7,12 @@ import os
 from app.models.base import db, Usuario, Rol, SolicitudPazSalvo, Respuesta, LogAuditoria
 from app.services.pdf_service import generar_documento_paz_salvo
 
-# Librerías criptográficas (ESTO ES TODO LO QUE NECESITAS)
+# Librerías criptográficas para la firma PAdES
 from pyhanko.sign import signers
 from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
 from pyhanko.sign.fields import SigFieldSpec, append_signature_field
 
 paz_salvo_bp = Blueprint('paz_salvo', __name__)
-
 # ====================================================================
 # 1. RUTA: CREAR NUEVA SOLICITUD
 # ====================================================================
@@ -196,7 +195,7 @@ def descargar_pdf(solicitud_id):
         return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=solicitud.id))
 
 # ====================================================================
-# 6. RUTA: FIRMA CRIPTOGRÁFICA PAdES (SOLUCIÓN DIRECTA)
+# 6. RUTA: FIRMA CRIPTOGRÁFICA PAdES (ADAPTACIÓN MULTIVERSIÓN)
 # ====================================================================
 @paz_salvo_bp.route('/paz-salvo/subir-firma/<int:solicitud_id>', methods=['POST'])
 @login_required
@@ -214,17 +213,32 @@ def subir_firma_pades(solicitud_id):
     archivo_p12.save(ruta_temp_p12)
 
     try:
-        # CARGA FORZADA Y MANUAL
-        # Al usar argumentos nombrados (pfx_file, password, ca_chain_files), 
-        # eliminamos el riesgo de "múltiples valores"
-        signer = signers.SimpleSigner.load_pkcs12(
-            ruta_temp_p12, 
-            password.encode('utf-8')
-        )
+        # ESTRATEGIA MULTI-VERSIÓN:
+        # pyHanko ha cambiado el nombre del parámetro de la contraseña varias veces.
+        # Este bucle prueba todos los nombres conocidos hasta encontrar el correcto,
+        # evitando el "WinError 6" y los conflictos de argumentos.
+        p12_password = password.encode('utf-8')
+        signer = None
         
-        # Validar signer inmediatamente
+        opciones_kwargs = [
+            {'passphrase': p12_password},
+            {'key_passphrase': p12_password},
+            {'bpassword': p12_password},
+            {'password': p12_password}
+        ]
+        
+        for kwargs in opciones_kwargs:
+            try:
+                # Cargamos el certificado con el argumento actual
+                signer = signers.SimpleSigner.load_pkcs12(ruta_temp_p12, **kwargs)
+                break # ¡Si no da error, encontramos el nombre correcto! Salimos del bucle.
+            except TypeError as e:
+                if "unexpected keyword argument" in str(e):
+                    continue # Falló este nombre, la librería intenta con el siguiente
+                raise e # Si es otro error de tipo, lo mostramos
+        
         if signer is None:
-            raise Exception("El certificado cargado es nulo.")
+            raise Exception("La contraseña es incorrecta o el certificado está dañado.")
 
         nombre_firmante = signer.cert.subject.human_friendly
 
@@ -265,6 +279,5 @@ def subir_firma_pades(solicitud_id):
 
     except Exception as e:
         if os.path.exists(ruta_temp_p12): os.remove(ruta_temp_p12)
-        # Esto nos mostrará el error real en la terminal sin romper el servidor
         print(f"ERROR DE FIRMA: {str(e)}") 
         return jsonify({'mensaje': f'Error de firma: {str(e)}'}), 500
