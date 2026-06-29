@@ -2,6 +2,11 @@ from flask import Blueprint, current_app, render_template, request, redirect, ur
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 import os
+import io
+
+# Generador de Códigos QR nativos en formato SVG (Vectores, no imágenes)
+import qrcode
+import qrcode.image.svg
 
 # Modelos
 from app.models.base import db, Usuario, Rol, SolicitudPazSalvo, Respuesta, LogAuditoria
@@ -13,6 +18,40 @@ from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
 from pyhanko.sign.fields import SigFieldSpec, append_signature_field
 
 paz_salvo_bp = Blueprint('paz_salvo', __name__)
+
+# ====================================================================
+# FUNCIÓN GLOBAL: GENERADOR DE QR VECTORIAL EXACTO A FIRMAEC
+# ====================================================================
+@paz_salvo_bp.app_template_global()
+def generar_qr_svg(nombre):
+    """Genera un QR real en formato SVG para que WeasyPrint lo dibuje nativamente en el PDF"""
+    if not nombre:
+        nombre = "RESPONSABLE"
+        
+    # Datos que hacen que el QR se vea complejo e idéntico al de la foto
+    data = f"Validar únicamente en FirmaEC.\nFirmado electrónicamente por:\n{nombre}"
+    
+    factory = qrcode.image.svg.SvgPathImage
+    qr = qrcode.QRCode(
+        version=4, # Versión 4 garantiza esa densidad visual del QR de la foto
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=10,
+        border=0,
+        image_factory=factory
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image()
+    
+    # Extraer únicamente la etiqueta <svg> limpia
+    svg_str = img.to_string(encoding='unicode')
+    if "<?xml" in svg_str:
+        svg_str = svg_str.split("?>")[-1].strip()
+        
+    # Inyectar la clase CSS para que coincida con tu diseño
+    svg_str = svg_str.replace('<svg ', '<svg class="firmaec-qr" preserveAspectRatio="xMidYMid meet" ')
+    return svg_str
+
 
 # ====================================================================
 # 1. RUTA: CREAR NUEVA SOLICITUD
@@ -180,7 +219,6 @@ def guardar_formulario(solicitud_id):
 
         db.session.commit()
         
-        # Generamos el PDF base fresco para que la firma PAdES lo encuentre
         solicitud = SolicitudPazSalvo.query.get(solicitud_id)
         solicitud.ex_funcionario = Usuario.query.get(solicitud.ex_funcionario_id)
         respuestas_db = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
@@ -221,7 +259,6 @@ def actualizar_espejo():
     respuestas_db = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
     datos_combinados = {r.campo_formulario: r.valor_respuesta for r in respuestas_db}
     
-    # Fusionamos la info fresca del teclado con la que ya estaba en BD
     for k, v in datos_en_vivo.items():
         if v.strip() != "":
             datos_combinados[k] = str(v).upper()
@@ -258,7 +295,7 @@ def descargar_pdf(solicitud_id):
         return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=solicitud.id))
 
 # ====================================================================
-# 7. RUTA: FIRMA CRIPTOGRÁFICA PAdES (VICTORIA FINAL)
+# 7. RUTA: FIRMA CRIPTOGRÁFICA PAdES (INVISIBLE A NIVEL PDF)
 # ====================================================================
 @paz_salvo_bp.route('/paz-salvo/subir-firma/<int:solicitud_id>', methods=['POST'])
 @login_required
@@ -276,52 +313,51 @@ def subir_firma_pades(solicitud_id):
     archivo_p12.save(ruta_temp_p12)
 
     try:
-        signer = signers.SimpleSigner.load_pkcs12(
-            ruta_temp_p12, 
-            passphrase=password.encode('utf-8')
-        )
+        # A. Extraer Nombre Limpio e Ignorar basura técnica (Serial Numbers, Country, etc)
+        signer = signers.SimpleSigner.load_pkcs12(ruta_temp_p12, passphrase=password.encode('utf-8'))
         
-        if signer is None:
-            raise Exception("El certificado no pudo ser cargado.")
+        diccionario_certificado = signer.signing_cert.subject.native
+        if 'common_name' in diccionario_certificado:
+            nombre_firmante = diccionario_certificado['common_name']
+        else:
+            texto_bruto = signer.signing_cert.subject.human_friendly
+            nombre_firmante = texto_bruto.split(',')[0].replace('COMMON NAME:', '').strip()
 
-        nombre_firmante = signer.signing_cert.subject.human_friendly
-
-        # ESTAMPAR FIRMA
-        ruta_pdf_original = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}.pdf')
-        if not os.path.exists(ruta_pdf_original):
-            raise Exception("El PDF base no existe. Genere el PDF primero.")
-
-        # PASO A: Leer y firmar en la memoria RAM
-        with open(ruta_pdf_original, 'rb') as inf:
-            w = IncrementalPdfFileWriter(inf)
-            append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma))
-            
-            pdf_en_memoria = signers.sign_pdf(
-                w, 
-                signers.PdfSignatureMetadata(field_name=campo_firma),
-                signer=signer
-            )
-
-        # PASO B: Escribir los bytes firmados sobrescribiendo el archivo original de forma segura
-        with open(ruta_pdf_original, 'wb') as outf:
-            pdf_en_memoria.seek(0)
-            outf.write(pdf_en_memoria.read())
-
-        # ACTUALIZAR BD
+        # B. Guardar variables en BD (Nunca tocar RESPONSABLE)
         respuesta_firma = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo_firma).first()
         if respuesta_firma:
             respuesta_firma.valor_respuesta = 'FIRMADO'
         else:
             db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=campo_firma, usuario_asignado_id=current_user.id, valor_respuesta='FIRMADO'))
             
-        nombre_label = campo_firma.replace('_r', '_nombre_resp').replace('_sig', '_responsable')
-        resp_nombre = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=nombre_label).first()
+        campo_nombre_firma = f"{campo_firma}_nombre"
+        resp_nombre = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma).first()
         if resp_nombre:
             resp_nombre.valor_respuesta = nombre_firmante.upper()
         else:
-            db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=nombre_label, usuario_asignado_id=current_user.id, valor_respuesta=nombre_firmante.upper()))
+            db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma, usuario_asignado_id=current_user.id, valor_respuesta=nombre_firmante.upper()))
             
         db.session.commit()
+
+        # C. Generar PDF fresco con el diseño HTML vectorizado (QR SVG)
+        ruta_pdf_original = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}.pdf')
+        solicitud_temp = SolicitudPazSalvo.query.get(solicitud_id)
+        solicitud_temp.ex_funcionario = Usuario.query.get(solicitud_temp.ex_funcionario_id)
+        resp_temp = Respuesta.query.filter_by(solicitud_id=solicitud_id).all()
+        generar_documento_paz_salvo(solicitud_temp, solicitud_temp.ex_funcionario, resp_temp, ruta_pdf_original)
+
+        # D. FIRMAR CRIPTOGRÁFICAMENTE DE FORMA INVISIBLE
+        # Al no usar coordenadas ni bounding boxes, PyHanko no romperá la tabla jamás.
+        with open(ruta_pdf_original, 'rb') as inf:
+            w = IncrementalPdfFileWriter(inf)
+            # Se añade la firma de manera invisible
+            append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma))
+            meta = signers.PdfSignatureMetadata(field_name=campo_firma)
+            pdf_en_memoria = signers.sign_pdf(w, signature_meta=meta, signer=signer)
+
+        with open(ruta_pdf_original, 'wb') as outf:
+            pdf_en_memoria.seek(0)
+            outf.write(pdf_en_memoria.read())
         
         if os.path.exists(ruta_temp_p12): os.remove(ruta_temp_p12)
         return jsonify({'status': 'success', 'mensaje': 'Firma estampada', 'firmado_por': nombre_firmante}), 200
