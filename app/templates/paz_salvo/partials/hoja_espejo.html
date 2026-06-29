@@ -20,21 +20,21 @@
     .ep-yn--s { color: #166534; background: #dcfce7; border: 1px solid #22c55e;}
     .ep-yn--n { color: #991b1b; background: #fee2e2; border: 1px solid #ef4444;}
     .ep-firma-box { width: 100%; height: 38px; display: flex; align-items: center; justify-content: center; background-color: #ffffff; }
+    /* Aumentamos la altura de la caja de firma en tu CSS */
+    .ep-firma-box { width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; }
 
     /* DISEÑO IDÉNTICO A FIRMAEC FOTOGRAFÍA */
     .firmaec-sello {
         display: flex;
         align-items: center;
-        background: transparent;
-        text-align: left;
+        width: 100%;
+        max-width: 130px; /* IMPORTANTE: Ajusta esto al ancho de tu celda */
         margin: 0 auto;
-        max-width: 145px; /* Restringe el texto para que haga salto de línea como en la foto */
     }
     .firmaec-qr {
-        width: 34px;
-        height: 34px;
-        margin-right: 4px;
-        flex-shrink: 0;
+        width: 30px; /* Tamaño del QR */
+        height: 30px;
+        margin-right: 5px;
     }
     /* Para que el SVG nativo se dibuje en negro puro y nítido */
     .firmaec-qr path { fill: #000 !important; shape-rendering: crispEdges; }
@@ -75,20 +75,13 @@
 {% set ex = solicitud.ex_funcionario if solicitud and solicitud.ex_funcionario else current_user %}
 
 {% macro firma_espejo(campo) %}
-<div class="ep-firma-box" id="espejo_firma_{{ campo }}">
+<div class="ep-firma-box" id="espejo_firma_{{ campo }}" style="height: 60px;">
     {% if dat.get(campo) == 'FIRMADO' %}
-    <div class="firmaec-sello">
-        <!-- Inyección del SVG real del Código QR -->
-        {{ generar_qr_svg(dat.get(campo ~ '_nombre')) | safe }}
-        <div class="firmaec-text-col">
-            <span class="firmaec-label-top">Validar únicamente en FirmaEC.</span>
-            <span class="firmaec-label">Firmado electrónicamente por:</span>
-            <!-- Nombre limpio sin tocar "Responsable" -->
-            <span class="firmaec-name" id="name_{{ campo }}">{{ dat.get(campo ~ '_nombre') | default('RESPONSABLE', true) | upper }}</span>
+        <div style="font-size: 8px; color: #15803d; font-weight: 800; text-align: center;">
+            <i class="bi bi-check-circle-fill"></i> Firma Estampada
         </div>
-    </div>
     {% else %}
-    <span style="color:#94a3b8; font-size:6.5px; font-style: italic;">[ Pendiente Firma ]</span>
+        <span style="color:#94a3b8; font-size:7px; font-style: italic;">[ Espacio Firma ]</span>
     {% endif %}
 </div>
 {% endmacro %}
