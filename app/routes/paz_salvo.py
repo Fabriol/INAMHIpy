@@ -298,8 +298,9 @@ def descargar_pdf(solicitud_id):
 # ====================================================================
 # 7. RUTA: FIRMA CRIPTOGRÁFICA PAdES (INVISIBLE A NIVEL PDF)
 # ====================================================================
-# ... (mantén tus imports anteriores)
-# NO importes NoStampStyle, no lo necesitas
+
+from PIL import Image
+from pyhanko.stamp import StaticStampStyle
 
 @paz_salvo_bp.route('/paz-salvo/subir-firma/<int:solicitud_id>', methods=['POST'])
 @login_required
@@ -320,46 +321,50 @@ def subir_firma_pades(solicitud_id):
         # A. Cargar Certificado y extraer nombre limpio
         signer = signers.SimpleSigner.load_pkcs12(ruta_temp_p12, passphrase=password.encode('utf-8'))
         diccionario_certificado = signer.signing_cert.subject.native
-        nombre_firmante = diccionario_certificado.get('common_name', 'FIRMADO')
+        if 'common_name' in diccionario_certificado:
+            nombre_firmante = diccionario_certificado['common_name']
+        else:
+            texto_bruto = signer.signing_cert.subject.human_friendly
+            nombre_firmante = texto_bruto.split(',')[0].replace('COMMON NAME:', '').strip()
 
-        # B. Actualizar Base de Datos (Marcamos como FIRMADO)
-        # Esto es vital para que la función de generación de PDF sepa qué dibujar
-        campo_nombre_firma = f"{campo_firma}_nombre"
-        
-        # 1. Guardar estado
+        # B. Guardar variables en BD
         res_firma = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo_firma).first()
         if res_firma: res_firma.valor_respuesta = 'FIRMADO'
         else: db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=campo_firma, usuario_asignado_id=current_user.id, valor_respuesta='FIRMADO'))
         
-        # 2. Guardar nombre
+        campo_nombre_firma = f"{campo_firma}_nombre"
         resp_nombre = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma).first()
         if resp_nombre: resp_nombre.valor_respuesta = nombre_firmante.upper()
         else: db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma, usuario_asignado_id=current_user.id, valor_respuesta=nombre_firmante.upper()))
-        
         db.session.commit()
 
-        # C. GENERAR EL PDF CON TU DISEÑO (¡Aquí se dibuja el QR y el texto!)
+        # C. Generar PDF (WeasyPrint dibujará tu diseño HTML con el QR perfecto)
         ruta_pdf_original = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}.pdf')
-        sol = SolicitudPazSalvo.query.get(solicitud_id)
-        # Recargamos respuestas para asegurar que 'FIRMADO' esté presente al renderizar
-        resp_actualizadas = Respuesta.query.filter_by(solicitud_id=solicitud_id).all()
-        generar_documento_paz_salvo(sol, Usuario.query.get(sol.ex_funcionario_id), resp_actualizadas, ruta_pdf_original)
+        solicitud_temp = SolicitudPazSalvo.query.get(solicitud_id)
+        solicitud_temp.ex_funcionario = Usuario.query.get(solicitud_temp.ex_funcionario_id)
+        resp_temp = Respuesta.query.filter_by(solicitud_id=solicitud_id).all()
+        generar_documento_paz_salvo(solicitud_temp, solicitud_temp.ex_funcionario, resp_temp, ruta_pdf_original)
 
-        # D. FIRMA CRIPTOGRÁFICA SIN SELLO (Invisible)
+        # D. FIRMAR CRIPTOGRÁFICAMENTE (MÁSCARA TRANSPARENTE)
+        # Creamos una imagen de 1x1 pixel totalmente transparente (RGBA = 0,0,0,0)
+        img_transparente = Image.new('RGBA', (1, 1), (0, 0, 0, 0))
+        sello_invisible = StaticStampStyle(background=img_transparente, border_width=0)
+
         with open(ruta_pdf_original, 'rb') as inf:
             w = IncrementalPdfFileWriter(inf)
-            append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma))
+            # Creamos una cajita minúscula (casi invisible) para anclar la firma
+            append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma, box=(0, 0, 10, 10)))
             meta = signers.PdfSignatureMetadata(field_name=campo_firma)
             
-            # Al NO pasar el argumento 'style', pyHanko firma sin añadir ningún sello visual intrusivo
-            pdf_en_memoria = signers.sign_pdf(w, signature_meta=meta, signer=signer)
+            # Firmamos aplicando el sello transparente
+            pdf_en_memoria = signers.sign_pdf(w, signature_meta=meta, signer=signer, style=sello_invisible)
 
         with open(ruta_pdf_original, 'wb') as outf:
             pdf_en_memoria.seek(0)
             outf.write(pdf_en_memoria.read())
         
         if os.path.exists(ruta_temp_p12): os.remove(ruta_temp_p12)
-        return jsonify({'status': 'success', 'mensaje': 'Firma válida'}), 200
+        return jsonify({'status': 'success', 'mensaje': 'Firma estampada'}), 200
 
     except Exception as e:
         if os.path.exists(ruta_temp_p12): os.remove(ruta_temp_p12)
