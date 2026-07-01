@@ -19,9 +19,12 @@
 
     /* Barra de Progreso Personalizada */
     .progress-container { width: 100%; background-color: #e2e8f0; border-radius: 20px; height: 12px; overflow: hidden; margin-top: 5px; position: relative; }
-    .progress-bar-custom { height: 100%; border-radius: 20px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: linear-gradient(90deg, #3b82f6, #0ea5e9); }
+    
+    /* TRUCO CSS: Usamos var() para evitar que el editor marque error con Jinja */
+    .progress-bar-custom { height: 100%; border-radius: 20px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); background: linear-gradient(90deg, #3b82f6, #0ea5e9); width: var(--progreso-w, 0%); }
     .progress-100 { background: linear-gradient(90deg, #10b981, #059669) !important; }
     .porcentaje-text { font-size: 0.75rem; font-weight: 900; color: #475569; display: block; text-align: right; margin-bottom: 2px; }
+    .text-success-custom { color: #16a34a !important; }
 
     /* Badges de Estado */
     .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
@@ -89,9 +92,9 @@
                     </td>
                     
                     <td style="padding: 16px 25px;">
-                        <span class="porcentaje-text {% if porcentaje == 100 %}text-success{% endif %}">{{ porcentaje }}% Completado</span>
+                        <span class="porcentaje-text {% if porcentaje == 100 %}text-success-custom{% endif %}">{{ porcentaje }}% Completado</span>
                         <div class="progress-container shadow-sm">
-                            <div class="progress-bar-custom" style="width: {{ porcentaje }}%;"></div>
+                            <div class="progress-bar-custom {% if porcentaje == 100 %}progress-100{% endif %}" style="--progreso-w: {{ porcentaje }}%;"></div>
                         </div>
                     </td>
                     

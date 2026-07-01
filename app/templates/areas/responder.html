@@ -1,56 +1,229 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mt-4 justify-content-center">
-    <div class="col-md-10">
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-header bg-dark text-white pt-3 pb-2 border-0">
-                <h4 class="fw-bold">Validación de Trámite #{{ solicitud.id }}</h4>
-            </div>
-            <div class="card-body p-4">
-                
-                <form method="POST" action="/areas/responder/{{ solicitud.id }}">
-                    
-                    <h5 class="fw-bold text-muted mb-4 border-bottom pb-2">Sección: {{ current_user.rol.nombre }}</h5>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-                    {% for pregunta in preguntas %}
-                    <div class="row mb-4 bg-light p-3 rounded mx-1 shadow-sm">
+<style>
+    :root {
+        --blue-50: #eff6ff;
+        --blue-100: #dbeafe;
+        --blue-600: #2563eb;
+        --blue-900: #1e3a8a;
+        --green-50: #f0fdf4;
+        --green-600: #16a34a;
+        --slate-50: #f8fafc;
+        --slate-200: #e2e8f0;
+        --slate-300: #cbd5e1;
+        --slate-500: #64748b;
+        --slate-900: #0f172a;
+        --grad-header: linear-gradient(90deg, #2563eb, #0ea5e9, #22c55e);
+        --blur: blur(18px);
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 30px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .88);
+        border: 1px solid rgba(255, 255, 255, .80);
+        backdrop-filter: var(--blur);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 4px;
+        background: var(--grad-header);
+    }
+
+    .info-card {
+        background: #fafcff;
+        border: 2px dashed var(--blue-600);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .question-box {
+        background: #fff;
+        border: 1px solid var(--slate-300);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        transition: transform 0.2s;
+    }
+
+    .question-box:hover {
+        transform: translateY(-2px);
+        border-color: var(--blue-600);
+    }
+
+    .doc-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid var(--slate-300);
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700 !important;
+        color: #0f172a !important;
+        background: #fff !important;
+        text-transform: uppercase;
+        transition: 0.3s;
+    }
+
+    .doc-input:focus {
+        border-color: var(--blue-600);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, .15);
+        outline: none;
+    }
+
+    .form-label-custom {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--blue-900);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+</style>
+
+<div class="page fade-in">
+    <div class="page-header">
+        <div>
+            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Validación de Área</span>
+            <h1 style="font-size: 24px; font-weight: 900; color: var(--blue-900); margin: 0;">{{ current_user.rol.nombre }}</h1>
+        </div>
+        <div>
+            <a href="/areas/tareas" class="btn btn-light border fw-bold shadow-sm text-dark">
+                <i class="bi bi-arrow-left me-2"></i> Volver a Pendientes
+            </a>
+        </div>
+    </div>
+
+    <div class="info-card">
+        <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-person-badge-fill me-2"></i>Expediente de Paz y Salvo #{{ solicitud.id }} perteneciente a:</h6>
+        <div class="row">
+            <div class="col-md-4">
+                <p class="mb-1" style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">Cédula de Identidad</p>
+                <p class="fw-bold m-0 fs-5 text-dark">{{ solicitud.ex_funcionario.cedula | default('NO REGISTRA', true) }}</p>
+            </div>
+            <div class="col-md-4">
+                <p class="mb-1" style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">Nombres y Apellidos</p>
+                <p class="fw-bold m-0 fs-5 text-dark text-uppercase">{{ solicitud.ex_funcionario.nombres }} {{ solicitud.ex_funcionario.apellidos }}</p>
+            </div>
+            <div class="col-md-4">
+                <p class="mb-1" style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">Correo Institucional</p>
+                <p class="fw-bold m-0 fs-6 text-primary">{{ solicitud.ex_funcionario.email }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4" style="overflow: hidden;">
+        <div class="card-header border-bottom-0 text-white" style="background: linear-gradient(135deg, var(--blue-900), var(--blue-600)); padding: 15px 20px;">
+            <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase;"><i class="bi bi-ui-checks me-2"></i> Formulario de Revisión y Descargo</h5>
+        </div>
+        <div class="card-body p-4 bg-light">
+            <form id="formularioValidacion" method="POST" action="/areas/responder/{{ solicitud.id }}">
+                
+                {% for pregunta in preguntas %}
+                <div class="question-box">
+                    <div class="row align-items-start">
                         <div class="col-md-6 border-end">
-                            <label class="form-label fw-bold">{{ pregunta.enunciado }}</label>
+                            <label class="form-label-custom">{{ pregunta.enunciado }} <span class="text-danger">*</span></label>
                             
                             {% if pregunta.tipo_respuesta == 'SI_NO' %}
-                                <select class="form-select border-primary" name="pregunta_{{ pregunta.id }}" required>
-                                    <option value="">Seleccione...</option>
+                                <select class="doc-input mt-2" name="pregunta_{{ pregunta.id }}" required>
+                                    <option value="">— Seleccione SÍ o NO —</option>
                                     <option value="SI">SÍ</option>
                                     <option value="NO">NO</option>
                                 </select>
                             {% elif pregunta.tipo_respuesta == 'NUMERO' %}
-                                <div class="input-group">
-                                    <span class="input-group-text">$</span>
-                                    <input type="number" step="0.01" class="form-control border-primary" name="pregunta_{{ pregunta.id }}" required>
+                                <div class="input-group mt-2">
+                                    <span class="input-group-text bg-white fw-bold border-end-0" style="border-color: var(--slate-300);">$</span>
+                                    <input type="text" class="doc-input border-start-0" name="pregunta_{{ pregunta.id }}" placeholder="0.00" required oninput="window['soloMoneda'](this)">
                                 </div>
                             {% else %}
-                                <input type="text" class="form-control border-primary" name="pregunta_{{ pregunta.id }}" required>
+                                <input type="text" class="doc-input mt-2" name="pregunta_{{ pregunta.id }}" placeholder="Ingrese su respuesta..." required oninput="window['convertirMayusculas'](this)">
                             {% endif %}
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label text-muted">Observación / Detalle (Opcional)</label>
-                            <input type="text" class="form-control" name="observacion_{{ pregunta.id }}" placeholder="Ej: No entregó credencial...">
+                        <div class="col-md-6 ps-4">
+                            <label class="form-label-custom text-muted"><i class="bi bi-chat-left-text me-1"></i> Detalle / Observación (Opcional)</label>
+                            <input type="text" class="doc-input mt-2 bg-white" name="observacion_{{ pregunta.id }}" placeholder="Escriba novedades o detalles aquí..." oninput="window['convertirMayusculas'](this)" style="font-weight: 500 !important; color: var(--slate-500) !important;">
                         </div>
                     </div>
-                    {% else %}
-                    <div class="alert alert-warning">No hay preguntas configuradas para su área. Consulte con el Administrador.</div>
-                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-warning border-0 fw-bold rounded-3 shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> No se encontraron preguntas configuradas para su área. Consulte con el Administrador.
+                </div>
+                {% endfor %}
 
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="/areas/tareas" class="btn btn-outline-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-success fw-bold px-5">Guardar y Finalizar mi Revisión</button>
-                    </div>
-                </form>
-
-            </div>
+                <div class="d-flex justify-content-end mt-4 pt-3 border-top gap-3">
+                    <button type="button" class="btn btn-success fw-bold px-4 py-2" onclick="window['validarYGuardarRespuesta']()" style="border-radius: 8px;">
+                        <i class="bi bi-check2-all me-2"></i> Guardar y Finalizar Revisión
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+    window.soloMoneda = (el) => {
+        let valor = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+        el.value = valor;
+    };
+
+    window.convertirMayusculas = (el) => {
+        let textoLimpio = el.value.toUpperCase();
+        el.value = textoLimpio;
+    };
+
+    window.validarYGuardarRespuesta = () => {
+        let form = document.getElementById('formularioValidacion');
+        let requeridos = form.querySelectorAll('input[required], select[required]');
+        let formValido = true;
+
+        requeridos.forEach(el => {
+            if (el.value.trim() === '') {
+                el.style.borderColor = '#ef4444';
+                el.style.backgroundColor = '#fff5f5';
+                formValido = false;
+            } else {
+                el.style.borderColor = '#cbd5e1';
+                el.style.backgroundColor = '#fff';
+            }
+        });
+
+        if (!formValido) {
+            Swal.fire('Campos Incompletos', 'Por favor, responda todas las preguntas obligatorias marcadas con asterisco.', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            title: '¿Confirmar Revisión?',
+            text: 'Al guardar, estos datos se reflejarán en el documento de Paz y Salvo del ex-funcionario.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Sí, Sellar Revisión',
+            cancelButtonText: 'Revisar de nuevo'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+                form.submit();
+            }
+        });
+    };
+</script>
 {% endblock %}
