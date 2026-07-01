@@ -373,3 +373,39 @@ def subir_firma_pades(solicitud_id):
     except Exception as e:
         if os.path.exists(ruta_temp_p12): os.remove(ruta_temp_p12)
         return jsonify({'mensaje': f'Error de firma: {str(e)}'}), 500
+
+# ====================================================================
+# 8. RUTA: ELIMINAR SOLICITUD (SOLO ADMINISTRADOR)
+# ====================================================================
+@paz_salvo_bp.route('/paz-salvo/eliminar/<int:solicitud_id>', methods=['POST'])
+@login_required
+def eliminar_solicitud(solicitud_id):
+    # Regla estricta: Solo el Administrador puede borrar
+    if current_user.rol.nombre != 'Administrador':
+        return jsonify({'status': 'error', 'mensaje': 'No tiene permisos de administrador para realizar esta acción.'}), 403
+        
+    try:
+        # Primero, eliminamos todas las respuestas asociadas al formulario para evitar conflictos de claves foráneas
+        Respuesta.query.filter_by(solicitud_id=solicitud_id).delete()
+        
+        # Opcional: Si quieres mantener tu directorio limpio, borra también el PDF asociado
+        directorio_temp = os.path.join(current_app.root_path, 'static', 'temp')
+        ruta_pdf = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}.pdf')
+        if os.path.exists(ruta_pdf):
+            os.remove(ruta_pdf)
+
+        # Finalmente, eliminamos la solicitud raíz de la BD
+        solicitud = SolicitudPazSalvo.query.get_or_404(solicitud_id)
+        db.session.delete(solicitud)
+        db.session.commit()
+        
+        # Registramos en auditoría (opcional pero buena práctica)
+        log = LogAuditoria(usuario_id=current_user.id, modulo='Formularios', accion='ELIMINAR EXPEDIENTE', detalle=f"Eliminó expediente ID: {solicitud_id}")
+        db.session.add(log)
+        db.session.commit()
+            
+        return jsonify({'status': 'success', 'mensaje': 'Expediente eliminado correctamente.'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'mensaje': str(e)}), 500
