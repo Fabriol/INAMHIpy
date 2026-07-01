@@ -299,8 +299,10 @@ def descargar_pdf(solicitud_id):
 # 7. RUTA: FIRMA CRIPTOGRÁFICA PAdES (INVISIBLE A NIVEL PDF)
 # ====================================================================
 
-from PIL import Image
-from pyhanko.stamp import StaticStampStyle
+from pyhanko.sign import signers
+from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
+from pyhanko.sign.fields import SigFieldSpec, append_signature_field
+import os
 
 @paz_salvo_bp.route('/paz-salvo/subir-firma/<int:solicitud_id>', methods=['POST'])
 @login_required
@@ -338,26 +340,30 @@ def subir_firma_pades(solicitud_id):
         else: db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma, usuario_asignado_id=current_user.id, valor_respuesta=nombre_firmante.upper()))
         db.session.commit()
 
-        # C. Generar PDF (WeasyPrint dibujará tu diseño HTML con el QR perfecto)
+        # C. Generar PDF (El HTML dibujará tu QR y tu nombre)
         ruta_pdf_original = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}.pdf')
         solicitud_temp = SolicitudPazSalvo.query.get(solicitud_id)
         solicitud_temp.ex_funcionario = Usuario.query.get(solicitud_temp.ex_funcionario_id)
         resp_temp = Respuesta.query.filter_by(solicitud_id=solicitud_id).all()
         generar_documento_paz_salvo(solicitud_temp, solicitud_temp.ex_funcionario, resp_temp, ruta_pdf_original)
 
-        # D. FIRMAR CRIPTOGRÁFICAMENTE (MÁSCARA TRANSPARENTE)
-        # Creamos una imagen de 1x1 pixel totalmente transparente (RGBA = 0,0,0,0)
-        img_transparente = Image.new('RGBA', (1, 1), (0, 0, 0, 0))
-        sello_invisible = StaticStampStyle(background=img_transparente, border_width=0)
-
+        # D. FIRMA CRIPTOGRÁFICA INVISIBLE (Sin "style" para evitar el error 500)
+        from pyhanko.sign import fields # Importación necesaria para el PAdES estricto
+        
         with open(ruta_pdf_original, 'rb') as inf:
             w = IncrementalPdfFileWriter(inf)
-            # Creamos una cajita minúscula (casi invisible) para anclar la firma
-            append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma, box=(0, 0, 10, 10)))
-            meta = signers.PdfSignatureMetadata(field_name=campo_firma)
             
-            # Firmamos aplicando el sello transparente
-            pdf_en_memoria = signers.sign_pdf(w, signature_meta=meta, signer=signer, style=sello_invisible)
+            # Caja en 0,0,0,0 asegura que pyHanko no tape tu diseño HTML
+            append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma, box=(0, 0, 0, 0)))
+            
+            # Subfilter PADES asegura validación del Gobierno (FirmaEC)
+            meta = signers.PdfSignatureMetadata(
+                field_name=campo_firma,
+                subfilter=fields.SigSeedSubFilter.PADES
+            )
+            
+            # Firmamos SIN el argumento style
+            pdf_en_memoria = signers.sign_pdf(w, signature_meta=meta, signer=signer)
 
         with open(ruta_pdf_original, 'wb') as outf:
             pdf_en_memoria.seek(0)
