@@ -52,21 +52,6 @@
         margin-bottom: 24px;
     }
 
-    .question-box {
-        background: #fff;
-        border: 1px solid var(--slate-300);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 16px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        transition: transform 0.2s;
-    }
-
-    .question-box:hover {
-        transform: translateY(-2px);
-        border-color: var(--blue-600);
-    }
-
     .doc-input {
         width: 100%;
         padding: 10px 14px;
@@ -92,14 +77,54 @@
         color: var(--blue-900);
         text-transform: uppercase;
         margin-bottom: 8px;
+        display: block;
+    }
+
+    /* Barra de Progreso Personalizada */
+    .progress-container {
+        width: 100%;
+        background-color: #e2e8f0;
+        border-radius: 20px;
+        height: 12px;
+        overflow: hidden;
+        margin-top: 8px;
+    }
+
+    .progress-bar-custom {
+        height: 100%;
+        border-radius: 20px;
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(90deg, #3b82f6, #0ea5e9);
+        width: var(--progreso-w, 0%);
+    }
+
+    .progress-100 {
+        background: linear-gradient(90deg, #10b981, #059669) !important;
+    }
+
+    /* Estilo Especial Panel Final */
+    .panel-veredicto {
+        border: 2px solid #10b981 !important;
+    }
+
+    .header-veredicto {
+        background: linear-gradient(135deg, #059669, #10b981);
     }
 </style>
 
+<!-- CÁLCULO DE PROGRESO -->
+{% set total_preguntas = 8 %}
+{% set respondidas = solicitud.respuestas|length if solicitud.respuestas else 0 %}
+{% set porcentaje = ((respondidas / total_preguntas) * 100) | round(0) | int %}
+{% if porcentaje > 100 %}{% set porcentaje = 100 %}{% endif %}
+
 <div class="page fade-in">
+    <!-- CABECERA -->
     <div class="page-header">
         <div>
-            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Validación de Área</span>
-            <h1 style="font-size: 24px; font-weight: 900; color: var(--blue-900); margin: 0;">{{ current_user.rol.nombre }}</h1>
+            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Validación Final</span>
+            <h1 style="font-size: 24px; font-weight: 900; color: var(--blue-900); margin: 0;">{{ current_user.rol.nombre
+                }}</h1>
         </div>
         <div>
             <a href="/areas/tareas" class="btn btn-light border fw-bold shadow-sm text-dark">
@@ -108,84 +133,152 @@
         </div>
     </div>
 
+    <!-- TARJETA DE CONTEXTO DEL EX FUNCIONARIO -->
     <div class="info-card">
-        <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-person-badge-fill me-2"></i>Expediente de Paz y Salvo #{{ solicitud.id }} perteneciente a:</h6>
+        <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-person-badge-fill me-2"></i>Expediente de Paz y Salvo
+            #{{ solicitud.id }} perteneciente a:</h6>
         <div class="row">
             <div class="col-md-4">
-                <p class="mb-1" style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">Cédula de Identidad</p>
-                <p class="fw-bold m-0 fs-5 text-dark">{{ solicitud.ex_funcionario.cedula | default('NO REGISTRA', true) }}</p>
+                <p class="mb-1"
+                    style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">
+                    Cédula de Identidad</p>
+                <p class="fw-bold m-0 fs-5 text-dark">{{ solicitud.ex_funcionario.cedula | default('NO REGISTRA', true)
+                    }}</p>
             </div>
             <div class="col-md-4">
-                <p class="mb-1" style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">Nombres y Apellidos</p>
-                <p class="fw-bold m-0 fs-5 text-dark text-uppercase">{{ solicitud.ex_funcionario.nombres }} {{ solicitud.ex_funcionario.apellidos }}</p>
+                <p class="mb-1"
+                    style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">
+                    Nombres y Apellidos</p>
+                <p class="fw-bold m-0 fs-5 text-dark text-uppercase">{{ solicitud.ex_funcionario.nombres }} {{
+                    solicitud.ex_funcionario.apellidos }}</p>
             </div>
             <div class="col-md-4">
-                <p class="mb-1" style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">Correo Institucional</p>
+                <p class="mb-1"
+                    style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">
+                    Correo Institucional</p>
                 <p class="fw-bold m-0 fs-6 text-primary">{{ solicitud.ex_funcionario.email }}</p>
             </div>
         </div>
+
+        <!-- BARRA DE PROGRESO VISUAL -->
+        <div class="mt-4 pt-3 border-top border-primary border-opacity-25">
+            <div class="d-flex justify-content-between align-items-end">
+                <span class="fw-bold"
+                    style="font-size: 12px; color: var(--slate-500); text-transform: uppercase;">Desarrollo del
+                    Formulario Base</span>
+                <span class="fw-bold fs-5 {% if porcentaje == 100 %}text-success{% else %}text-primary{% endif %}">{{
+                    porcentaje }}%</span>
+            </div>
+            <div class="progress-container shadow-sm">
+                <div class="progress-bar-custom {% if porcentaje == 100 %}progress-100{% endif %}"
+                    style="--progreso-w: {{ porcentaje }}%;"></div>
+            </div>
+        </div>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-4" style="overflow: hidden;">
-        <div class="card-header border-bottom-0 text-white" style="background: linear-gradient(135deg, var(--blue-900), var(--blue-600)); padding: 15px 20px;">
-            <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase;"><i class="bi bi-ui-checks me-2"></i> Formulario de Revisión y Descargo</h5>
-        </div>
-        <div class="card-body p-4 bg-light">
-            <form id="formularioValidacion" method="POST" action="/areas/responder/{{ solicitud.id }}">
-                
-                {% for pregunta in preguntas %}
-                <div class="question-box">
-                    <div class="row align-items-start">
-                        <div class="col-md-6 border-end">
-                            <label class="form-label-custom">{{ pregunta.enunciado }} <span class="text-danger">*</span></label>
-                            
-                            {% if pregunta.tipo_respuesta == 'SI_NO' %}
-                                <select class="doc-input mt-2" name="pregunta_{{ pregunta.id }}" required>
-                                    <option value="">— Seleccione SÍ o NO —</option>
-                                    <option value="SI">SÍ</option>
-                                    <option value="NO">NO</option>
-                                </select>
-                            {% elif pregunta.tipo_respuesta == 'NUMERO' %}
-                                <div class="input-group mt-2">
-                                    <span class="input-group-text bg-white fw-bold border-end-0" style="border-color: var(--slate-300);">$</span>
-                                    <input type="text" class="doc-input border-start-0" name="pregunta_{{ pregunta.id }}" placeholder="0.00" required oninput="window['soloMoneda'](this)">
-                                </div>
-                            {% else %}
-                                <input type="text" class="doc-input mt-2" name="pregunta_{{ pregunta.id }}" placeholder="Ingrese su respuesta..." required oninput="window['convertirMayusculas'](this)">
-                            {% endif %}
-                        </div>
+    <!-- FORMULARIO ÚNICO: ESTADO FINAL DEL PROCESO -->
+    <form id="formularioValidacion" method="POST" action="/areas/responder/{{ solicitud.id }}">
 
-                        <div class="col-md-6 ps-4">
-                            <label class="form-label-custom text-muted"><i class="bi bi-chat-left-text me-1"></i> Detalle / Observación (Opcional)</label>
-                            <input type="text" class="doc-input mt-2 bg-white" name="observacion_{{ pregunta.id }}" placeholder="Escriba novedades o detalles aquí..." oninput="window['convertirMayusculas'](this)" style="font-weight: 500 !important; color: var(--slate-500) !important;">
-                        </div>
+        {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
+        <div class="card border-0 shadow-sm rounded-4 mt-2 panel-veredicto" style="overflow: hidden;">
+            <div class="card-header text-white header-veredicto" style="padding: 15px 20px;">
+                <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase;"><i
+                        class="bi bi-shield-check me-2"></i> Estado Final del Proceso</h5>
+            </div>
+            <div class="card-body p-4 bg-white">
+                <p class="text-muted small fw-bold mb-4" style="font-size: 13px;"><i
+                        class="bi bi-info-circle-fill me-1 text-primary"></i> Recursos Humanos define el estado final
+                    del trámite:</p>
+
+                <div class="row align-items-start">
+                    <div class="col-md-5">
+                        <label class="form-label-custom text-dark">Dictamen Oficial <span
+                                class="text-danger">*</span></label>
+                        <select class="doc-input mt-2" name="estado_final" id="estadoFinalSelect"
+                            onchange="window['toggleEstadoFinal']()"
+                            style="border-color: #10b981; font-size: 14px; font-weight: 900 !important;" required>
+                            <option value="">— Seleccione una opción —</option>
+                            <option value="Aprobado">✅ Aprobado</option>
+                            <option value="En revisión">⏳ En revisión</option>
+                            <option value="Negado">❌ Negado</option>
+                        </select>
+                    </div>
+
+                    <!-- CAMPO DE OBSERVACIÓN OBLIGATORIA (Aparece si es Negado) -->
+                    <div class="col-md-7" id="divObservacionFinal" style="display: none;">
+                        <label class="form-label-custom text-danger"><i
+                                class="bi bi-exclamation-triangle-fill me-1"></i> Observación Obligatoria <span
+                                class="text-danger">*</span></label>
+                        <input type="text" class="doc-input mt-2" id="observacionFinalInput" name="observacion_final"
+                            placeholder="Detalle por qué se niega el trámite..."
+                            oninput="window['convertirMayusculas'](this)"
+                            style="border-color: #ef4444; background-color: #fef2f2 !important;">
                     </div>
                 </div>
-                {% else %}
-                <div class="alert alert-warning border-0 fw-bold rounded-3 shadow-sm">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i> No se encontraron preguntas configuradas para su área. Consulte con el Administrador.
-                </div>
-                {% endfor %}
 
-                <div class="d-flex justify-content-end mt-4 pt-3 border-top gap-3">
-                    <button type="button" class="btn btn-success fw-bold px-4 py-2" onclick="window['validarYGuardarRespuesta']()" style="border-radius: 8px;">
-                        <i class="bi bi-check2-all me-2"></i> Guardar y Finalizar Revisión
-                    </button>
+                <!-- CAJA INFORMATIVA DE CONSECUENCIAS (Aparece si es Aprobado) -->
+                <div id="divAlertaAprobado" class="alert alert-success border-0 shadow-sm mt-4 mb-0 rounded-4"
+                    style="display: none; background-color: #f0fdf4;">
+                    <h6 class="fw-bold mb-3" style="color: #166534; font-size: 14px;"><i
+                            class="bi bi-gear-fill me-2"></i> Acciones del Sistema al Aprobar:</h6>
+                    <ul class="mb-0" style="color: #15803d; font-weight: 700; font-size: 13px; line-height: 1.8;">
+                        <li>El documento queda almacenado en la base de datos de manera irreversible.</li>
+                        <li>El usuario ex funcionario pasa a estado <span
+                                class="badge bg-danger rounded-pill px-2 py-1 ms-1"
+                                style="font-size: 10px;">INHABILITADO</span></li>
+                        <li>Se bloquea instantáneamente su acceso al sistema institucional.</li>
+                    </ul>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
+
+        <div class="d-flex justify-content-end mt-4 pt-3 border-top gap-3">
+            <button type="button" class="btn btn-success fw-bold px-4 py-2"
+                onclick="window['validarYGuardarRespuesta']()" style="border-radius: 8px;">
+                <i class="bi bi-check2-all me-2"></i> Guardar Veredicto Final
+            </button>
+        </div>
+        {% else %}
+        <!-- Mensaje de seguridad por si alguien que no es de RRHH intenta entrar -->
+        <div class="alert alert-danger fw-bold rounded-4 shadow-sm p-4 mt-4 text-center border-0"
+            style="background-color: #fef2f2; color: #991b1b;">
+            <i class="bi bi-shield-lock-fill fs-1 d-block mb-2 text-danger"></i>
+            <h5 class="fw-bold">Acceso Restringido</h5>
+            <p class="m-0 small">Solo la dirección de <strong>Talento Humano</strong> o el
+                <strong>Administrador</strong> tienen los permisos necesarios para emitir el dictamen final de este
+                documento.</p>
+        </div>
+        {% endif %}
+    </form>
 </div>
 
 <script>
-    window.soloMoneda = (el) => {
-        let valor = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
-        el.value = valor;
-    };
-
     window.convertirMayusculas = (el) => {
         let textoLimpio = el.value.toUpperCase();
         el.value = textoLimpio;
+    };
+
+    window.toggleEstadoFinal = () => {
+        let estadoSelect = document.getElementById('estadoFinalSelect');
+        let divObs = document.getElementById('divObservacionFinal');
+        let obsInput = document.getElementById('observacionFinalInput');
+        let divAprobado = document.getElementById('divAlertaAprobado');
+
+        if (estadoSelect && estadoSelect.value === 'Negado') {
+            divObs.style.display = 'block';
+            obsInput.setAttribute('required', 'required');
+            divAprobado.style.display = 'none';
+        } else if (estadoSelect && estadoSelect.value === 'Aprobado') {
+            divObs.style.display = 'none';
+            obsInput.removeAttribute('required');
+            obsInput.value = ''; 
+            divAprobado.style.display = 'block';
+        } else {
+            divObs.style.display = 'none';
+            obsInput.removeAttribute('required');
+            obsInput.value = ''; 
+            divAprobado.style.display = 'none';
+        }
     };
 
     window.validarYGuardarRespuesta = () => {
@@ -205,22 +298,55 @@
         });
 
         if (!formValido) {
-            Swal.fire('Campos Incompletos', 'Por favor, responda todas las preguntas obligatorias marcadas con asterisco.', 'warning');
+            Swal.fire('Campos Incompletos', 'Por favor, seleccione el dictamen oficial y la observación antes de guardar.', 'warning');
             return;
         }
 
-        Swal.fire({
-            title: '¿Confirmar Revisión?',
-            text: 'Al guardar, estos datos se reflejarán en el documento de Paz y Salvo del ex-funcionario.',
-            icon: 'question',
+        // LÓGICA DE ALERTA DINÁMICA SÚPER CHÉVERE
+        let estadoSeleccionado = document.getElementById('estadoFinalSelect').value;
+        let observacion = document.getElementById('observacionFinalInput').value;
+
+        let swalParams = {
             showCancelButton: true,
-            confirmButtonColor: '#16a34a',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'Sí, Sellar Revisión',
-            cancelButtonText: 'Revisar de nuevo'
-        }).then((result) => {
+            cancelButtonText: 'Cancelar Operación'
+        };
+
+        if (estadoSeleccionado === 'Negado') {
+            swalParams.title = '¿Rechazar y Notificar al Usuario?';
+            swalParams.html = `
+                <div style="font-size: 14px; text-align: left; background: #fef2f2; padding: 16px; border-radius: 12px; border-left: 5px solid #ef4444; margin-top: 10px; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.1);">
+                    <strong style="color: #991b1b; font-size: 15px;"><i class="bi bi-bell-fill me-2"></i>Vista previa de la alerta a enviar:</strong><br><br>
+                    <span style="color: #7f1d1d; line-height: 1.5;">"Estimado ex-funcionario, su trámite de Paz y Salvo ha sido <b>NEGADO</b>. <br><br><b>Motivo de rechazo:</b><br><i>${observacion}</i>"</span>
+                </div>
+                <p style="margin-top: 15px; font-size: 13px; color: #64748b; font-weight: 600;">El sistema enviará esta notificación automáticamente a su cuenta.</p>
+            `;
+            swalParams.icon = 'error';
+            swalParams.confirmButtonText = '<i class="bi bi-send-x-fill me-1"></i> Sí, Denegar y Notificar';
+            swalParams.confirmButtonColor = '#dc2626';
+
+        } else if (estadoSeleccionado === 'Aprobado') {
+            swalParams.title = '¿Sellar Aprobación Definitiva?';
+            swalParams.html = `
+                <div style="font-size: 14px; text-align: left; background: #f0fdf4; padding: 16px; border-radius: 12px; border-left: 5px solid #16a34a; margin-top: 10px;">
+                    <strong style="color: #166534;"><i class="bi bi-check-circle-fill me-2"></i>El usuario será inhabilitado permanentemente.</strong>
+                </div>
+            `;
+            swalParams.icon = 'warning';
+            swalParams.confirmButtonText = '<i class="bi bi-lock-fill me-1"></i> Sí, Aprobar e Inhabilitar';
+            swalParams.confirmButtonColor = '#16a34a';
+
+        } else {
+            swalParams.title = '¿Guardar en Revisión?';
+            swalParams.text = 'El documento se mantendrá a la espera de validaciones adicionales.';
+            swalParams.icon = 'info';
+            swalParams.confirmButtonText = '<i class="bi bi-save me-1"></i> Sí, Guardar Estado';
+            swalParams.confirmButtonColor = '#3b82f6';
+        }
+
+        Swal.fire(swalParams).then((result) => {
             if (result.isConfirmed) {
-                Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+                Swal.fire({ title: 'Procesando dictamen...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
                 form.submit();
             }
         });

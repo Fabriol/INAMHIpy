@@ -409,3 +409,21 @@ def eliminar_solicitud(solicitud_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'mensaje': str(e)}), 500
+    
+# ====================================================================
+# 9. RUTA: VISTA DE SOLO LECTURA (HOJA ESPEJO AISLADA)
+# ====================================================================
+@paz_salvo_bp.route('/paz-salvo/espejo/<int:solicitud_id>')
+@login_required
+def ver_hoja_espejo(solicitud_id):
+    solicitud = SolicitudPazSalvo.query.get_or_404(solicitud_id)
+    solicitud.ex_funcionario = Usuario.query.get(solicitud.ex_funcionario_id)
+    
+    # Extraemos todas las respuestas guardadas hasta el momento
+    respuestas_db = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
+    datos_combinados = {r.campo_formulario: r.valor_respuesta for r in respuestas_db}
+    
+    # Renderizamos una plantilla puramente visual
+    return render_template('paz_salvo/ver_espejo.html', 
+                           solicitud=solicitud, 
+                           datos=datos_combinados)
