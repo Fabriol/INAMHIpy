@@ -95,7 +95,7 @@ def exportar_auditoria_excel():
     ]
     # Inyección de los campos de cada área de forma dinámica
     for p in preguntas:
-        columnas_ws1.append(f"[{p.rol.nombre}] {p.enunciado}")
+        columnas_ws1.append(f"{p.enunciado}")
         
     columnas_ws1.extend(["Estado del Proceso", "Fecha Creación", "Fecha Finalización"])
     ws1.append(columnas_ws1)
@@ -110,7 +110,7 @@ def exportar_auditoria_excel():
     # Poblado de datos de trámites
     solicitudes = SolicitudPazSalvo.query.all()
     for sol in solicitudes:
-        ex = sol.ex_funcionario
+        ex = Usuario.query.get(sol.ex_funcionario_id)
         fila = [
             f"#{sol.id}",
             ex.cedula,
@@ -120,7 +120,7 @@ def exportar_auditoria_excel():
         
         # Mapeo dinámico de respuestas por celda/pregunta
         for p in preguntas:
-            resp = Respuesta.query.filter_by(solicitud_id=sol.id, pregunta_id=p.id).first()
+            resp = Respuesta.query.filter_by(solicitud_id=sol.id, campo_formulario=f'pregunta_{p.id}').first()
             fila.append(resp.valor_respuesta if resp else "PENDIENTE")
             
         fila.extend([

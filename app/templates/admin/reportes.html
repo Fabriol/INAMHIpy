@@ -1,104 +1,364 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding: 28px; border-radius: 30px; background: rgba(255,255,255,.75); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 24px 55px rgba(15,23,42,.10); }
-    .badge-custom { display: inline-flex; padding: 7px 14px; border-radius: 999px; background: linear-gradient(135deg,#2563eb,#0ea5e9); color: white; font-size: 11px; font-weight: 900; text-transform: uppercase; }
-    h1 { margin: 12px 0 6px; font-size: 38px; font-weight: 900; color: #0f172a; letter-spacing: -1px;}
-    .btn-secondary-custom { border: none; padding: 12px 18px; border-radius: 14px; background: linear-gradient(135deg,#64748b,#475569); color: white; font-size: 13px; font-weight: 900; text-decoration: none; }
-    
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-    .stat-card { background: white; padding: 25px; border-radius: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); border-top: 5px solid; }
-    .stat-card i { font-size: 2rem; }
-    .stat-card div { display: flex; flex-direction: column; }
-    .stat-card span { font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
-    .stat-card strong { font-size: 2rem; font-weight: 900; color: #0f172a; line-height: 1; margin-top: 5px; }
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    .main-card { background: white; border-radius: 24px; padding: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); border-top: 5px solid #0ea5e9;}
-    .filter-row { display: flex; gap: 20px; margin: 20px 0; }
-    .filter-row input, .filter-row select { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; font-weight: 600; }
-    
-    .table-custom { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    .table-custom th { background: #f8fafc; padding: 15px; font-size: 0.75rem; color: #475569; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
-    .table-custom td { padding: 15px; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; font-weight: 600; text-align: center; vertical-align: middle; }
-    .table-custom td.text-start { text-align: left; }
-    .btn-recordatorio { border: 1px solid #3b82f6; background: #eff6ff; color: #2563eb; padding: 8px 15px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
+<style>
+    :root {
+        --blue-50: #eff6ff;
+        --blue-100: #dbeafe;
+        --blue-600: #2563eb;
+        --blue-900: #1e3a8a;
+        --green-50: #f0fdf4;
+        --green-600: #16a34a;
+        --slate-50: #f8fafc;
+        --slate-200: #e2e8f0;
+        --slate-300: #cbd5e1;
+        --slate-500: #64748b;
+        --slate-900: #0f172a;
+        --grad-header: linear-gradient(90deg, #2563eb, #0ea5e9, #22c55e);
+        --blur: blur(18px);
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 30px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .88);
+        border: 1px solid rgba(255, 255, 255, .80);
+        backdrop-filter: var(--blur);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 4px;
+        background: var(--grad-header);
+    }
+
+    .info-card {
+        background: #fafcff;
+        border: 2px dashed var(--blue-600);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .question-box {
+        background: #fff;
+        border: 1px solid var(--slate-300);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        transition: transform 0.2s;
+    }
+
+    .question-box:hover {
+        transform: translateY(-2px);
+        border-color: var(--blue-600);
+    }
+
+    .doc-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid var(--slate-300);
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700 !important;
+        color: #0f172a !important;
+        background: #fff !important;
+        text-transform: uppercase;
+        transition: 0.3s;
+    }
+
+    .doc-input:focus {
+        border-color: var(--blue-600);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, .15);
+        outline: none;
+    }
+
+    .form-label-custom {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--blue-900);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    /* Barra de Progreso Personalizada */
+    .progress-container {
+        width: 100%;
+        background-color: #e2e8f0;
+        border-radius: 20px;
+        height: 12px;
+        overflow: hidden;
+        margin-top: 8px;
+    }
+
+    .progress-bar-custom {
+        height: 100%;
+        border-radius: 20px;
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(90deg, #3b82f6, #0ea5e9);
+        width: var(--progreso-w, 0%);
+    }
+
+    .progress-100 {
+        background: linear-gradient(90deg, #10b981, #059669) !important;
+    }
 </style>
 
-<div class="page-header">
-    <div>
-        <span class="badge-custom">Reportes</span>
-        <h1>Reportes del Sistema</h1>
-        <p class="text-muted m-0">Seguimiento de formularios, estado de asignaciones y envío de recordatorios.</p>
-    </div>
-    <a href="/dashboard" class="btn-secondary-custom">← Volver</a>
-</div>
+<!-- CÁLCULO DE PROGRESO -->
+{% set total_preguntas = 8 %}
+{% set respondidas = solicitud.respuestas|length if solicitud.respuestas else 0 %}
+{% set porcentaje = ((respondidas / total_preguntas) * 100) | round(0) | int %}
+{% if porcentaje > 100 %}{% set porcentaje = 100 %}{% endif %}
 
-<div class="stats-grid">
-    <div class="stat-card" style="border-color: #3b82f6;">
-        <i class="bi bi-people-fill" style="color: #3b82f6;"></i>
-        <div><span>Usuarios registrados</span><strong>{{ total_usuarios | default(0) }}</strong></div>
-    </div>
-    <div class="stat-card" style="border-color: #22c55e;">
-        <i class="bi bi-file-earmark-text-fill" style="color: #22c55e;"></i>
-        <div><span>Documentos subidos</span><strong>{{ total_documentos | default(0) }}</strong></div>
-    </div>
-    <div class="stat-card" style="border-color: #a855f7;">
-        <i class="bi bi-ui-checks" style="color: #a855f7;"></i>
-        <div><span>Formularios totales</span><strong>1</strong></div>
-    </div>
-    <div class="stat-card" style="border-color: #f59e0b;">
-        <i class="bi bi-check-circle-fill" style="color: #f59e0b;"></i>
-        <div><span>Completados 100%</span><strong>0</strong></div>
-    </div>
-</div>
-
-<div class="main-card">
-    <div class="d-flex justify-content-between align-items-center">
-        <h3 class="fw-bold m-0 text-dark">Formularios con campos pendientes</h3>
-        <button class="btn btn-dark" style="border-radius: 12px; font-weight: 700;">Actualizar</button>
-    </div>
-    <p class="text-muted mt-2">Usuarios que aún no han completado sus campos asignados. Puedes enviarles un recordatorio.</p>
-
-    <div class="filter-row">
-        <div style="flex: 1;">
-            <label class="small fw-bold text-muted mb-2">Buscar formulario</label>
-            <input type="text" placeholder="Nombre del formulario...">
+<div class="page fade-in">
+    <!-- CABECERA -->
+    <div class="page-header">
+        <div>
+            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Validación de Área</span>
+            <h1 style="font-size: 24px; font-weight: 900; color: var(--blue-900); margin: 0;">{{ current_user.rol.nombre
+                }}</h1>
         </div>
-        <div style="flex: 1;">
-            <label class="small fw-bold text-muted mb-2">Filtrar por usuario asignado</label>
-            <select><option>Todos los usuarios</option></select>
+        <div>
+            <a href="/areas/tareas" class="btn btn-light border fw-bold shadow-sm text-dark">
+                <i class="bi bi-arrow-left me-2"></i> Volver a Pendientes
+            </a>
         </div>
     </div>
 
-    <div style="background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0;">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold m-0" style="color: #1e3a8a;">PAZ Y SALVO</h5>
-            <span class="badge bg-warning text-dark fw-bold px-3 py-2" style="border-radius: 10px;">EN_PROCESO</span>
+    <!-- TARJETA DE CONTEXTO DEL EX FUNCIONARIO -->
+    <div class="info-card">
+        <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-person-badge-fill me-2"></i>Expediente de Paz y Salvo
+            #{{ solicitud.id }} perteneciente a:</h6>
+        <div class="row">
+            <div class="col-md-4">
+                <p class="mb-1"
+                    style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">
+                    Cédula de Identidad</p>
+                <p class="fw-bold m-0 fs-5 text-dark">{{ solicitud.ex_funcionario.cedula | default('NO REGISTRA', true)
+                    }}</p>
+            </div>
+            <div class="col-md-4">
+                <p class="mb-1"
+                    style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">
+                    Nombres y Apellidos</p>
+                <p class="fw-bold m-0 fs-5 text-dark text-uppercase">{{ solicitud.ex_funcionario.nombres }} {{
+                    solicitud.ex_funcionario.apellidos }}</p>
+            </div>
+            <div class="col-md-4">
+                <p class="mb-1"
+                    style="font-size: 11px; color: var(--slate-500); font-weight: 800; text-transform: uppercase;">
+                    Correo Institucional</p>
+                <p class="fw-bold m-0 fs-6 text-primary">{{ solicitud.ex_funcionario.email }}</p>
+            </div>
         </div>
-        <div class="progress" style="height: 8px; border-radius: 10px;">
-            <div class="progress-bar bg-success" style="width: 99%;"></div>
+
+        <!-- BARRA DE PROGRESO VISUAL -->
+        <div class="mt-4 pt-3 border-top border-primary border-opacity-25">
+            <div class="d-flex justify-content-between align-items-end">
+                <span class="fw-bold"
+                    style="font-size: 12px; color: var(--slate-500); text-transform: uppercase;">Desarrollo del
+                    Formulario Base</span>
+                <span class="fw-bold fs-5 {% if porcentaje == 100 %}text-success{% else %}text-primary{% endif %}">{{
+                    porcentaje }}%</span>
+            </div>
+            <div class="progress-container shadow-sm">
+                <div class="progress-bar-custom {% if porcentaje == 100 %}progress-100{% endif %}"
+                    style="--progreso-w: {{ porcentaje }}%;"></div>
+            </div>
         </div>
-        <p class="small mt-2 mb-0 fw-bold"><span style="color: #10b981;">99%</span> completado | Completados: 146 | <span style="color: #ef4444;">Pendientes: 3</span></p>
     </div>
 
-    <table class="table-custom">
-        <thead><tr><th class="text-start">USUARIO</th><th>ROL</th><th>ASIGNADOS</th><th>COMPLETADOS</th><th>PENDIENTES</th><th>ACCIÓN</th></tr></thead>
-        <tbody>
-            <tr>
-                <td class="text-start">
-                    <div class="d-flex align-items-center gap-3">
-                        <div style="width: 35px; height: 35px; background: #3b82f6; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">E</div>
-                        <div><strong style="display: block;">Erick Analuisa</strong><span class="text-muted small">@erick</span></div>
+    <!-- FORMULARIO DE RESPUESTAS -->
+    <div class="card border-0 shadow-sm rounded-4" style="overflow: hidden;">
+        <div class="card-header border-bottom-0 text-white"
+            style="background: linear-gradient(135deg, var(--blue-900), var(--blue-600)); padding: 15px 20px;">
+            <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase;"><i
+                    class="bi bi-ui-checks me-2"></i> Formulario de Revisión y Descargo</h5>
+        </div>
+        <div class="card-body p-4 bg-light">
+            <form id="formularioValidacion" method="POST" action="/areas/responder/{{ solicitud.id }}">
+
+                {% for pregunta in preguntas %}
+                <div class="question-box">
+                    <div class="row align-items-start">
+                        <!-- Lado de la Pregunta -->
+                        <div class="col-md-6 border-end">
+                            <label class="form-label-custom">{{ pregunta.enunciado }} <span
+                                    class="text-danger">*</span></label>
+
+                            {% if pregunta.tipo_respuesta == 'SI_NO' %}
+                            <select class="doc-input mt-2" name="pregunta_{{ pregunta.id }}" required>
+                                <option value="">— Seleccione SÍ o NO —</option>
+                                <option value="SI">SÍ</option>
+                                <option value="NO">NO</option>
+                            </select>
+                            {% elif pregunta.tipo_respuesta == 'NUMERO' %}
+                            <div class="input-group mt-2">
+                                <span class="input-group-text bg-white fw-bold border-end-0"
+                                    style="border-color: var(--slate-300);">$</span>
+                                <input type="text" class="doc-input border-start-0" name="pregunta_{{ pregunta.id }}"
+                                    placeholder="0.00" required oninput="window['soloMoneda'](this)">
+                            </div>
+                            {% else %}
+                            <input type="text" class="doc-input mt-2" name="pregunta_{{ pregunta.id }}"
+                                placeholder="Ingrese su respuesta..." required
+                                oninput="window['convertirMayusculas'](this)">
+                            {% endif %}
+                        </div>
+
+                        <!-- Lado de la Observación -->
+                        <div class="col-md-6 ps-4">
+                            <label class="form-label-custom text-muted"><i class="bi bi-chat-left-text me-1"></i>
+                                Detalle / Observación (Opcional)</label>
+                            <input type="text" class="doc-input mt-2 bg-white" name="observacion_{{ pregunta.id }}"
+                                placeholder="Escriba novedades o detalles aquí..."
+                                oninput="window['convertirMayusculas'](this)"
+                                style="font-weight: 500 !important; color: var(--slate-500) !important;">
+                        </div>
                     </div>
-                </td>
-                <td><span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2" style="border-radius: 10px;">Administrativa</span></td>
-                <td>149</td>
-                <td><strong>146</strong></td>
-                <td><strong style="color: #ef4444;">3</strong></td>
-                <td><button class="btn-recordatorio"><i class="bi bi-envelope-fill me-2"></i>Enviar recordatorio</button></td>
-            </tr>
-        </tbody>
-    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-warning border-0 fw-bold rounded-3 shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> No se encontraron preguntas configuradas para
+                    su área. Consulte con el Administrador.
+                </div>
+                {% endfor %}
+
+                <!-- VEREDICTO FINAL DE RECURSOS HUMANOS / ADMINISTRADOR -->
+                {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
+                {% if porcentaje == 100 %}
+                <div class="card border-0 shadow-sm rounded-4 mt-4"
+                    style="overflow: hidden; border: 2px solid #8b5cf6 !important;">
+                    <div class="card-header text-white"
+                        style="background: linear-gradient(135deg, #4c1d95, #7c3aed); padding: 15px 20px;">
+                        <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase;"><i
+                                class="bi bi-briefcase-fill me-2"></i> Veredicto Final - Talento Humano</h5>
+                    </div>
+                    <div class="card-body p-4 bg-white">
+                        <div class="row align-items-start">
+                            <div class="col-md-6">
+                                <label class="form-label-custom text-dark">Estado Final del Trámite Institucional <span
+                                        class="text-danger">*</span></label>
+                                <select class="doc-input mt-2" name="estado_final" id="estadoFinalSelect"
+                                    onchange="window['toggleObservacionFinal']()" style="border-color: #8b5cf6;"
+                                    required>
+                                    <option value="">— Defina el Estado Final —</option>
+                                    <option value="Aprobado">✅ Aprobado (Documentación Completa)</option>
+                                    <option value="En revisión">⏳ En revisión (Validación Interna)</option>
+                                    <option value="Negado">❌ Negado (Devuelto al Funcionario)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6" id="divObservacionFinal" style="display: none;">
+                                <label class="form-label-custom text-danger"><i
+                                        class="bi bi-exclamation-circle-fill me-1"></i> Motivo del Rechazo <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="doc-input mt-2" id="observacionFinalInput"
+                                    name="observacion_final" placeholder="Especifique detalladamente el motivo..."
+                                    oninput="window['convertirMayusculas'](this)"
+                                    style="border-color: #ef4444; background-color: #fef2f2 !important;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-info border-0 shadow-sm mt-4 fw-bold p-4 d-flex align-items-center rounded-4"
+                    style="background-color: #e0e7ff; color: #4338ca;">
+                    <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                    <div>
+                        El panel de <strong>Veredicto Final de RRHH</strong> se habilitará automáticamente en esta
+                        sección cuando el documento espejo alcance el 100% de llenado por todas las áreas
+                        institucionales.
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+
+                <div class="d-flex justify-content-end mt-4 pt-3 border-top gap-3">
+                    <button type="button" class="btn btn-success fw-bold px-4 py-2"
+                        onclick="window['validarYGuardarRespuesta']()" style="border-radius: 8px;">
+                        <i class="bi bi-check2-all me-2"></i> Guardar y Finalizar Revisión
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script>
+    window.soloMoneda = (el) => {
+        let valor = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+        el.value = valor;
+    };
+
+    window.convertirMayusculas = (el) => {
+        let textoLimpio = el.value.toUpperCase();
+        el.value = textoLimpio;
+    };
+
+    window.toggleObservacionFinal = () => {
+        let estadoSelect = document.getElementById('estadoFinalSelect');
+        let divObs = document.getElementById('divObservacionFinal');
+        let obsInput = document.getElementById('observacionFinalInput');
+
+        if (estadoSelect && estadoSelect.value === 'Negado') {
+            divObs.style.display = 'block';
+            obsInput.setAttribute('required', 'required');
+        } else if (estadoSelect) {
+            divObs.style.display = 'none';
+            obsInput.removeAttribute('required');
+            obsInput.value = '';
+        }
+    };
+
+    window.validarYGuardarRespuesta = () => {
+        let form = document.getElementById('formularioValidacion');
+        let requeridos = form.querySelectorAll('input[required], select[required]');
+        let formValido = true;
+
+        requeridos.forEach(el => {
+            if (el.value.trim() === '') {
+                el.style.borderColor = '#ef4444';
+                el.style.backgroundColor = '#fff5f5';
+                formValido = false;
+            } else {
+                el.style.borderColor = '#cbd5e1';
+                el.style.backgroundColor = '#fff';
+            }
+        });
+
+        if (!formValido) {
+            Swal.fire('Campos Incompletos', 'Por favor, responda todas las preguntas obligatorias y los veredictos marcados con asterisco.', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            title: '¿Confirmar Revisión?',
+            text: 'Al guardar, estos datos se reflejarán en el documento de Paz y Salvo del ex-funcionario.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Sí, Sellar Revisión',
+            cancelButtonText: 'Revisar de nuevo'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+                form.submit();
+            }
+        });
+    };
+</script>
 {% endblock %}
