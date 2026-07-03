@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    :root {
+        --blue-600: #2563eb;
+        --blue-900: #1e3a8a;
+        --red-500: #ef4444;
+        --red-600: #dc2626;
+        --slate-300: #cbd5e1;
+        --slate-500: #64748b;
+    }
+    .page-header { background: rgba(255, 255, 255, .9); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 24px; border-top: 4px solid var(--blue-600); }
+    .doc-form-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: flex-start; }
+    .doc-form-left { background: #fff; border: 2px solid var(--blue-900); border-radius: 8px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); overflow: hidden; padding: 25px; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+    .input-group label { font-size: 11px; font-weight: 800; color: var(--slate-500); text-transform: uppercase; }
+    .doc-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--slate-300); border-radius: 8px; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+    .doc-input:focus { border-color: var(--blue-600); outline: none; }
+    .btn-firmaec { background: linear-gradient(135deg, #1e3a8a, #1d4ed8); color: white; border: none; border-radius: 8px; padding: 10px; width: 100%; font-weight: bold; margin-top: 10px; }
+    .hoja-espejo-preview { background: #e8edf8; border-radius: 20px; padding: 20px; position: sticky; top: 20px; }
+    .has-error .doc-input { border-color: var(--red-500); background: #fff5f5; }
+    .error-msg { font-size: 10px; color: var(--red-600); font-weight: 700; display: none; margin-top: 2px; }
+    .has-error .error-msg { display: block; }
+</style>
+
+<div class="page fade-in">
+    <div class="page-header d-flex justify-content-between">
+        <div>
+            <span class="badge bg-primary mb-2">Trámite #{{ solicitud.id }}</span>
+            <h2 class="m-0 fw-bold text-dark">Mis Tareas Designadas</h2>
+            <p class="text-muted small m-0">Llene la información requerida. Se reflejará automáticamente en la hoja espejo.</p>
+        </div>
+        <div>
+            <a href="/areas/tareas" class="btn btn-secondary fw-bold"><i class="bi bi-arrow-left"></i> Volver</a>
+        </div>
+    </div>
+
+    <div class="doc-form-layout">
+        <!-- FORMULARIO EXCLUSIVO DEL USUARIO -->
+        <div class="doc-form-left">
+            <h5 class="fw-bold mb-4" style="color: var(--blue-900);"><i class="bi bi-pencil-square me-2"></i> Llene los siguientes campos:</h5>
+            
+            <form id="formularioOficial" action="/paz-salvo/guardar/{{ solicitud.id }}" method="POST" hx-post="/actualizar-espejo" hx-trigger="keyup changed delay:100ms, change" hx-target="#vista-espejo">
+                <input type="hidden" name="solicitud_id" value="{{ solicitud.id }}">
+
+                <!-- ITERAMOS SOBRE EL DICCIONARIO MAESTRO (AQUÍ ESTÁ LA MAGIA QUE CREA SOLO LO ASIGNADO) -->
+                {% set dic_etiquetas = {
+                    'tic_verificacion': ['S/N Verificación equipo', 'select'], 'tic_ip_fija': ['S/N Acceso IP', 'select'], 'tic_liberacion': ['S/N Liberación IP', 'select'],
+                    'tic_nombre_resp1': ['Resp. Equipos', 'text'], 'tic_r1': ['Firma Control Hardware', 'firma'],
+                    'tic_backup': ['S/N Entrega backup', 'select'], 'tic_ruta_backup': ['Ruta Backup', 'text'],
+                    'tic_nombre_resp2': ['Resp. Backup', 'text'], 'tic_r2': ['Firma Control Backup', 'firma'],
+                    'tic_retiro_acceso': ['S/N Retiro accesos', 'select'], 'tic_cierre_correo': ['S/N Cierre Correo', 'select'], 'tic_esigef': ['S/N Cierre eSIGEF', 'select'],
+                    'tic_quipux': ['S/N Cierre QUIPUX', 'select'], 'tic_spryn': ['S/N Cierre SPRYN', 'select'], 'tic_esbye': ['S/N Cierre eSByE', 'select'],
+                    'tic_nombre_resp3': ['Resp. Cuentas', 'text'], 'tic_r3': ['Firma Cierre Cuentas', 'firma'],
+                    'tic_tarjeta_cuentas': ['S/N Tarjeta Acceso', 'select'], 'tic_obs': ['Novedades TIC', 'text'],
+                    'tic_nombre_resp4': ['Resp. Tarjeta', 'text'], 'tic_r4': ['Firma Control Accesos', 'firma'],
+                    'tic_responsable': ['Nombre Resp. TIC General', 'text'], 'tic_r5': ['Firma Jefe TIC', 'firma'],
+                    'fin_saldos': ['S/N Saldos contables', 'select'], 'fin_saldos_valor': ['Valor Saldos $', 'text'], 'fin_nombre_resp1': ['Resp. Saldos', 'text'], 'fin_r1': ['Firma Análisis Contable', 'firma'],
+                    'fin_anticipo': ['S/N Anticipo sueldos', 'select'], 'fin_anticipo_valor': ['Valor Anticipo $', 'text'], 'fin_nombre_resp2': ['Resp. Anticipos', 'text'], 'fin_r2': ['Firma Tesorería', 'firma'],
+                    'fin_recuperacion': ['S/N Recup. valores', 'select'], 'fin_recuperacion_valor': ['Valor Recup. $', 'text'], 'fin_nombre_resp3': ['Resp. Valores', 'text'], 'fin_r3': ['Firma Recuperación', 'firma'],
+                    'fin_devolucion': ['S/N Dev. muebles', 'select'], 'fin_devolucion_valor': ['Valor Devolución $', 'text'], 'fin_nombre_resp4': ['Resp. Muebles', 'text'], 'fin_r4': ['Firma Ajustes Financieros', 'firma'],
+                    'fin_director': ['Nombre Director/a Finan.', 'text'], 'fin_dir': ['Firma PAdES Director/a', 'firma'],
+                    'seg_archivos': ['Análisis Archivos Digitales', 'select'], 'seg_entrega_copia': ['Copia Seguridad Física', 'select'], 'seg_nombre_resp1': ['Analista Seguridad', 'text'], 'seg_r1': ['Firma Criptografía 1', 'firma'],
+                    'seg_archivos_fisicos': ['Auditoría Archivos Físicos', 'select'], 'seg_verificacion_info': ['Cifrado Dispositivos', 'select'], 'seg_nombre_resp2': ['Analista Seguridad', 'text'], 'seg_r2': ['Firma Criptografía 2', 'firma'],
+                    'seg_oficial': ['Oficial Seguridad de Información', 'text'], 'seg_responsable': ['Responsable Infraestructura', 'text'], 'seg_oficial_sig': ['Firma Oficial EGSI', 'firma'],
+                    'admin_informe': ['S/N Entrega informe', 'select'], 'admin_nombre_resp1': ['Resp. Informe', 'text'], 'admin_r1': ['Firma Validación Informe', 'firma'],
+                    'admin_bienes': ['S/N Bienes y muebles', 'select'], 'admin_valor_bienes': ['Valor Bienes $', 'text'], 'admin_acta_bienes': ['N° Acta Recepción', 'text'], 'admin_nombre_resp2': ['Resp. Bienes', 'text'], 'admin_r2': ['Firma Custodio Bienes', 'firma'],
+                    'admin_deducibles': ['S/N Deducibles', 'select'], 'admin_deducibles_valor': ['Valor Deducibles $', 'text'], 'admin_nombre_resp3': ['Resp. Deducibles', 'text'], 'admin_r3': ['Firma Deducibles', 'firma'],
+                    'admin_pasajes': ['S/N Pasajes justificar', 'select'], 'admin_pasajes_valor': ['Valor Pasajes $', 'text'], 'admin_nombre_resp4': ['Resp. Pasajes', 'text'], 'admin_r4': ['Firma Liquidación Pasajes', 'firma'],
+                    'admin_responsable': ['Director/a Administrativo', 'text'], 'admin_dir': ['Firma PAdES Director/a', 'firma']
+                } %}
+
+                {% for campo in campos_asignados %}
+                    {% if dic_etiquetas.get(campo) %}
+                        {% set label = dic_etiquetas[campo][0] %}
+                        {% set tipo = dic_etiquetas[campo][1] %}
+
+                        {% if tipo == 'text' %}
+                            <div class="input-group">
+                                <label>{{ label }}</label>
+                                <input type="text" name="{{ campo }}" class="doc-input" value="{{ datos.get(campo, '') }}" {% if campo in campos_bloqueados %}readonly disabled style="background:#e2e8f0;"{% endif %} oninput="window.convertirMayusculas(this)">
+                                <span class="error-msg">⚠ Obligatorio</span>
+                            </div>
+                        {% elif tipo == 'select' %}
+                            <div class="input-group">
+                                <label>{{ label }}</label>
+                                <select name="{{ campo }}" class="doc-input" {% if campo in campos_bloqueados %}disabled style="background:#e2e8f0;"{% endif %}>
+                                    <option value="">—</option>
+                                    <option value="SI" {% if datos.get(campo) == 'SI' %}selected{% endif %}>SÍ</option>
+                                    <option value="NO" {% if datos.get(campo) == 'NO' %}selected{% endif %}>NO</option>
+                                </select>
+                                <span class="error-msg">⚠ Obligatorio</span>
+                            </div>
+                        {% elif tipo == 'firma' %}
+                            <div class="p-3 mt-3 mb-4" style="background: #f8fafc; border: 2px dashed #93c5fd; text-align: center; border-radius: 8px;">
+                                <label style="font-weight: 900; color: #1e40af;">{{ label }}</label>
+                                <input type="hidden" name="{{ campo }}" id="input_{{ campo }}" value="{% if campo in campos_bloqueados %}FIRMADO{% endif %}">
+                                
+                                {% if campo in campos_bloqueados %}
+                                    <div class="mt-2 text-success fw-bold"><i class="bi bi-check-circle-fill"></i> FIRMA APLICADA</div>
+                                {% else %}
+                                    <button type="button" class="btn-firmaec" onclick="window.abrirModalFirmaEC('{{ campo }}')"><i class="bi bi-shield-lock-fill"></i> Estampar Firma PAdES</button>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </form>
+
+            <button type="button" class="btn btn-success w-100 fw-bold py-3 mt-4" onclick="window.validarYGuardarTodo()">
+                <i class="bi bi-cloud-check-fill me-2"></i> Guardar Mis Respuestas
+            </button>
+        </div>
+
+        <!-- HOJA ESPEJO -->
+        <div class="hoja-espejo-preview">
+            <span class="badge bg-white text-primary px-3 py-2 shadow-sm mb-3 border border-primary fw-bold">
+                <span class="spinner-grow spinner-grow-sm text-primary me-2"></span>Espejo en Tiempo Real
+            </span>
+            <div id="vista-espejo" style="background: white; border: 1px solid #cbd5e1; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                {% include 'paz_salvo/partials/hoja_espejo.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.convertirMayusculas = (el) => { el.value = el.value.toUpperCase(); };
+    window.mostrarError = (el) => { el.closest('.input-group').classList.add('has-error'); };
+    window.quitarError = (el) => { el.closest('.input-group').classList.remove('has-error'); };
+
+    window.abrirModalFirmaEC = (campoFirma) => {
+        let form = document.getElementById('formularioOficial');
+        let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
+        let faltan = false;
+        requeridos.forEach(el => { if (el.value.trim() === '') { window.mostrarError(el); faltan = true; } else { window.quitarError(el); }});
+        if(faltan) { Swal.fire('Datos Incompletos', 'Llene todos los cuadros de texto antes de firmar para evitar perder información.', 'warning'); return; }
+
+        Swal.fire({
+            title: 'Firma Electrónica PAdES',
+            html: `
+                <div style="text-align:left; font-size:13px;">
+                    <label class="fw-bold mb-1">Certificado .p12 / .pfx</label>
+                    <input type="file" id="swal-p12-file" class="form-control mb-3">
+                    <label class="fw-bold mb-1">Contraseña</label>
+                    <input type="password" id="swal-p12-pass" class="form-control">
+                </div>
+            `,
+            showCancelButton: true, confirmButtonText: 'Firmar',
+            preConfirm: async () => {
+                let file = document.getElementById('swal-p12-file').files[0];
+                let pass = document.getElementById('swal-p12-pass').value;
+                if(!file || !pass) { Swal.showValidationMessage('Faltan datos'); return false; }
+                
+                // GUARDADO SILENCIOSO DE TEXTOS ANTES DE FIRMAR
+                let formPayload = new FormData(form);
+                await fetch(form.action, { method: 'POST', body: formPayload });
+
+                let formData = new FormData();
+                formData.append('pdf_firmado', file);
+                formData.append('password', pass);
+                formData.append('campo', campoFirma);
+                
+                return fetch(`/paz-salvo/subir-firma/{{ solicitud.id }}`, { method: 'POST', body: formData }).then(res => res.json());
+            }
+        }).then((result) => {
+            if(result.isConfirmed) { Swal.fire('Éxito', 'Firma aplicada.', 'success').then(() => window.location.reload()); }
+        });
+    };
+
+    window.validarYGuardarTodo = () => {
+        let form = document.getElementById('formularioOficial');
+        let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
+        let firmas = form.querySelectorAll('input[type="hidden"][id^="input_"]');
+        let valido = true;
+
+        requeridos.forEach(el => { if (el.value.trim() === '') { window.mostrarError(el); valido = false; } else { window.quitarError(el); } });
+        firmas.forEach(el => { if(el.value !== 'FIRMADO') { valido = false; } });
+
+        if(!valido) { Swal.fire('Trámite Incompleto', 'Debe llenar todo el texto y estampar todas las firmas asignadas.', 'error'); return; }
+
+        Swal.fire({ title: '¿Guardar Trámite?', text: 'Se sellará su información.', icon: 'question', showCancelButton: true, confirmButtonColor: '#16a34a' }).then((result) => {
+            if(result.isConfirmed) { form.submit(); }
+        });
+    };
+</script>
+{% endblock %}

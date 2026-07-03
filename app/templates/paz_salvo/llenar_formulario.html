@@ -260,8 +260,10 @@
 {% set asig_dict = asignaciones_dict if asignaciones_dict else {} %}
 {% set admin = current_user.rol.nombre == 'Administrador' %}
 
+<!-- MACROS CON LA MAGIA DE VISIBILIDAD -->
+<!-- Se eliminó 'or name in bloqueados' para que solo vea lo que se le asignó explícitamente -->
 {% macro input_text(name, label, type='text', width='', max_len='', js_val='', val='') %}
-{% if admin or name in asignados or name in bloqueados %}
+{% if admin or name in asignados %}
 <div class="input-group {{ width }}" id="grp_{{ name }}">
     <label>{{ label }}</label>
     {% if admin %}
@@ -283,7 +285,7 @@
 {% endmacro %}
 
 {% macro select_sino(name, label, width='', val='') %}
-{% if admin or name in asignados or name in bloqueados %}
+{% if admin or name in asignados %}
 <div class="input-group {{ width }}" id="grp_{{ name }}">
     <label>{{ label }}</label>
     {% if admin %}
@@ -306,7 +308,7 @@
 {% endmacro %}
 
 {% macro firma_box(campo, label, nombre_firm='') %}
-{% if admin or campo in asignados or campo in bloqueados %}
+{% if admin or campo in asignados %}
 <div class="p-3 rounded" style="background: #f8fafc; border: 1.5px dashed #93c5fd; text-align: center; flex: 1;">
     <span
         style="font-size: 9px; font-weight: 800; color: #1e40af; display: block; margin-bottom: 8px; text-transform: uppercase;">{{
@@ -920,7 +922,7 @@
                 {% for c in ['nombres_apellidos', 'cedula', 'modalidad', 'fecha_ingreso', 'fecha_salida', 'direccion',
                 'numero_domicilio', 'celular', 'emergencia', 'email1', 'email2', 'provincia', 'canton', 'lugar_trabajo',
                 'grupo_ocupacional', 'unidad', 'cargo'] %}
-                {% if c in asignados or c in bloqueados %}{% set s12_show.val = true %}{% endif %}
+                {% if c in asignados %}{% set s12_show.val = true %}{% endif %}
                 {% endfor %}
 
                 {% if s12_show.val %}
@@ -932,7 +934,7 @@
                     {{ input_text('cedula', 'Cédula de Ciudadanía', 'text', '', '10', 'window.validarCedula',
                     datos.get('cedula', solicitud.ex_funcionario.cedula)) }}
 
-                    {% if admin or 'modalidad' in asignados or 'modalidad' in bloqueados %}
+                    {% if admin or 'modalidad' in asignados %}
                     <div class="input-group" id="grp_modalidad">
                         <label>Modalidad Laboral</label>
                         {% if admin %}<div class="mb-1" style="font-size: 0.75rem;">{% if asig_dict.get('modalidad')
@@ -971,7 +973,7 @@
                     {{ input_text('email1', 'Correo Principal', 'email', '', '100', '', datos.get('email1', '')) }}
                     {{ input_text('email2', 'Correo Alternativo', 'email', '', '100', '', datos.get('email2', '')) }}
 
-                    {% if admin or 'provincia' in asignados or 'provincia' in bloqueados %}
+                    {% if admin or 'provincia' in asignados %}
                     <div class="input-group" id="grp_provincia">
                         <label>Provincia</label>
                         {% if admin %}<div class="mb-1" style="font-size: 0.75rem;">{% if asig_dict.get('provincia')
@@ -987,7 +989,7 @@
                     </div>
                     {% endif %}
 
-                    {% if admin or 'canton' in asignados or 'canton' in bloqueados %}
+                    {% if admin or 'canton' in asignados %}
                     <div class="input-group" id="grp_canton">
                         <label>Cantón</label>
                         {% if admin %}<div class="mb-1" style="font-size: 0.75rem;">{% if asig_dict.get('canton')
@@ -1002,7 +1004,7 @@
                     </div>
                     {% endif %}
 
-                    {% if admin or 'lugar_trabajo' in asignados or 'lugar_trabajo' in bloqueados %}
+                    {% if admin or 'lugar_trabajo' in asignados %}
                     <div class="input-group">
                         <label>Lugar de Dependencia</label>
                         {% if admin %}<div class="mb-1" style="font-size: 0.75rem;">{% if asig_dict.get('lugar_trabajo')
@@ -1021,7 +1023,7 @@
                     </div>
                     {% endif %}
 
-                    {% if admin or 'grupo_ocupacional' in asignados or 'grupo_ocupacional' in bloqueados %}
+                    {% if admin or 'grupo_ocupacional' in asignados %}
                     <div class="input-group">
                         <label>Grupo Ocupacional LOSEP</label>
                         {% if admin %}<div class="mb-1" style="font-size: 0.75rem;">{% if
@@ -1058,7 +1060,7 @@
                 'tramites_losep', 'tramites_acta_claves', 'tramites_nombre_resp3', 'tramites_r3',
                 'tramites_admin_contrato', 'tramites_desc_contrato', 'tramites_memo', 'tramites_jefe_inmediato',
                 'tramites_servidor_recibe', 'tramites_obs', 'tramites_nombre_responsable', 'tramites_jefe'] %}
-                {% if c in asignados or c in bloqueados %}{% set s3_show.val = true %}{% endif %}
+                {% if c in asignados %}{% set s3_show.val = true %}{% endif %}
                 {% endfor %}
 
                 {% if s3_show.val %}
@@ -1116,7 +1118,7 @@
                 'admin_acta_bienes', 'admin_nombre_resp2', 'admin_r2', 'admin_deducibles', 'admin_deducibles_valor',
                 'admin_nombre_resp3', 'admin_r3', 'admin_pasajes', 'admin_pasajes_valor', 'admin_nombre_resp4',
                 'admin_r4', 'admin_responsable', 'admin_dir'] %}
-                {% if c in asignados or c in bloqueados %}{% set s4_show.val = true %}{% endif %}
+                {% if c in asignados %}{% set s4_show.val = true %}{% endif %}
                 {% endfor %}
 
                 {% if s4_show.val %}
@@ -1168,7 +1170,7 @@
                 'tic_backup', 'tic_ruta_backup', 'tic_nombre_resp2', 'tic_r2', 'tic_retiro_acceso', 'tic_cierre_correo',
                 'tic_esigef', 'tic_quipux', 'tic_spryn', 'tic_esbye', 'tic_nombre_resp3', 'tic_r3',
                 'tic_tarjeta_cuentas', 'tic_obs', 'tic_nombre_resp4', 'tic_r4', 'tic_responsable', 'tic_r5'] %}
-                {% if c in asignados or c in bloqueados %}{% set s5_show.val = true %}{% endif %}
+                {% if c in asignados %}{% set s5_show.val = true %}{% endif %}
                 {% endfor %}
 
                 {% if s5_show.val %}
@@ -1224,7 +1226,7 @@
                 'fin_anticipo_valor', 'fin_nombre_resp2', 'fin_r2', 'fin_recuperacion', 'fin_recuperacion_valor',
                 'fin_nombre_resp3', 'fin_r3', 'fin_devolucion', 'fin_devolucion_valor', 'fin_nombre_resp4', 'fin_r4',
                 'fin_director', 'fin_dir'] %}
-                {% if c in asignados or c in bloqueados %}{% set s6_show.val = true %}{% endif %}
+                {% if c in asignados %}{% set s6_show.val = true %}{% endif %}
                 {% endfor %}
 
                 {% if s6_show.val %}
@@ -1274,7 +1276,7 @@
                 {% for c in ['seg_archivos', 'seg_entrega_copia', 'seg_nombre_resp1', 'seg_r1', 'seg_archivos_fisicos',
                 'seg_verificacion_info', 'seg_nombre_resp2', 'seg_r2', 'seg_oficial', 'seg_responsable',
                 'seg_oficial_sig'] %}
-                {% if c in asignados or c in bloqueados %}{% set s7_show.val = true %}{% endif %}
+                {% if c in asignados %}{% set s7_show.val = true %}{% endif %}
                 {% endfor %}
 
                 {% if s7_show.val %}
@@ -1314,7 +1316,7 @@
                 'rrhh_resp_vacaciones', 'rrhh_r5', 'rrhh_juramentada', 'rrhh_num_declaracion', 'rrhh_resp_juramentada',
                 'rrhh_r6', 'rrhh_credencial', 'rrhh_resp_credencial2', 'rrhh_r7', 'rrhh_acta_bienes', 'rrhh_resp_acta',
                 'rrhh_r8', 'rrhh_director', 'rrhh_dir'] %}
-                {% if c in asignados or c in bloqueados %}{% set s8_show.val = true %}{% endif %}
+                {% if c in asignados %}{% set s8_show.val = true %}{% endif %}
                 {% endfor %}
 
                 {% if s8_show.val %}
@@ -1390,7 +1392,7 @@
                 {% set s9_show = namespace(val=admin) %}
                 {% for c in ['recepcion_fecha', 'recepcion_hojas', 'recepcion_servidor', 'recepcion_cargo',
                 'recepcion_r1'] %}
-                {% if c in asignados or c in bloqueados %}{% set s9_show.val = true %}{% endif %}
+                {% if c in asignados %}{% set s9_show.val = true %}{% endif %}
                 {% endfor %}
 
                 {% if s9_show.val %}
@@ -1411,7 +1413,7 @@
 
                 {% set s10_show = namespace(val=admin) %}
                 {% for c in ['servidor_saliente', 'cedula_firmante'] %}
-                {% if c in asignados or c in bloqueados %}{% set s10_show.val = true %}{% endif %}
+                {% if c in asignados %}{% set s10_show.val = true %}{% endif %}
                 {% endfor %}
 
                 {% if s10_show.val %}
@@ -1476,7 +1478,7 @@
             <div class="p-3 bg-light border-top text-end mt-3">
                 <button type="button" class="btn btn-success fw-bold px-4 py-2"
                     onclick="window['validarYGuardarTodo']()">
-                    <i class="bi bi-cloud-check-fill me-2"></i> Guardar Todo el Trámite
+                    <i class="bi bi-cloud-check-fill me-2"></i> Guardar Mis Respuestas
                 </button>
             </div>
         </div>

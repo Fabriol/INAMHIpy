@@ -427,3 +427,43 @@ def ver_hoja_espejo(solicitud_id):
     return render_template('paz_salvo/ver_espejo.html', 
                            solicitud=solicitud, 
                            datos=datos_combinados)
+
+# ====================================================================
+# 10. RUTA: VISTA EXCLUSIVA DE "MIS CAMPOS" PARA LAS ÁREAS (SEPARADA)
+# ====================================================================
+@paz_salvo_bp.route('/paz-salvo/mis-campos/<int:solicitud_id>', methods=['GET'])
+@login_required
+def mis_campos_asignados(solicitud_id):
+    # Bloqueo de seguridad: El Administrador no usa esta vista
+    if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos']:
+        return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=solicitud_id))
+
+    solicitud = SolicitudPazSalvo.query.get_or_404(solicitud_id)
+    solicitud.ex_funcionario = Usuario.query.get(solicitud.ex_funcionario_id)
+    
+    # Buscamos TODAS las respuestas para dibujar el espejo completo
+    todas_las_respuestas = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
+    datos_diccionario = {r.campo_formulario: r.valor_respuesta for r in todas_las_respuestas}
+    
+    # Filtramos SOLO los campos que el Administrador le designó a este usuario específico
+    mis_campos_asignados = []
+    mis_campos_bloqueados = []
+    
+    for r in todas_las_respuestas:
+        if r.usuario_asignado_id == current_user.id:
+            mis_campos_asignados.append(r.campo_formulario)
+            # Si el campo ya tiene texto o está firmado, lo bloqueamos para que no lo altere por error
+            if r.valor_respuesta and r.valor_respuesta.strip() != "":
+                mis_campos_bloqueados.append(r.campo_formulario)
+
+    # Si no tiene campos, le avisamos
+    if not mis_campos_asignados:
+        flash('No tiene campos asignados en este trámite actualmente.', 'info')
+        return redirect(url_for('areas.mis_tareas'))
+
+    # Renderizamos la página NUEVA Y SEPARADA
+    return render_template('paz_salvo/mis_campos.html', 
+                           solicitud=solicitud, 
+                           campos_asignados=mis_campos_asignados,
+                           campos_bloqueados=mis_campos_bloqueados,
+                           datos=datos_diccionario)

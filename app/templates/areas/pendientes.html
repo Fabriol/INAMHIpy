@@ -236,14 +236,28 @@
 
                     <td>
                         <div class="d-flex justify-content-center gap-2">
-                            <!-- BOTÓN VER SUPER DESTACADO (Sin abrir pestaña nueva) -->
-                            <a href="/paz-salvo/espejo/{{ solicitud.id }}" class="btn btn-action btn-ver-destacado"
-                                title="Revisar avance del documento">
-                                <i class="bi bi-eye-fill fs-5 me-1" style="vertical-align: middle;"></i> VER AVANCE
-                            </a>
-                            <a href="/areas/responder/{{ solicitud.id }}" class="btn btn-action btn-validar">
-                                <i class="bi bi-pencil-square fs-5 me-1" style="vertical-align: middle;"></i> VALIDAR
-                            </a>
+                            <!-- BOTONES PARA EL ADMINISTRADOR Y RRHH (Poder Total) -->
+                            {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
+                                
+                                <a href="/paz-salvo/espejo/{{ solicitud.id }}" class="btn btn-action btn-ver-destacado" title="Revisar avance">
+                                    <i class="bi bi-eye-fill fs-5 me-1" style="vertical-align: middle;"></i> VER AVANCE
+                                </a>
+                                
+                                <a href="/paz-salvo/llenar/{{ solicitud.id }}" class="btn btn-action" style="background-color: #1e3a8a; color: white;" title="Delegar y Validar Formulario">
+                                    <i class="bi bi-pencil-square fs-5 me-1" style="vertical-align: middle;"></i> GESTIONAR
+                                </a>
+                                
+                                <!-- Botón exclusivo para dar el estado de Aprobado/Negado -->
+                                <a href="/areas/responder/{{ solicitud.id }}" class="btn btn-action" style="background-color: #10b981; color: white;" title="Emitir Dictamen Final">
+                                    <i class="bi bi-check-circle-fill fs-5 me-1" style="vertical-align: middle;"></i> DICTAMEN
+                                </a>
+
+                            <!-- BOTÓN ÚNICO PARA LAS DEMÁS ÁREAS (Vista Aislada) -->
+                            {% else %}
+                                <a href="/paz-salvo/mis-campos/{{ solicitud.id }}" class="btn btn-action" style="background-color: #0ea5e9; color: white;">
+                                    <i class="bi bi-vector-pen fs-5 me-1" style="vertical-align: middle;"></i> VALIDAR MIS CAMPOS
+                                </a>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>
