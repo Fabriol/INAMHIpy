@@ -111,7 +111,7 @@
         text-transform: uppercase;
     }
 
-    /* WEATHER CARD (DERECHA) */
+    /* WEATHER CARD (DERECHA MODIFICADA PARA LOGO) */
     .hero-right {
         display: flex;
         flex-direction: column;
@@ -123,7 +123,7 @@
     .weather-card {
         position: relative;
         overflow: hidden;
-        padding: 28px;
+        padding: 35px 28px;
         min-height: 230px;
         width: 100%;
         max-width: 320px;
@@ -134,6 +134,9 @@
         text-align: center;
         transition: 0.4s ease;
         cursor: default;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .weather-card:hover {
@@ -141,36 +144,32 @@
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
+    /* Contenedor transparente para el logo oficial */
     .weather-logo-wrap {
-        width: 90px;
-        height: 70px;
-        margin: 0 auto 14px;
-        border-radius: 20px;
-        background: rgba(255, 255, 255, .95);
+        width: 100%;
+        max-width: 220px;
+        height: 80px;
+        margin: 0 auto 15px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
         animation: iconFloat 3s ease-in-out infinite;
     }
 
-    .weather-logo-fb {
-        font-size: 20px;
-        font-weight: 900;
-        color: #1e3a8a;
-    }
-
-    .weather-card h2 {
-        margin: 0;
-        font-size: 28px;
-        font-weight: 900;
-        color: white;
+    .weather-logo-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.3));
+        /* Sombra elegante para que resalte sobre el fondo */
     }
 
     .weather-card p {
-        margin-top: 8px;
-        font-size: 12px;
+        margin-top: 15px;
+        font-size: 13px;
+        font-weight: 600;
         color: #dbeafe;
+        line-height: 1.5;
     }
 
     .pulse-ring {
@@ -184,7 +183,7 @@
         animation: pulseRing 2.5s ease-in-out infinite;
     }
 
-    /* TARJETAS DE MÉTRICAS (ANIMACIÓN MEJORADA) */
+    /* TARJETAS DE MÉTRICAS */
     .dashboard-grid {
         margin-top: 30px;
         display: grid;
@@ -208,7 +207,6 @@
         cursor: default;
     }
 
-    /* Efecto 3D de Levitación en Tarjetas */
     .info-card:hover {
         transform: translateY(-8px) scale(1.02);
         box-shadow: 0 25px 50px rgba(15, 23, 42, .1);
@@ -632,10 +630,12 @@
 
         <div class="hero-right">
             <div class="weather-card">
+
+                <!-- AQUÍ ESTÁ EL NUEVO CONTENEDOR DEL LOGO -->
                 <div class="weather-logo-wrap">
-                    <div class="weather-logo-fb">IN</div>
+                    <img src="static/img/inamhi.png" alt="Logo INAMHI" class="weather-logo-img">
                 </div>
-                <h2>INAMHI</h2>
+
                 <p>Tecnología y gestión institucional al servicio del Ecuador.</p>
                 <div class="pulse-ring"></div>
             </div>

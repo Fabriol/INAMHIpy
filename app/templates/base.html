@@ -47,60 +47,33 @@
             box-shadow: 15px 0 40px rgba(0, 0, 0, 0.4);
         }
 
+        /* Contenedor del Logo Institucional */
         .brand-box {
             display: flex;
             align-items: center;
+            justify-content: center;
             margin-bottom: 40px;
             padding-bottom: 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             white-space: nowrap;
+            height: 85px;
+            /* Mantiene la altura estable para que no salte el menú */
         }
 
-        .logo-icon {
-            width: 45px;
-            height: 45px;
-            min-width: 45px;
-            background: linear-gradient(135deg, #2563eb, #0ea5e9);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 18px;
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
-            margin: 0 auto;
-            transition: margin 0.3s ease;
+        /* Animación y tamaño inteligente del logo */
+        .sidebar-logo {
+            max-width: 55px;
+            /* Tamaño cuando está colapsado */
+            max-height: 55px;
+            object-fit: contain;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
         }
 
-        .sidebar:hover .logo-icon {
-            margin: 0;
-            margin-right: 15px;
-        }
-
-        .brand-text {
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: all 0.2s ease;
-        }
-
-        .sidebar:hover .brand-text {
-            opacity: 1;
-            transform: translateX(0);
-            transition: all 0.4s ease 0.1s;
-        }
-
-        .brand-text h2 {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 900;
-            letter-spacing: -1px;
-        }
-
-        .brand-text span {
-            font-size: 10px;
-            color: #94a3b8;
-            font-weight: 700;
-            text-transform: uppercase;
+        .sidebar:hover .sidebar-logo {
+            max-width: 200px;
+            /* Tamaño cuando el menú se expande */
+            max-height: 65px;
         }
 
         /* Enlaces de Navegación */
@@ -225,12 +198,12 @@
     {% if current_user.is_authenticated %}
 
     <aside class="sidebar">
+
+        <!-- ===================================== -->
+        <!-- ZONA DEL LOGO ACTUALIZADA             -->
+        <!-- ===================================== -->
         <div class="brand-box">
-            <div class="logo-icon">IN</div>
-            <div class="brand-text">
-                <h2>INAMHI</h2>
-                <span>Gestión Interna</span>
-            </div>
+            <img src="static/img/inamhi.png" alt="Logo INAMHI" class="sidebar-logo">
         </div>
 
         <nav>
