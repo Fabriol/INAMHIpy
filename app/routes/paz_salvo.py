@@ -55,7 +55,7 @@ def generar_qr_svg(nombre):
 
 
 # ====================================================================
-# 1. RUTA: CREAR NUEVA SOLICITUD
+# 1. RUTA: CREAR NUEVA SOLICITUD (INTEGRADA CON GESTIÓN DE USUARIOS)
 # ====================================================================
 @paz_salvo_bp.route('/paz-salvo/nueva', methods=['GET', 'POST'])
 @login_required
@@ -65,39 +65,23 @@ def nueva_solicitud():
         return redirect(url_for('dashboard.index'))
 
     if request.method == 'POST':
-        cedula = request.form.get('cedula', '').strip()
-        username_input = request.form.get('username', '').strip()
-        email_input = request.form.get('email', '').strip()
+        # Ahora recibimos directamente el ID del usuario seleccionado en la lista
+        usuario_id = request.form.get('usuario_id')
+        usuario = Usuario.query.get(usuario_id)
 
-        usuario = Usuario.query.filter_by(cedula=cedula).first()
-        
         if not usuario:
-            correo_existente = Usuario.query.filter_by(email=email_input).first()
-            if correo_existente:
-                flash(f'El correo {email_input} ya está asignado.', 'danger')
-                return redirect(url_for('paz_salvo.nueva_solicitud'))
+            flash('Error: El usuario seleccionado no existe en la base de datos.', 'danger')
+            return redirect(url_for('paz_salvo.nueva_solicitud'))
 
-            rol_ex = Rol.query.filter_by(nombre='Ex Funcionario').first()
-            usuario = Usuario(
-                rol_id=rol_ex.id, 
-                cedula=cedula, 
-                nombres=request.form.get('nombres', '').upper(),
-                apellidos=request.form.get('apellidos', '').upper(),
-                username=username_input,
-                email=email_input,
-                password_hash=generate_password_hash(cedula), 
-                activo=True
-            )
-            db.session.add(usuario)
-            db.session.commit()
-
+        # Verificamos que no tenga trámites en curso
         tramite_creado = SolicitudPazSalvo.query.filter_by(ex_funcionario_id=usuario.id, estado='CREADO').first()
         tramite_proceso = SolicitudPazSalvo.query.filter_by(ex_funcionario_id=usuario.id, estado='EN_PROGRESO').first()
         
         if tramite_creado or tramite_proceso:
-            flash('Este ex funcionario ya cuenta con un trámite activo.', 'warning')
+            flash(f'El ex funcionario {usuario.cedula} ya cuenta con un trámite activo.', 'warning')
             return redirect(url_for('paz_salvo.nueva_solicitud'))
 
+        # Creamos el trámite conectado a ese usuario
         nueva_solicitud = SolicitudPazSalvo(ex_funcionario_id=usuario.id, estado='CREADO')
         db.session.add(nueva_solicitud)
         
@@ -105,14 +89,18 @@ def nueva_solicitud():
         db.session.add(log)
         db.session.commit()
         
-        flash('Expediente creado exitosamente.', 'success')
+        flash('Expediente creado exitosamente. Los datos de identidad han sido sellados.', 'success')
         return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=nueva_solicitud.id))
+
+    # GET: Obtenemos solo los usuarios que tienen el rol de "Ex Funcionario" para mostrarlos en el select
+    rol_ex = Rol.query.filter_by(nombre='Ex Funcionario').first()
+    ex_funcionarios = Usuario.query.filter_by(rol_id=rol_ex.id, activo=True).all() if rol_ex else []
 
     solicitudes_db = SolicitudPazSalvo.query.order_by(SolicitudPazSalvo.id.desc()).all()
     for sol in solicitudes_db:
         sol.usuario_data = Usuario.query.get(sol.ex_funcionario_id)
         
-    return render_template('paz_salvo/crear.html', solicitudes=solicitudes_db)
+    return render_template('paz_salvo/crear.html', solicitudes=solicitudes_db, ex_funcionarios=ex_funcionarios)
 
 # ====================================================================
 # 2. RUTA: DELEGAR CAMPOS (PANEL ADMINISTRADOR)

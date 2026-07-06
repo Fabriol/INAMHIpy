@@ -10,18 +10,11 @@
         --blue-100: #dbeafe;
         --blue-600: #2563eb;
         --blue-900: #1e3a8a;
-        --green-50: #f0fdf4;
-        --green-600: #16a34a;
-        --red-50: #fff1f2;
-        --red-500: #ef4444;
-        --red-600: #dc2626;
         --slate-50: #f8fafc;
         --slate-200: #e2e8f0;
         --slate-300: #cbd5e1;
         --slate-500: #64748b;
         --slate-900: #0f172a;
-        --grad-header: linear-gradient(90deg, #2563eb, #0ea5e9, #22c55e);
-        --blur: blur(18px);
     }
 
     .panel-creacion {
@@ -75,9 +68,9 @@
 
     .form-label-custom {
         font-size: 0.8rem;
-        font-weight: 700;
+        font-weight: 800;
         color: #475569;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
@@ -85,9 +78,9 @@
     .form-control-custom {
         border-radius: 10px;
         background-color: #f8fafc;
-        border: 1px solid #cbd5e1;
+        border: 1.5px solid #cbd5e1;
         padding: 12px 16px;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         font-weight: 600;
         color: #0f172a;
         transition: 0.3s;
@@ -98,20 +91,6 @@
         border-color: #2563eb;
         box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
         outline: none;
-    }
-
-    .input-group-text-custom {
-        background-color: #e2e8f0;
-        border: 1px solid #cbd5e1;
-        border-radius: 0 10px 10px 0;
-        font-weight: 700;
-        color: #475569;
-        font-size: 0.85rem;
-        padding: 0 15px;
-    }
-
-    .input-email-left {
-        border-radius: 10px 0 0 10px !important;
     }
 
     .tabla-expedientes {
@@ -174,82 +153,95 @@
         color: #15803d;
         border: 1px solid #bbf7d0;
     }
+
+    /* Tarjeta de visualización del usuario seleccionado */
+    .user-preview-card {
+        display: none;
+        /* Oculta por defecto */
+        background: linear-gradient(135deg, #f0fdfa, #dcfce7);
+        border: 1px solid #86efac;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
 </style>
 
 <div class="panel-creacion d-flex justify-content-between align-items-center">
     <div>
         <span class="badge-modulo">Trámites de Personal</span>
         <h1 class="panel-title">Apertura de Paz y Salvo</h1>
-        <p class="text-muted small m-0">Ingrese los datos iniciales para la apertura del expediente institucional.</p>
+        <p class="text-muted small m-0">Seleccione el servidor desde la base de datos de Gestión de Usuarios.</p>
     </div>
     <a href="/dashboard" class="btn btn-sm btn-outline-secondary fw-bold px-3 py-2" style="border-radius: 8px;">← Volver
         al Panel</a>
 </div>
 
 <div class="card-formulario">
-    <h5 class="fw-bold mb-4" style="color: #0f172a;"><i class="bi bi-file-earmark-medical me-2 text-primary"></i>Datos
-        Iniciales de Identificación</h5>
+    <h5 class="fw-bold mb-4" style="color: #0f172a;">
+        <i class="bi bi-person-badge-fill me-2 text-primary"></i>Selección de Ex Funcionario
+    </h5>
 
-    <form action="/paz-salvo/nueva" method="POST">
+    <form action="/paz-salvo/nueva" method="POST" id="formNuevaSolicitud">
         <div class="row g-4">
-            <div class="col-md-4">
-                <label class="form-label-custom">Cédula de Identidad <span class="text-danger">*</span></label>
-                <input type="text" name="cedula" class="form-control form-control-custom w-100"
-                    placeholder="Ej: 1700000000" maxlength="10" required
-                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-            </div>
+            <div class="col-md-12">
+                <label class="form-label-custom">Buscar por Cédula o Nombre <span class="text-danger">*</span></label>
 
-            <div class="col-md-4">
-                <label class="form-label-custom">Nombres Completos <span class="text-danger">*</span></label>
-                <input type="text" name="nombres" id="nombresInput" class="form-control form-control-custom w-100"
-                    placeholder="Ej: JOSTIN JOSTIN" required
-                    oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '').toUpperCase()"
-                    onkeyup="window['generarCredenciales']()">
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label-custom">Apellidos Completos <span class="text-danger">*</span></label>
-                <input type="text" name="apellidos" id="apellidosInput" class="form-control form-control-custom w-100"
-                    placeholder="Ej: MALDONADO MALDONADO" required
-                    oninput="this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '').toUpperCase()"
-                    onkeyup="window['generarCredenciales']()">
+                <!-- SELECTOR INTELIGENTE CONECTADO A LA BD -->
+                <select name="usuario_id" id="usuarioSelect" class="form-control form-control-custom w-100" required
+                    onchange="mostrarDatosUsuario(this)">
+                    <option value="">— Haga clic aquí para seleccionar al Ex Funcionario —</option>
+                    {% for ex in ex_funcionarios %}
+                    <option value="{{ ex.id }}" data-cedula="{{ ex.cedula }}"
+                        data-nombres="{{ ex.apellidos }} {{ ex.nombres }}" data-email="{{ ex.email }}">
+                        {{ ex.cedula }} - {{ ex.apellidos }} {{ ex.nombres }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <div class="form-text mt-2 text-muted" style="font-size: 0.75rem;">
+                    <i class="bi bi-info-circle-fill text-primary"></i> Si el servidor no aparece en la lista, primero
+                    debe registrarlo en el módulo de <b>Gestión de Usuarios</b> asignándole el rol de "Ex Funcionario".
+                </div>
             </div>
         </div>
 
-        <div class="row g-4 mt-1">
-            <div class="col-md-5">
-                <label class="form-label-custom">Nombre de Usuario Generado <span class="text-danger">*</span></label>
-                <input type="text" name="username" id="usernameInput"
-                    class="form-control form-control-custom w-100 fw-bold text-primary" placeholder="jdoe" required
-                    oninput="this.value = this.value.toLowerCase().replace(/[^a-z0-9]/g, '')">
-                <div class="form-text" style="font-size: 0.7rem;">(Primera letra del nombre + Apellido)</div>
-            </div>
-
-            <div class="col-md-7">
-                <label class="form-label-custom">Correo Electrónico Institucional <span
-                        class="text-danger">*</span></label>
-                <div class="input-group">
-                    <input type="text" name="email_prefijo" id="emailInput"
-                        class="form-control form-control-custom input-email-left fw-bold text-primary"
-                        placeholder="jdoe" required
-                        oninput="this.value = this.value.toLowerCase().replace(/[^a-z0-9]/g, '')">
-                    <span class="input-group-text input-group-text-custom">@inamhi.gob.ec</span>
+        <!-- TARJETA PREVIEW (SE LLENA SOLA CON JS) -->
+        <div id="previewUsuario" class="user-preview-card">
+            <h6 class="fw-bold text-success mb-3"><i class="bi bi-check-circle-fill me-2"></i>Identidad Confirmada y
+                Bloqueada</h6>
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="text-muted"
+                        style="font-size: 10px; font-weight: 800; text-transform: uppercase;">Cédula de
+                        Identidad</label>
+                    <p id="lblCedula" class="fw-bold m-0 fs-5" style="color: #1e3a8a;">-</p>
                 </div>
-                <input type="hidden" name="email" id="emailCompleto">
+                <div class="col-md-4">
+                    <label class="text-muted"
+                        style="font-size: 10px; font-weight: 800; text-transform: uppercase;">Nombres Completos</label>
+                    <p id="lblNombres" class="fw-bold m-0" style="color: #0f172a;">-</p>
+                </div>
+                <div class="col-md-4">
+                    <label class="text-muted"
+                        style="font-size: 10px; font-weight: 800; text-transform: uppercase;">Correo
+                        Institucional</label>
+                    <p id="lblEmail" class="fw-bold m-0" style="color: #0f172a;">-</p>
+                </div>
             </div>
         </div>
 
         <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
             <a href="/dashboard" class="btn btn-light fw-bold px-4 py-2"
                 style="border-radius: 10px; color: #64748b;">Cancelar</a>
-            <button type="submit" class="btn btn-primary fw-bold px-4 py-2" onclick="window['unirCorreo']()"
-                style="border-radius: 10px; background: linear-gradient(135deg, #1e3a8a, #2563eb); border: none;">
+
+            <button type="submit" id="btnCrear" class="btn btn-primary fw-bold px-4 py-2 disabled"
+                style="border-radius: 10px; background: linear-gradient(135deg, #1e3a8a, #2563eb); border: none; opacity: 0.6;">
                 <i class="bi bi-shield-plus me-2"></i>Crear Expediente e Iniciar
             </button>
         </div>
     </form>
 </div>
 
+<!-- TABLA INFERIOR (SE MANTIENE IGUAL) -->
 <div class="bg-white p-4 rounded-4 shadow-sm border border-light">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h5 class="fw-bold m-0" style="color: #0f172a;"><i class="bi bi-layers-half me-2 text-primary"></i>Expedientes
@@ -314,42 +306,31 @@
     </div>
 </div>
 
-<div class="alert alert-info mt-4 d-flex align-items-center gap-3 border-0 rounded-4 p-3"
-    style="background-color: #f0fdf4; color: #166534;">
-    <i class="bi bi-info-circle-fill text-success" style="font-size: 1.2rem;"></i>
-    <p class="m-0 small fw-bold">
-        <strong>Regla de Negocio:</strong> El sistema previene la duplicidad de registros en la base de datos validando
-        la Cédula de Identidad ingresada.
-    </p>
-</div>
-
 <script>
-    window.quitarTildes = (texto) => {
-        return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    };
+    // Función inteligente para extraer los datos ocultos del Select y dibujarlos
+    window.mostrarDatosUsuario = (selectElement) => {
+        let previewCard = document.getElementById('previewUsuario');
+        let btnCrear = document.getElementById('btnCrear');
 
-    window.generarCredenciales = () => {
-        let nombresStr = document.getElementById('nombresInput').value.trim();
-        let apellidosStr = document.getElementById('apellidosInput').value.trim();
+        if (selectElement.value !== "") {
+            // Obtenemos la opción seleccionada
+            let opcionSeleccionada = selectElement.options[selectElement.selectedIndex];
 
-        let usernameInput = document.getElementById('usernameInput');
-        let emailInput = document.getElementById('emailInput');
+            // Llenamos las etiquetas con los datos extraídos (Data Attributes)
+            document.getElementById('lblCedula').innerText = opcionSeleccionada.getAttribute('data-cedula');
+            document.getElementById('lblNombres').innerText = opcionSeleccionada.getAttribute('data-nombres');
+            document.getElementById('lblEmail').innerText = opcionSeleccionada.getAttribute('data-email');
 
-        if (nombresStr.length > 0 && apellidosStr.length > 0) {
-            let primerNombre = nombresStr.split(' ')[0];
-            let primeraLetra = primerNombre.charAt(0).toLowerCase();
-            let primerApellido = apellidosStr.split(' ')[0].toLowerCase();
-            let usernameLimpio = window.quitarTildes(primeraLetra + primerApellido);
-
-            usernameInput.value = usernameLimpio;
-            emailInput.value = usernameLimpio;
+            // Mostramos la tarjeta y habilitamos el botón de guardar
+            previewCard.style.display = 'block';
+            btnCrear.classList.remove('disabled');
+            btnCrear.style.opacity = '1';
+        } else {
+            // Si regresa a la opción vacía, ocultamos todo y bloqueamos el botón
+            previewCard.style.display = 'none';
+            btnCrear.classList.add('disabled');
+            btnCrear.style.opacity = '0.6';
         }
-    };
-
-    window.unirCorreo = () => {
-        let prefijo = document.getElementById('emailInput').value;
-        let dominio = "@inamhi.gob.ec";
-        document.getElementById('emailCompleto').value = prefijo + dominio;
     };
 
     window.eliminarExpediente = (idSolicitud) => {
@@ -364,27 +345,17 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`/paz-salvo/eliminar/${idSolicitud}`, {
-                    method: 'POST'
-                })
+                fetch(`/paz-salvo/eliminar/${idSolicitud}`, { method: 'POST' })
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'success') {
-                            Swal.fire({
-                                title: '¡Eliminado!',
-                                text: 'El expediente ha sido borrado de la base de datos.',
-                                icon: 'success',
-                                confirmButtonColor: '#16a34a'
-                            }).then(() => {
-                                window.location.reload();
-                            });
+                            Swal.fire({ title: '¡Eliminado!', text: 'El expediente ha sido borrado.', icon: 'success', confirmButtonColor: '#16a34a' })
+                                .then(() => { window.location.reload(); });
                         } else {
                             Swal.fire('Error', data.mensaje, 'error');
                         }
                     })
-                    .catch(error => {
-                        Swal.fire('Error', 'Hubo un problema de conexión con el servidor.', 'error');
-                    });
+                    .catch(error => { Swal.fire('Error', 'Problema de conexión con el servidor.', 'error'); });
             }
         });
     };
