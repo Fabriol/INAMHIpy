@@ -1499,6 +1499,10 @@
     </div>
 </div>
 
+<script id="asignaciones-data" type="application/json">
+    {{ asig_dict | default({}) | tojson | safe }}
+</script>
+
 <script>
     let divisionPoliticaEcuador = {
         "PICHINCHA": ["QUITO", "CAYAMBE", "MEJÍA", "PEDRO MONCAYO", "RUMIÑAHUI", "SAN MIGUEL DE LOS BANCOS", "PEDRO VICENTE MALDONADO", "PUERTO QUITO"],
@@ -1516,11 +1520,35 @@
         if (provSelect) {
             let selectedProv = provSelect.getAttribute('data-selected');
             provSelect.innerHTML = '<option value="">Seleccione Provincia...</option>';
-            Object.keys(divisionPoliticaEcuador).forEach(prov => {
+            Object.keys(divisionPoliticaEcuador).forEach((prov) => {
                 let isSelected = (prov === selectedProv) ? 'selected' : '';
                 provSelect.innerHTML += `<option value="${prov}" ${isSelected}>${prov}</option>`;
             });
             window.filtrarCantonesEcuador();
+        }
+
+        let dataNode = document.getElementById('asignaciones-data');
+        let asignacionesPrevias = dataNode ? JSON.parse(dataNode.textContent) : {};
+        let checkboxesAdmin = document.querySelectorAll('input[type="checkbox"][name="campos"]');
+        
+        checkboxesAdmin.forEach((cb) => {
+            let nombreCampo = cb.value;
+            if (asignacionesPrevias[nombreCampo]) {
+                cb.checked = true;
+                cb.disabled = true;
+                let contenedor = cb.parentElement;
+                contenedor.classList.add("text-success");
+                contenedor.style.textDecoration = "line-through";
+                contenedor.style.opacity = "0.6";
+                contenedor.style.pointerEvents = "none";
+                contenedor.title = "Ya asignado a: " + asignacionesPrevias[nombreCampo];
+            }
+        });
+    });
+
+    document.body.addEventListener('htmx:afterRequest', (event) => {
+        if (event.detail.target.id === 'live-alert') {
+            setTimeout(() => { window.location.reload(); }, 1500);
         }
     });
 
@@ -1532,7 +1560,7 @@
             let selectedCant = cantSelect.getAttribute('data-selected');
             cantSelect.innerHTML = '<option value="">Seleccione Cantón...</option>';
             if (divisionPoliticaEcuador[prov]) {
-                divisionPoliticaEcuador[prov].forEach(c => {
+                divisionPoliticaEcuador[prov].forEach((c) => {
                     let isSelected = (c === selectedCant) ? 'selected' : '';
                     cantSelect.innerHTML += `<option value="${c}" ${isSelected}>${c}</option>`;
                 });
@@ -1561,6 +1589,22 @@
     };
 
     window.abrirModalFirmaEC = (campoFirma, labelFirma) => {
+        let form = document.getElementById('formularioOficial');
+        
+        let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
+        let faltanDatos = false;
+        requeridos.forEach((el) => {
+            if (el.value.trim() === '') { 
+                window.mostrarError(el, '⚠ Obligatorio.'); 
+                faltanDatos = true; 
+            }
+        });
+
+        if (faltanDatos || document.querySelectorAll('.has-error').length > 0) {
+            Swal.fire('Complete los datos', 'Para evitar pérdida de información, primero llene todos los campos de texto asignados y luego proceda a firmar.', 'warning');
+            return;
+        }
+
         Swal.fire({
             title: '<h2 class="swal-firmaec-title">Validación Criptográfica PAdES</h2>',
             html: `
@@ -1590,11 +1634,18 @@
             showCancelButton: true, confirmButtonText: '<i class="bi bi-shield-lock-fill me-2"></i> Inyectar Firma PAdES', cancelButtonText: 'Cancelar',
             customClass: { popup: 'swal-firmaec-popup', header: 'swal-firmaec-header', confirmButton: 'btn btn-primary px-4 py-2 fw-bold shadow-sm', cancelButton: 'btn btn-light px-4 py-2 fw-bold' },
             showLoaderOnConfirm: true,
-            preConfirm: () => {
+            preConfirm: async () => {
                 let fileInput = document.getElementById('swal-p12-file').files[0];
                 let passInput = document.getElementById('swal-p12-pass').value;
 
                 if (!fileInput || !passInput) { Swal.showValidationMessage('⚠️ Faltan datos. Adjunte el certificado y la contraseña.'); return false; }
+
+                let formPayload = new FormData(form);
+                try {
+                    await fetch(form.action, { method: 'POST', body: formPayload });
+                } catch(e) {
+                    console.warn(e);
+                }
 
                 let formData = new FormData();
                 formData.append('pdf_firmado', fileInput);
@@ -1602,11 +1653,11 @@
                 formData.append('campo', campoFirma);
 
                 return fetch(`/paz-salvo/subir-firma/{{ solicitud.id }}`, { method: 'POST', body: formData })
-                    .then(response => {
-                        if (!response.ok) { return response.json().then(err => { throw new Error(err.mensaje || 'Error al procesar.'); }); }
+                    .then((response) => {
+                        if (!response.ok) { return response.json().then((err) => { throw new Error(err.mensaje || 'Error al procesar.'); }); }
                         return response.json();
                     })
-                    .catch(error => { Swal.showValidationMessage(`❌ ${error.message}`); });
+                    .catch((error) => { Swal.showValidationMessage(`❌ ${error.message}`); });
             }
         }).then((result) => {
             if (result.isConfirmed) {
@@ -1619,19 +1670,33 @@
 
     window.validarYGuardarTodo = () => {
         let form = document.getElementById('formularioOficial');
-        let requeridos = form.querySelectorAll('input[type="text"]:not([readonly]), select:not([disabled])');
+        let requeridosTexto = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
         let formValido = true;
-
-        requeridos.forEach(el => {
+        
+        requeridosTexto.forEach((el) => {
             if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); formValido = false; }
         });
 
-        if (!formValido || document.querySelectorAll('.has-error').length > 0) {
-            Swal.fire('Formulario Incompleto', 'Llene todos los campos habilitados correctamente antes de guardar.', 'warning');
+        let requeridosFirma = form.querySelectorAll('input[type="hidden"][id^="input_"]');
+        let firmasValidas = true;
+
+        requeridosFirma.forEach((el) => {
+            if (el.value !== 'FIRMADO') {
+                firmasValidas = false;
+                let cajaFirma = el.closest('div.p-3');
+                if(cajaFirma) {
+                    cajaFirma.style.borderColor = '#ef4444';
+                    cajaFirma.style.backgroundColor = '#fef2f2';
+                }
+            }
+        });
+
+        if (!formValido || !firmasValidas || document.querySelectorAll('.has-error').length > 0) {
+            Swal.fire('Trámite Incompleto', 'Debe llenar todos los campos habilitados y estampar TODAS las firmas antes de poder enviar su asignación.', 'warning');
             return;
         }
 
-        Swal.fire({ title: '¿Finalizar trámite?', text: 'Se guardarán de manera irreversible los datos llenados (Guardado Atómico).', icon: 'question', showCancelButton: true, confirmButtonText: 'Sí, Guardar Trámite', confirmButtonColor: '#16a34a' }).then((result) => {
+        Swal.fire({ title: '¿Sellar Trámite?', text: 'Se guardarán de manera irreversible los datos llenados (Guardado Atómico).', icon: 'question', showCancelButton: true, confirmButtonText: 'Sí, Guardar Trámite', confirmButtonColor: '#16a34a' }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({ title: 'Guardando...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
                 form.submit();
