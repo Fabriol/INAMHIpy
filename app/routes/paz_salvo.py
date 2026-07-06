@@ -137,7 +137,7 @@ def asignar_campos(solicitud_id):
         return f"<div class='alert alert-danger py-2 mt-2'>Error en BD: {str(e)}</div>"
 
 # ====================================================================
-# 3. RUTA: LLENAR FORMULARIO (SEMÁFORO Y VISTAS AISLADAS)
+# 3. RUTA: LLENAR FORMULARIO (PANEL ADMINISTRADOR/RRHH)
 # ====================================================================
 @paz_salvo_bp.route('/paz-salvo/llenar/<int:solicitud_id>', methods=['GET'])
 @login_required
@@ -162,14 +162,21 @@ def llenar_formulario(solicitud_id):
     
     for r in respuestas_db:
         es_su_campo = (r.usuario_asignado_id == current_user.id)
-        
         if es_su_campo:
             campos_asignados_al_usuario.append(r.campo_formulario)
-            if r.valor_respuesta and r.valor_respuesta.strip() != "":
+            
+        # ==========================================
+        # MAGIA DE SEGURIDAD: BLOQUEO ABSOLUTO
+        # ==========================================
+        # Si el campo ya tiene cualquier texto o firma guardada, se bloquea para TODO EL MUNDO
+        if r.valor_respuesta and str(r.valor_respuesta).strip() != "":
+            if r.campo_formulario not in campos_bloqueados:
                 campos_bloqueados.append(r.campo_formulario)
 
+        # Bloqueo de privacidad para usuarios que no son Administradores
         if current_user.rol.nombre != 'Administrador' and not es_su_campo:
-            campos_bloqueados.append(r.campo_formulario)
+            if r.campo_formulario not in campos_bloqueados:
+                campos_bloqueados.append(r.campo_formulario)
 
     return render_template('paz_salvo/llenar_formulario.html', 
                            solicitud=solicitud, 

@@ -170,13 +170,6 @@
         box-shadow: 0 8px 15px rgba(29, 78, 216, .3);
     }
 
-    .btn-firmaec:disabled {
-        background: #94a3b8;
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
-    }
-
     .hoja-espejo-preview {
         background: linear-gradient(135deg, #e8edf8, #d4daf0);
         border-radius: 20px;
@@ -260,10 +253,18 @@
 {% set asig_dict = asignaciones_dict if asignaciones_dict else {} %}
 {% set admin = current_user.rol.nombre == 'Administrador' %}
 
-<!-- MACROS CON LA MAGIA DE VISIBILIDAD -->
-<!-- Se eliminó 'or name in bloqueados' para que solo vea lo que se le asignó explícitamente -->
 {% macro input_text(name, label, type='text', width='', max_len='', js_val='', val='') %}
 {% if admin or name in asignados %}
+
+{# STRING LIMPIO PARA EVITAR ERROR EN VS CODE #}
+{% set oninput_str = "window.convertirMayusculas(this);" %}
+{% if js_val %}
+{% set oninput_str = oninput_str ~ " window." ~ js_val ~ "(this);" %}
+{% endif %}
+{% if type == 'email' %}
+{% set oninput_str = oninput_str ~ " window.validarEmail(this);" %}
+{% endif %}
+
 <div class="input-group {{ width }}" id="grp_{{ name }}">
     <label>{{ label }}</label>
     {% if admin %}
@@ -277,9 +278,8 @@
     {% endif %}
     <input type="{{ type }}" name="{{ name }}" class="doc-input" value="{{ val }}" {% if name in bloqueados %} readonly
         disabled style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %} {% if max_len
-        %}maxlength="{{ max_len }}" {% endif %}
-        oninput="if('{{ js_val }}') { window['{{ js_val }}'](this); } if('{{ type }}' === 'email') { window['validarEmail'](this); }">
-    <span class="error-msg" id="msg_{{ name }}">⚠ Campo requerido o formato incorrecto.</span>
+        %}maxlength="{{ max_len }}" {% endif %} oninput="{{ oninput_str }}">
+    <span class="error-msg" id="msg_{{ name }}">⚠ Formato incorrecto o campo requerido.</span>
 </div>
 {% endif %}
 {% endmacro %}
@@ -298,7 +298,7 @@
     </div>
     {% endif %}
     <select name="{{ name }}" class="doc-input" {% if name in bloqueados %} disabled
-        style="background-color: #e2e8f0 !important;" {% endif %}>
+        style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}>
         <option value="">—</option>
         <option value="SI" {% if val=='SI' %}selected{% endif %}>SÍ</option>
         <option value="NO" {% if val=='NO' %}selected{% endif %}>NO</option>
@@ -337,14 +337,9 @@
     </div>
     {% else %}
     <button type="button" class="btn-firmaec" id="btn_{{ campo }}"
-        onclick="window['abrirModalFirmaEC']('{{ campo }}', '{{ label }}')">
+        onclick="window.abrirModalFirmaEC('{{ campo }}', '{{ label }}')">
         <i class="bi bi-shield-lock-fill"></i> Firmar PAdES (.p12)
     </button>
-    <div id="previewFirma_{{ campo }}"
-        style="display:none; margin-top: 8px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 6px;">
-        <span style="font-size: 10px; color: #15803d; font-weight: 800;"><i class="bi bi-check-circle-fill"></i>
-            Certificado Verificado</span>
-    </div>
     {% endif %}
 </div>
 {% endif %}
@@ -354,15 +349,14 @@
 <div class="page fade-in">
     <div class="page-header no-print">
         <div>
-            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Trámite Institucional #{{ solicitud.id }}</span>
+            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Trámite Institucional Único #{{ solicitud.id
+                }}</span>
             <h1 style="font-size: 24px; font-weight: 900; color: #1e3a8a; margin: 0;">Gestión de Liquidación Base</h1>
         </div>
         <div>
-            <!-- NUEVO BOTÓN OFICIAL: Obliga al sistema a cargar la tabla actualizada -->
-            <a href="/paz-salvo/nueva" class="btn btn-lg btn-secondary fw-bold shadow-sm me-2">
+            <a href="/areas/tareas" class="btn btn-lg btn-secondary fw-bold shadow-sm me-2">
                 <i class="bi bi-arrow-left-circle-fill me-2"></i> Volver a la Bandeja
             </a>
-
             <button class="btn btn-lg btn-light border fw-bold shadow-sm me-2 text-dark" onclick="window.print()">
                 <i class="bi bi-printer-fill text-primary me-2"></i> Imprimir Hoja Espejo
             </button>
@@ -934,9 +928,9 @@
                 <div class="doc-section-head">👤 1. Datos Personales y Unidad</div>
                 <div class="doc-fields-grid">
                     {{ input_text('nombres_apellidos', 'Nombres y Apellidos Completos', 'text', 'span-2', '100',
-                    'window.soloLetras', datos.get('nombres_apellidos', solicitud.ex_funcionario.nombres ~ ' ' ~
+                    'soloLetras', datos.get('nombres_apellidos', solicitud.ex_funcionario.nombres ~ ' ' ~
                     solicitud.ex_funcionario.apellidos)) }}
-                    {{ input_text('cedula', 'Cédula de Ciudadanía', 'text', '', '10', 'window.validarCedula',
+                    {{ input_text('cedula', 'Cédula de Ciudadanía', 'text', '', '10', 'validarCedula',
                     datos.get('cedula', solicitud.ex_funcionario.cedula)) }}
 
                     {% if admin or 'modalidad' in asignados %}
@@ -948,7 +942,7 @@
                                     class="bi bi-exclamation-triangle-fill"></i> Pendiente</span>{% endif %}</div>{%
                         endif %}
                         <select name="modalidad" class="doc-input" {% if 'modalidad' in bloqueados %} disabled
-                            style="background-color: #e2e8f0 !important;" {% endif %}>
+                            style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}>
                             <option value="">Seleccione...</option>
                             <option value="PERMANENTE" {% if datos.get('modalidad')=='PERMANENTE' %}selected{% endif %}>
                                 Nombramiento Permanente</option>
@@ -962,21 +956,23 @@
                     </div>
                     {% endif %}
 
-                    {{ input_text('fecha_ingreso', 'Fecha de Ingreso', 'date', '', '', 'window.validarFechas',
+                    {{ input_text('fecha_ingreso', 'Fecha de Ingreso', 'date', '', '', 'validarFechas',
                     datos.get('fecha_ingreso', '')) }}
-                    {{ input_text('fecha_salida', 'Fecha de Salida', 'date', '', '', 'window.validarFechas',
+                    {{ input_text('fecha_salida', 'Fecha de Salida', 'date', '', '', 'validarFechas',
                     datos.get('fecha_salida', '')) }}
                     {{ input_text('direccion', 'Dirección Domiciliaria', 'text', 'span-2', '200', '',
                     datos.get('direccion', '')) }}
 
-                    {{ input_text('numero_domicilio', 'Teléfono Fijo Casa', 'text', '', '9',
-                    'window.validarConvencional', datos.get('numero_domicilio', '')) }}
-                    {{ input_text('celular', 'Teléfono Celular', 'text', '', '10', 'window.validarCelular',
+                    {{ input_text('numero_domicilio', 'Teléfono Fijo Casa', 'text', '', '9', 'validarConvencional',
+                    datos.get('numero_domicilio', '')) }}
+                    {{ input_text('celular', 'Teléfono Celular', 'text', '', '10', 'validarCelular',
                     datos.get('celular', '')) }}
-                    {{ input_text('emergencia', 'Contacto de Emergencia', 'text', 'span-2', '10',
-                    'window.validarCelular', datos.get('emergencia', '')) }}
-                    {{ input_text('email1', 'Correo Principal', 'email', '', '100', '', datos.get('email1', '')) }}
-                    {{ input_text('email2', 'Correo Alternativo', 'email', '', '100', '', datos.get('email2', '')) }}
+                    {{ input_text('emergencia', 'Contacto de Emergencia', 'text', 'span-2', '10', 'validarCelular',
+                    datos.get('emergencia', '')) }}
+                    {{ input_text('email1', 'Correo Principal', 'email', '', '100', 'validarEmail', datos.get('email1',
+                    '')) }}
+                    {{ input_text('email2', 'Correo Alternativo', 'email', '', '100', 'validarEmail',
+                    datos.get('email2', '')) }}
 
                     {% if admin or 'provincia' in asignados %}
                     <div class="input-group" id="grp_provincia">
@@ -987,9 +983,9 @@
                                     class="bi bi-exclamation-triangle-fill"></i> Pendiente</span>{% endif %}</div>{%
                         endif %}
                         <select name="provincia" id="provinciaSelect" class="doc-input"
-                            data-selected="{{ datos.get('provincia', '') }}"
-                            onchange="window['filtrarCantonesEcuador']()" {% if 'provincia' in bloqueados %} disabled
-                            style="background-color: #e2e8f0 !important;" {% endif %}></select>
+                            data-selected="{{ datos.get('provincia', '') }}" onchange="window.filtrarCantonesEcuador()"
+                            {% if 'provincia' in bloqueados %} disabled
+                            style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}></select>
                         <span class="error-msg" id="msg_provincia">⚠ Campo requerido.</span>
                     </div>
                     {% endif %}
@@ -1004,7 +1000,7 @@
                         endif %}
                         <select name="canton" id="cantonSelect" class="doc-input"
                             data-selected="{{ datos.get('canton', '') }}" {% if 'canton' in bloqueados %} disabled
-                            style="background-color: #e2e8f0 !important;" {% endif %}></select>
+                            style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}></select>
                         <span class="error-msg" id="msg_canton">⚠ Campo requerido.</span>
                     </div>
                     {% endif %}
@@ -1018,7 +1014,7 @@
                                 class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle-fill"></i>
                                 Pendiente</span>{% endif %}</div>{% endif %}
                         <select name="lugar_trabajo" class="doc-input" {% if 'lugar_trabajo' in bloqueados %} disabled
-                            style="background-color: #e2e8f0 !important;" {% endif %}>
+                            style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}>
                             <option value="">—</option>
                             <option value="PLANTA CENTRAL" {% if datos.get('lugar_trabajo')=='PLANTA CENTRAL'
                                 %}selected{% endif %}>Planta Central</option>
@@ -1038,7 +1034,7 @@
                                     class="bi bi-exclamation-triangle-fill"></i> Pendiente</span>{% endif %}</div>{%
                         endif %}
                         <select name="grupo_ocupacional" class="doc-input" {% if 'grupo_ocupacional' in bloqueados %}
-                            disabled style="background-color: #e2e8f0 !important;" {% endif %}>
+                            disabled style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}>
                             <option value="">—</option>
                             <option value="NJS" {% if datos.get('grupo_ocupacional')=='NJS' %}selected{% endif %}>NJS
                                 (Jerárquico)</option>
@@ -1052,9 +1048,9 @@
                     </div>
                     {% endif %}
 
-                    {{ input_text('unidad', 'Dirección Técnica / Unidad', 'text', 'span-2', '', '', datos.get('unidad',
-                    '')) }}
-                    {{ input_text('cargo', 'Cargo Institucional Desempeñado', 'text', 'span-2', '', '',
+                    {{ input_text('unidad', 'Dirección Técnica / Unidad', 'text', 'span-2', '100', '',
+                    datos.get('unidad', '')) }}
+                    {{ input_text('cargo', 'Cargo Institucional Desempeñado', 'text', 'span-2', '100', '',
                     datos.get('cargo', '')) }}
                 </div>
                 {% endif %}
@@ -1075,8 +1071,8 @@
                     datos.get('tramites_informe', '')) }}
                     {{ select_sino('tramites_quipux_cero', '¿Bandeja de QUIPUX en Cero?', '',
                     datos.get('tramites_quipux_cero', '')) }}
-                    {{ input_text('tramites_nombre_resp1', 'Servidor Validador Fila 1', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('tramites_nombre_resp1', '')) }}
+                    {{ input_text('tramites_nombre_resp1', 'Servidor Validador Fila 1', 'text', 'span-2', '100',
+                    'soloLetras', datos.get('tramites_nombre_resp1', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('tramites_r1', 'Firma Responsable 1',
                         datos.get('tramites_nombre_resp1', 'SERVIDOR')) }}</div>
 
@@ -1084,8 +1080,8 @@
                     datos.get('tramites_fe_presentacion', '')) }}
                     {{ select_sino('tramites_claves_asignadas', '¿Retiro de Claves de Sistemas?', '',
                     datos.get('tramites_claves_asignadas', '')) }}
-                    {{ input_text('tramites_nombre_resp2', 'Servidor Validador Fila 2', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('tramites_nombre_resp2', '')) }}
+                    {{ input_text('tramites_nombre_resp2', 'Servidor Validador Fila 2', 'text', 'span-2', '100',
+                    'soloLetras', datos.get('tramites_nombre_resp2', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('tramites_r2', 'Firma Responsable 2',
                         datos.get('tramites_nombre_resp2', 'SERVIDOR')) }}</div>
 
@@ -1093,26 +1089,26 @@
                     datos.get('tramites_losep', '')) }}
                     {{ select_sino('tramites_acta_claves', '¿Acta de Entrega de Claves?', '',
                     datos.get('tramites_acta_claves', '')) }}
-                    {{ input_text('tramites_nombre_resp3', 'Servidor Validador Fila 3', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('tramites_nombre_resp3', '')) }}
+                    {{ input_text('tramites_nombre_resp3', 'Servidor Validador Fila 3', 'text', 'span-2', '100',
+                    'soloLetras', datos.get('tramites_nombre_resp3', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('tramites_r3', 'Firma Responsable 3',
                         datos.get('tramites_nombre_resp3', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('tramites_admin_contrato', '¿Fue Administrador de Contratos?', '',
                     datos.get('tramites_admin_contrato', '')) }}
-                    {{ input_text('tramites_desc_contrato', 'Detalle de Contratos a Cargo', 'text', '', '', '',
+                    {{ input_text('tramites_desc_contrato', 'Detalle de Contratos a Cargo', 'text', '', '255', '',
                     datos.get('tramites_desc_contrato', '')) }}
-                    {{ input_text('tramites_memo', 'N° Memorando de Relevo', 'text', 'span-2', '', '',
+                    {{ input_text('tramites_memo', 'N° Memorando de Relevo', 'text', 'span-2', '100', '',
                     datos.get('tramites_memo', '')) }}
 
-                    {{ input_text('tramites_jefe_inmediato', 'Nombre del Jefe Inmediato', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('tramites_jefe_inmediato', '')) }}
-                    {{ input_text('tramites_servidor_recibe', 'Servidor que recibe custodia', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('tramites_servidor_recibe', '')) }}
-                    {{ input_text('tramites_obs', 'Observaciones', 'text', 'span-2', '', '', datos.get('tramites_obs',
-                    '')) }}
-                    {{ input_text('tramites_nombre_responsable', 'Jefe de Área', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('tramites_nombre_responsable', '')) }}
+                    {{ input_text('tramites_jefe_inmediato', 'Nombre del Jefe Inmediato', 'text', 'span-2', '100',
+                    'soloLetras', datos.get('tramites_jefe_inmediato', '')) }}
+                    {{ input_text('tramites_servidor_recibe', 'Servidor que recibe custodia', 'text', 'span-2', '100',
+                    'soloLetras', datos.get('tramites_servidor_recibe', '')) }}
+                    {{ input_text('tramites_obs', 'Observaciones', 'text', 'span-2', '255', '',
+                    datos.get('tramites_obs', '')) }}
+                    {{ input_text('tramites_nombre_responsable', 'Jefe de Área', 'text', 'span-2', '100', 'soloLetras',
+                    datos.get('tramites_nombre_responsable', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('tramites_jefe', 'Firma Electrónica Jefe',
                         datos.get('tramites_nombre_responsable', 'JEFE DE ÁREA')) }}</div>
                 </div>
@@ -1131,40 +1127,40 @@
                 <div class="doc-fields-grid">
                     {{ select_sino('admin_informe', '¿Validación de Informe de Bienes?', '', datos.get('admin_informe',
                     '')) }}
-                    {{ input_text('admin_nombre_resp1', 'Resp. Informe', 'text', '', '', 'window.soloLetras',
+                    {{ input_text('admin_nombre_resp1', 'Resp. Informe', 'text', '', '100', 'soloLetras',
                     datos.get('admin_nombre_resp1', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('admin_r1', 'Firma Validación Informe',
                         datos.get('admin_nombre_resp1', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('admin_bienes', '¿Devolución de Bienes?', '', datos.get('admin_bienes', '')) }}
-                    {{ input_text('admin_valor_bienes', 'Valorización Faltante $', 'text', '', '', 'window.soloMoneda',
+                    {{ input_text('admin_valor_bienes', 'Valorización Faltante $', 'text', '', '15', 'soloMoneda',
                     datos.get('admin_valor_bienes', '')) }}
-                    {{ input_text('admin_acta_bienes', 'N° Acta Recepción', 'text', 'span-2', '', '',
+                    {{ input_text('admin_acta_bienes', 'N° Acta Recepción', 'text', 'span-2', '100', '',
                     datos.get('admin_acta_bienes', '')) }}
-                    {{ input_text('admin_nombre_resp2', 'Resp. Bienes', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('admin_nombre_resp2', 'Resp. Bienes', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('admin_nombre_resp2', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('admin_r2', 'Firma Custodio Bienes',
                         datos.get('admin_nombre_resp2', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('admin_deducibles', '¿Registra Valores Deducibles?', '',
                     datos.get('admin_deducibles', '')) }}
-                    {{ input_text('admin_deducibles_valor', 'Monto a Descontar $', 'text', '', '', 'window.soloMoneda',
+                    {{ input_text('admin_deducibles_valor', 'Monto a Descontar $', 'text', '', '15', 'soloMoneda',
                     datos.get('admin_deducibles_valor', '')) }}
-                    {{ input_text('admin_nombre_resp3', 'Resp. Deducibles', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('admin_nombre_resp3', 'Resp. Deducibles', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('admin_nombre_resp3', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('admin_r3', 'Firma Deducibles',
                         datos.get('admin_nombre_resp3', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('admin_pasajes', '¿Liquidó Pasajes Aéreos?', '', datos.get('admin_pasajes', '')) }}
-                    {{ input_text('admin_pasajes_valor', 'Monto Pasajes $', 'text', '', '', 'window.soloMoneda',
+                    {{ input_text('admin_pasajes_valor', 'Monto Pasajes $', 'text', '', '15', 'soloMoneda',
                     datos.get('admin_pasajes_valor', '')) }}
-                    {{ input_text('admin_nombre_resp4', 'Resp. Pasajes', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('admin_nombre_resp4', 'Resp. Pasajes', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('admin_nombre_resp4', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('admin_r4', 'Firma Liquidación Pasajes',
                         datos.get('admin_nombre_resp4', 'SERVIDOR')) }}</div>
 
-                    {{ input_text('admin_responsable', 'Director/a Administrativo/a', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('admin_responsable', '')) }}
+                    {{ input_text('admin_responsable', 'Director/a Administrativo/a', 'text', 'span-2', '100',
+                    'soloLetras', datos.get('admin_responsable', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('admin_dir', 'Firma PAdES Director/a',
                         datos.get('admin_responsable', 'DIRECTOR/A')) }}</div>
                 </div>
@@ -1185,15 +1181,15 @@
                     datos.get('tic_verificacion', '')) }}
                     {{ select_sino('tic_ip_fija', '¿Desvinculación IP?', '', datos.get('tic_ip_fija', '')) }}
                     {{ select_sino('tic_liberacion', '¿Liberación Accesos?', '', datos.get('tic_liberacion', '')) }}
-                    {{ input_text('tic_nombre_resp1', 'Validador Equipos/IP', 'text', '', '', 'window.soloLetras',
+                    {{ input_text('tic_nombre_resp1', 'Validador Equipos/IP', 'text', '', '100', 'soloLetras',
                     datos.get('tic_nombre_resp1', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('tic_r1', 'Firma Control Hardware',
                         datos.get('tic_nombre_resp1', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('tic_backup', '¿Hizo Entrega de Respaldos?', '', datos.get('tic_backup', '')) }}
-                    {{ input_text('tic_ruta_backup', 'Ruta Servidor Institucional', 'text', '', '', '',
+                    {{ input_text('tic_ruta_backup', 'Ruta Servidor Institucional', 'text', '', '255', '',
                     datos.get('tic_ruta_backup', '')) }}
-                    {{ input_text('tic_nombre_resp2', 'Validador Respaldos', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('tic_nombre_resp2', 'Validador Respaldos', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('tic_nombre_resp2', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('tic_r2', 'Firma Control Backup',
                         datos.get('tic_nombre_resp2', 'SERVIDOR')) }}</div>
@@ -1206,21 +1202,21 @@
                     {{ select_sino('tic_quipux', '¿Desactivación QUIPUX?', '', datos.get('tic_quipux', '')) }}
                     {{ select_sino('tic_spryn', '¿Baja SPRYN?', '', datos.get('tic_spryn', '')) }}
                     {{ select_sino('tic_esbye', '¿Baja eSByE?', '', datos.get('tic_esbye', '')) }}
-                    {{ input_text('tic_nombre_resp3', 'Validador Cierre Cuentas', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('tic_nombre_resp3', '')) }}
+                    {{ input_text('tic_nombre_resp3', 'Validador Cierre Cuentas', 'text', 'span-2', '100', 'soloLetras',
+                    datos.get('tic_nombre_resp3', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('tic_r3', 'Firma Cierre Cuentas',
                         datos.get('tic_nombre_resp3', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('tic_tarjeta_cuentas', '¿Entrega Tarjeta Acceso?', '',
                     datos.get('tic_tarjeta_cuentas', '')) }}
-                    {{ input_text('tic_obs', 'Novedades TIC', 'text', '', '', '', datos.get('tic_obs', '')) }}
-                    {{ input_text('tic_nombre_resp4', 'Validador Tarjetas', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('tic_obs', 'Novedades TIC', 'text', '', '255', '', datos.get('tic_obs', '')) }}
+                    {{ input_text('tic_nombre_resp4', 'Validador Tarjetas', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('tic_nombre_resp4', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('tic_r4', 'Firma Control Accesos',
                         datos.get('tic_nombre_resp4', 'SERVIDOR')) }}</div>
 
-                    {{ input_text('tic_responsable', 'Responsable Unidad TICs', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('tic_responsable', '')) }}
+                    {{ input_text('tic_responsable', 'Responsable Unidad TICs', 'text', 'span-2', '100', 'soloLetras',
+                    datos.get('tic_responsable', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('tic_r5', 'Firma Jefe TIC', datos.get('tic_responsable',
                         'JEFE TIC')) }}</div>
                 </div>
@@ -1238,39 +1234,39 @@
                 <div class="doc-section-head mt-4">💰 6. Gestión Financiera</div>
                 <div class="doc-fields-grid">
                     {{ select_sino('fin_saldos', '¿Saldos Pendientes?', '', datos.get('fin_saldos', '')) }}
-                    {{ input_text('fin_saldos_valor', 'Monto Saldo $', 'text', '', '', 'window.soloMoneda',
+                    {{ input_text('fin_saldos_valor', 'Monto Saldo $', 'text', '', '15', 'soloMoneda',
                     datos.get('fin_saldos_valor', '')) }}
-                    {{ input_text('fin_nombre_resp1', 'Analista Contable', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('fin_nombre_resp1', 'Analista Contable', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('fin_nombre_resp1', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('fin_r1', 'Firma Análisis Contable',
                         datos.get('fin_nombre_resp1', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('fin_anticipo', '¿Anticipos Activos?', '', datos.get('fin_anticipo', '')) }}
-                    {{ input_text('fin_anticipo_valor', 'Saldo Anticipo $', 'text', '', '', 'window.soloMoneda',
+                    {{ input_text('fin_anticipo_valor', 'Saldo Anticipo $', 'text', '', '15', 'soloMoneda',
                     datos.get('fin_anticipo_valor', '')) }}
-                    {{ input_text('fin_nombre_resp2', 'Analista Tesorería', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('fin_nombre_resp2', 'Analista Tesorería', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('fin_nombre_resp2', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('fin_r2', 'Firma Tesorería', datos.get('fin_nombre_resp2',
                         'SERVIDOR')) }}</div>
 
                     {{ select_sino('fin_recuperacion', '¿Garantías/Recuperación?', '', datos.get('fin_recuperacion',
                     '')) }}
-                    {{ input_text('fin_recuperacion_valor', 'Valor a Recuperar $', 'text', '', '', 'window.soloMoneda',
+                    {{ input_text('fin_recuperacion_valor', 'Valor a Recuperar $', 'text', '', '15', 'soloMoneda',
                     datos.get('fin_recuperacion_valor', '')) }}
-                    {{ input_text('fin_nombre_resp3', 'Resp. Recuperación', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('fin_nombre_resp3', 'Resp. Recuperación', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('fin_nombre_resp3', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('fin_r3', 'Firma Recuperación',
                         datos.get('fin_nombre_resp3', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('fin_devolucion', '¿Liquidación Activos?', '', datos.get('fin_devolucion', '')) }}
-                    {{ input_text('fin_devolucion_valor', 'Monto Ajuste $', 'text', '', '', 'window.soloMoneda',
+                    {{ input_text('fin_devolucion_valor', 'Monto Ajuste $', 'text', '', '15', 'soloMoneda',
                     datos.get('fin_devolucion_valor', '')) }}
-                    {{ input_text('fin_nombre_resp4', 'Resp. Ajustes', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('fin_nombre_resp4', 'Resp. Ajustes', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('fin_nombre_resp4', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('fin_r4', 'Firma Ajustes Financieros',
                         datos.get('fin_nombre_resp4', 'SERVIDOR')) }}</div>
 
-                    {{ input_text('fin_director', 'Director/a Financiero/a', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('fin_director', 'Director/a Financiero/a', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('fin_director', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('fin_dir', 'Firma PAdES Director/a',
                         datos.get('fin_director', 'DIRECTOR/A')) }}</div>
@@ -1291,7 +1287,7 @@
                     }}
                     {{ select_sino('seg_entrega_copia', '¿Copia Seguridad Física?', '', datos.get('seg_entrega_copia',
                     '')) }}
-                    {{ input_text('seg_nombre_resp1', 'Analista Seguridad', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('seg_nombre_resp1', 'Analista Seguridad', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('seg_nombre_resp1', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('seg_r1', 'Firma Criptografía 1',
                         datos.get('seg_nombre_resp1', 'SERVIDOR')) }}</div>
@@ -1300,15 +1296,15 @@
                     datos.get('seg_archivos_fisicos', '')) }}
                     {{ select_sino('seg_verificacion_info', '¿Cifrado Dispositivos Egresados?', '',
                     datos.get('seg_verificacion_info', '')) }}
-                    {{ input_text('seg_nombre_resp2', 'Analista Seguridad', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('seg_nombre_resp2', 'Analista Seguridad', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('seg_nombre_resp2', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('seg_r2', 'Firma Criptografía 2',
                         datos.get('seg_nombre_resp2', 'SERVIDOR')) }}</div>
 
-                    {{ input_text('seg_oficial', 'Oficial Seguridad de Información', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('seg_oficial', '')) }}
-                    {{ input_text('seg_responsable', 'Responsable Infraestructura', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('seg_responsable', '')) }}
+                    {{ input_text('seg_oficial', 'Oficial Seguridad de Información', 'text', 'span-2', '100',
+                    'soloLetras', datos.get('seg_oficial', '')) }}
+                    {{ input_text('seg_responsable', 'Responsable Infraestructura', 'text', 'span-2', '100',
+                    'soloLetras', datos.get('seg_responsable', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('seg_oficial_sig', 'Firma Oficial EGSI',
                         datos.get('seg_oficial', datos.get('seg_responsable', 'OFICIAL'))) }}</div>
                 </div>
@@ -1329,67 +1325,67 @@
                 <div class="doc-fields-grid">
                     {{ select_sino('rrhh_capacitacion', '¿Cumplió Cursos Obligatorios?', '',
                     datos.get('rrhh_capacitacion', '')) }}
-                    {{ input_text('rrhh_cursos_eval', 'N° Horas / Calificación', 'text', '', '', '',
+                    {{ input_text('rrhh_cursos_eval', 'N° Horas / Calificación', 'text', '', '100', '',
                     datos.get('rrhh_cursos_eval', '')) }}
-                    {{ input_text('rrhh_resp_capacitacion', 'Analista Capacitación', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('rrhh_resp_capacitacion', '')) }}
+                    {{ input_text('rrhh_resp_capacitacion', 'Analista Capacitación', 'text', 'span-2', '100',
+                    'soloLetras', datos.get('rrhh_resp_capacitacion', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r1', 'Firma Capacitación',
                         datos.get('rrhh_resp_capacitacion', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('rrhh_evaluacion', '¿Evaluación de Desempeño?', '', datos.get('rrhh_evaluacion', ''))
                     }}
-                    {{ input_text('rrhh_resp_evaluacion', 'Analista Evaluación', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('rrhh_resp_evaluacion', '')) }}
+                    {{ input_text('rrhh_resp_evaluacion', 'Analista Evaluación', 'text', 'span-2', '100', 'soloLetras',
+                    datos.get('rrhh_resp_evaluacion', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r2', 'Firma Evaluación',
                         datos.get('rrhh_resp_evaluacion', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('rrhh_viajes', '¿Liquidó Viáticos?', '', datos.get('rrhh_viajes', '')) }}
-                    {{ input_text('rrhh_resp_viajes', 'Analista Comisiones', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('rrhh_resp_viajes', 'Analista Comisiones', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('rrhh_resp_viajes', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r3', 'Firma Comisiones', datos.get('rrhh_resp_viajes',
                         'SERVIDOR')) }}</div>
 
                     {{ select_sino('rrhh_siith', '¿Acción Personal SIITH?', '', datos.get('rrhh_siith', '')) }}
-                    {{ input_text('rrhh_resp_siith', 'Analista SIITH', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('rrhh_resp_siith', 'Analista SIITH', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('rrhh_resp_siith', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r4', 'Firma Baja SIITH', datos.get('rrhh_resp_siith',
                         'SERVIDOR')) }}</div>
 
-                    {{ input_text('rrhh_vacaciones', 'Saldo Días Vacaciones', 'text', '', '3', 'window.soloNumeros',
+                    {{ input_text('rrhh_vacaciones', 'Saldo Días Vacaciones', 'text', '', '3', 'soloNumeros',
                     datos.get('rrhh_vacaciones', '')) }}
-                    {{ input_text('rrhh_num_certificado', 'N° Certificado', 'text', '', '', '',
+                    {{ input_text('rrhh_num_certificado', 'N° Certificado', 'text', '', '50', '',
                     datos.get('rrhh_num_certificado', '')) }}
-                    {{ input_text('rrhh_resp_vacaciones', 'Analista Vacaciones', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('rrhh_resp_vacaciones', '')) }}
+                    {{ input_text('rrhh_resp_vacaciones', 'Analista Vacaciones', 'text', 'span-2', '100', 'soloLetras',
+                    datos.get('rrhh_resp_vacaciones', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r5', 'Firma Vacaciones',
                         datos.get('rrhh_resp_vacaciones', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('rrhh_juramentada', '¿Declaración Juramentada?', '', datos.get('rrhh_juramentada',
                     '')) }}
-                    {{ input_text('rrhh_num_declaracion', 'N° CGR', 'text', '', '', '',
+                    {{ input_text('rrhh_num_declaracion', 'N° CGR', 'text', '', '100', '',
                     datos.get('rrhh_num_declaracion', '')) }}
-                    {{ input_text('rrhh_resp_juramentada', 'Analista Control Legal', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('rrhh_resp_juramentada', '')) }}
+                    {{ input_text('rrhh_resp_juramentada', 'Analista Control Legal', 'text', 'span-2', '100',
+                    'soloLetras', datos.get('rrhh_resp_juramentada', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r6', 'Firma Declaraciones',
                         datos.get('rrhh_resp_juramentada', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('rrhh_credencial', '¿Devolución Credencial?', '', datos.get('rrhh_credencial', ''))
                     }}
-                    {{ input_text('rrhh_resp_credencial2', 'Analista Credenciales', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('rrhh_resp_credencial2', '')) }}
+                    {{ input_text('rrhh_resp_credencial2', 'Analista Credenciales', 'text', 'span-2', '100',
+                    'soloLetras', datos.get('rrhh_resp_credencial2', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r7', 'Firma Credenciales',
                         datos.get('rrhh_resp_credencial2', 'SERVIDOR')) }}</div>
 
                     {{ select_sino('rrhh_acta_bienes', '¿Cierre Ropa de Trabajo?', '', datos.get('rrhh_acta_bienes',
                     '')) }}
-                    {{ input_text('rrhh_resp_acta', 'Analista Dotación', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('rrhh_resp_acta', 'Analista Dotación', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('rrhh_resp_acta', '')) }}
-                    <div class="span-2 d-flex">{{ firma_box('rrhh_r8', 'Firma Dotación', datos.get('rrhh_resp_acta',
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_r8', 'Firma Act. Bienes', datos.get('rrhh_resp_acta',
                         'SERVIDOR')) }}</div>
 
-                    {{ input_text('rrhh_director', 'Director/a RRHH', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('rrhh_director', 'Nombre Director/a RRHH', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('rrhh_director', '')) }}
-                    <div class="span-2 d-flex">{{ firma_box('rrhh_dir', 'Firma Director/a', datos.get('rrhh_director',
+                    <div class="span-2 d-flex">{{ firma_box('rrhh_dir', 'Firma Dir. RRHH', datos.get('rrhh_director',
                         'DIRECTOR/A')) }}</div>
                 </div>
                 {% endif %}
@@ -1405,11 +1401,11 @@
                 <div class="doc-fields-grid">
                     {{ input_text('recepcion_fecha', 'Fecha y Hora Ingreso', 'date', '', '', '',
                     datos.get('recepcion_fecha', '')) }}
-                    {{ input_text('recepcion_hojas', 'Hojas Útiles', 'text', '', '3', 'window.soloNumeros',
+                    {{ input_text('recepcion_hojas', 'Hojas Útiles', 'text', '', '3', 'soloNumeros',
                     datos.get('recepcion_hojas', '')) }}
-                    {{ input_text('recepcion_servidor', 'Servidor de Ventanilla', 'text', 'span-2', '',
-                    'window.soloLetras', datos.get('recepcion_servidor', '')) }}
-                    {{ input_text('recepcion_cargo', 'Cargo Administrativo', 'text', 'span-2', '', 'window.soloLetras',
+                    {{ input_text('recepcion_servidor', 'Servidor de Ventanilla', 'text', 'span-2', '100', 'soloLetras',
+                    datos.get('recepcion_servidor', '')) }}
+                    {{ input_text('recepcion_cargo', 'Cargo Administrativo', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('recepcion_cargo', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('recepcion_r1', 'Firma Recepción',
                         datos.get('recepcion_servidor', 'SERVIDOR')) }}</div>
@@ -1425,7 +1421,7 @@
                 <div class="doc-section-head mt-4" style="background: linear-gradient(135deg, #4c1d95, #7c3aed);">✍️ 10.
                     Declaración Legal Final</div>
                 <div class="doc-fields-grid" style="background: #faf5ff;">
-                    {{ input_text('cedula_firmante', 'Cédula Firmante', 'text', '', '10', 'window.validarCedula',
+                    {{ input_text('cedula_firmante', 'Cédula Firmante', 'text', '', '10', 'validarCedula',
                     datos.get('cedula_firmante', solicitud.ex_funcionario.cedula)) }}
                     {{ input_text('fecha_firma', 'Fecha Ejecución', 'date', '', '', '', datos.get('fecha_firma', '')) }}
 
@@ -1465,14 +1461,9 @@
                             {% else %}
                             <button type="button" class="btn-firmaec" id="btn_servidor_saliente"
                                 style="background: linear-gradient(135deg, #7c3aed, #4c1d95); width: auto; margin: 0 auto;"
-                                onclick="window['abrirModalFirmaEC']('servidor_saliente', 'Autorización Final del Servidor')">
+                                onclick="window.abrirModalFirmaEC('servidor_saliente')">
                                 <i class="bi bi-shield-lock-fill"></i> Procesar Firma PAdES Real (.p12)
                             </button>
-                            <div id="previewFirma_servidor_saliente"
-                                style="display:none; margin-top: 10px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 6px; max-width: 300px; margin-left: auto; margin-right: auto;">
-                                <span style="font-size: 11px; color: #15803d; font-weight: 800;"><i
-                                        class="bi bi-check-circle-fill"></i> Firma Estampada</span>
-                            </div>
                             {% endif %}
                         </div>
                     </div>
@@ -1481,8 +1472,7 @@
             </form>
 
             <div class="p-3 bg-light border-top text-end mt-3">
-                <button type="button" class="btn btn-success fw-bold px-4 py-2"
-                    onclick="window['validarYGuardarTodo']()">
+                <button type="button" class="btn btn-success fw-bold px-4 py-2" onclick="window.validarYGuardarTodo()">
                     <i class="bi bi-cloud-check-fill me-2"></i> Guardar Mis Respuestas
                 </button>
             </div>
@@ -1573,15 +1563,17 @@
         }
     };
 
+    window.convertirMayusculas = (el) => { if (el.type !== 'email') el.value = el.value.toUpperCase(); };
     window.mostrarError = (el, msg) => { let grp = el.closest('.input-group'); grp.classList.add('has-error'); let span = grp.querySelector('.error-msg'); if (span) { span.innerText = msg; span.style.display = 'block'; } };
     window.quitarError = (el) => { let grp = el.closest('.input-group'); grp.classList.remove('has-error'); let span = grp.querySelector('.error-msg'); if (span) { span.style.display = 'none'; } };
+
     window.soloLetras = (el) => { if (/[^a-zA-ZÀ-ÿ\s]/.test(el.value)) { el.value = el.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, ''); window.mostrarError(el, '⚠ Solo letras.'); } else { window.quitarError(el); } };
     window.soloNumeros = (el) => { if (/[^0-9]/.test(el.value)) { el.value = el.value.replace(/[^0-9]/g, ''); window.mostrarError(el, '⚠ Solo números.'); } else { window.quitarError(el); } };
     window.validarConvencional = (el) => { el.value = el.value.replace(/[^0-9]/g, ''); if (el.value.length > 0 && el.value.length !== 9) { window.mostrarError(el, '⚠ Debe tener 9 dígitos.'); } else { window.quitarError(el); } };
-    window.validarCelular = (el) => { el.value = el.value.replace(/[^0-9]/g, ''); if (el.value.length > 0 && (el.value.length !== 10 || !el.value.startsWith('09'))) { window.mostrarError(el, '⚠ Inicia con 09 y tiene 10 dígitos.'); } else { window.quitarError(el); } };
+    window.validarCelular = (el) => { el.value = el.value.replace(/[^0-9]/g, ''); if (el.value.length > 0 && (el.value.length !== 10 || !el.value.startsWith('09'))) { window.mostrarError(el, '⚠ Inicia con 09 y 10 dígitos.'); } else { window.quitarError(el); } };
     window.soloMoneda = (el) => { if (/[^0-9.]/.test(el.value)) { el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); window.mostrarError(el, '⚠ Formato inválido.'); } else { window.quitarError(el); } };
     window.validarEmail = (el) => { let re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if (el.value && !re.test(el.value)) { window.mostrarError(el, '⚠ Correo inválido.'); } else { window.quitarError(el); } };
-    window.validarFechas = () => { let ing = document.querySelector('input[name="fecha_ingreso"]'); let sal = document.querySelector('input[name="fecha_salida"]'); if (ing && sal && ing.value && sal.value && new Date(sal.value) <= new Date(ing.value)) { window.mostrarError(sal, '⚠ Fecha salida debe ser mayor a ingreso.'); } else if (sal) { window.quitarError(sal); } };
+    window.validarFechas = () => { let ing = document.querySelector('input[name="fecha_ingreso"]'); let sal = document.querySelector('input[name="fecha_salida"]'); if (ing && sal && ing.value && sal.value && new Date(sal.value) <= new Date(ing.value)) { window.mostrarError(sal, '⚠ Fecha salida > ingreso.'); } else if (sal) { window.quitarError(sal); } };
 
     window.validarCedula = (el) => {
         el.value = el.value.replace(/[^0-9]/g, ''); let cedula = el.value;
@@ -1593,16 +1585,12 @@
         } else if (cedula.length > 0) { window.mostrarError(el, "⚠ Faltan dígitos (10)."); } else { window.quitarError(el); }
     };
 
-    window.abrirModalFirmaEC = (campoFirma, labelFirma) => {
+    window.abrirModalFirmaEC = (campoFirma) => {
         let form = document.getElementById('formularioOficial');
-
         let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
         let faltanDatos = false;
         requeridos.forEach((el) => {
-            if (el.value.trim() === '') {
-                window.mostrarError(el, '⚠ Obligatorio.');
-                faltanDatos = true;
-            }
+            if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); faltanDatos = true; }
         });
 
         if (faltanDatos || document.querySelectorAll('.has-error').length > 0) {
@@ -1613,13 +1601,10 @@
         Swal.fire({
             title: '<h2 class="swal-firmaec-title">Validación Criptográfica PAdES</h2>',
             html: `
-                <style>
-                    #swal-p12-pass::-ms-reveal, 
-                    #swal-p12-pass::-webkit-reveal { display: none !important; }
-                </style>
+                <style>#swal-p12-pass::-ms-reveal, #swal-p12-pass::-webkit-reveal { display: none !important; }</style>
                 <div style="text-align: left; padding: 15px;">
                     <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px; margin-bottom: 20px; border-radius: 4px; font-size: 12px; color: #1e3a8a; line-height: 1.4;">
-                        <i class="bi bi-info-circle-fill me-2"></i> Cargue su certificado <b>.p12</b> o <b>.pfx</b>. El sistema verificará su identidad y estampará criptográficamente su firma.
+                        <i class="bi bi-info-circle-fill me-2"></i> Cargue su certificado <b>.p12</b> o <b>.pfx</b>. El sistema estampará criptográficamente su firma.
                     </div>
                     <div class="mb-3">
                         <label style="font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 6px; display: block;">1. Archivo de Firma (.p12 / .pfx)</label>
@@ -1675,19 +1660,17 @@
 
     window.validarYGuardarTodo = () => {
         let form = document.getElementById('formularioOficial');
-        let requeridosTexto = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
-        let formValido = true;
+        let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
+        let firmas = form.querySelectorAll('input[type="hidden"][id^="input_"]');
+        let valido = true;
 
-        requeridosTexto.forEach((el) => {
-            if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); formValido = false; }
+        requeridos.forEach((el) => {
+            if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); valido = false; }
         });
 
-        let requeridosFirma = form.querySelectorAll('input[type="hidden"][id^="input_"]');
-        let firmasValidas = true;
-
-        requeridosFirma.forEach((el) => {
+        firmas.forEach((el) => {
             if (el.value !== 'FIRMADO') {
-                firmasValidas = false;
+                valido = false;
                 let cajaFirma = el.closest('div.p-3');
                 if (cajaFirma) {
                     cajaFirma.style.borderColor = '#ef4444';
@@ -1696,12 +1679,12 @@
             }
         });
 
-        if (!formValido || !firmasValidas || document.querySelectorAll('.has-error').length > 0) {
+        if (!valido || document.querySelectorAll('.has-error').length > 0) {
             Swal.fire('Trámite Incompleto', 'Debe llenar todos los campos habilitados y estampar TODAS las firmas antes de poder enviar su asignación.', 'warning');
             return;
         }
 
-        Swal.fire({ title: '¿Sellar Trámite?', text: 'Se guardarán de manera irreversible los datos llenados (Guardado Atómico).', icon: 'question', showCancelButton: true, confirmButtonText: 'Sí, Guardar Trámite', confirmButtonColor: '#16a34a' }).then((result) => {
+        Swal.fire({ title: '¿Sellar Trámite?', text: 'Se guardarán de manera irreversible los datos llenados.', icon: 'question', showCancelButton: true, confirmButtonText: 'Sí, Guardar Trámite', confirmButtonColor: '#16a34a' }).then((result) => {
             if (result.isConfirmed) {
                 Swal.fire({ title: 'Guardando...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
                 form.submit();

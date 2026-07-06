@@ -171,7 +171,7 @@
             filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.4));
         }
 
-        /* Tarjeta de Login (Glassmorphism Refinado) */
+        /* Tarjeta de Login */
         .login-card {
             background: rgba(255, 255, 255, 0.98);
             border-radius: 32px;
@@ -196,11 +196,20 @@
         .logo-box {
             background: white;
             border-radius: 22px;
-            padding: 18px;
+            padding: 15px 25px;
+            /* Ajustado para que el logo respire bien */
             display: inline-block;
             box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
             margin-bottom: 24px;
             border: 1px solid #f1f5f9;
+        }
+
+        /* AQUI ESTÁ EL ESTILO DEL LOGO */
+        .logo-institucional {
+            max-height: 55px;
+            /* Controla el alto del logo para que no se desborde */
+            width: auto;
+            object-fit: contain;
         }
 
         .form-label {
@@ -219,7 +228,7 @@
             align-items: center;
         }
 
-        .input-group-custom i {
+        .input-group-custom i.left-icon {
             position: absolute;
             left: 18px;
             color: #94a3b8;
@@ -232,7 +241,8 @@
             border-radius: 16px !important;
             background-color: #f8fafc;
             border: 2px solid #e2e8f0;
-            padding: 14px 18px 14px 48px;
+            padding: 14px 48px 14px 48px;
+            /* Padding ajustado para íconos izquierdo y derecho */
             font-size: 0.95rem;
             font-weight: 600;
             color: #0f172a;
@@ -245,8 +255,8 @@
             box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.15);
         }
 
-        .form-control:focus+i,
-        .form-control:not(:placeholder-shown)+i {
+        .form-control:focus+.left-icon,
+        .form-control:not(:placeholder-shown)+.left-icon {
             color: #2563eb;
         }
 
@@ -361,18 +371,14 @@
                 </p>
 
                 <div class="d-flex flex-column gap-2" style="max-width: 450px;">
-                    <div class="feature-item">
-                        <i class="bi bi-check-circle-fill"></i> Gestión centralizada de solicitudes
-                    </div>
-                    <div class="feature-item">
-                        <i class="bi bi-check-circle-fill"></i> Validación cruzada por áreas técnicas
-                    </div>
-                    <div class="feature-item">
-                        <i class="bi bi-check-circle-fill"></i> Control y seguimiento en tiempo real
-                    </div>
-                    <div class="feature-item">
-                        <i class="bi bi-check-circle-fill"></i> Auditoría criptográfica y trazabilidad
-                    </div>
+                    <div class="feature-item"><i class="bi bi-check-circle-fill"></i> Gestión centralizada de
+                        solicitudes</div>
+                    <div class="feature-item"><i class="bi bi-check-circle-fill"></i> Validación cruzada por áreas
+                        técnicas</div>
+                    <div class="feature-item"><i class="bi bi-check-circle-fill"></i> Control y seguimiento en tiempo
+                        real</div>
+                    <div class="feature-item"><i class="bi bi-check-circle-fill"></i> Auditoría criptográfica y
+                        trazabilidad</div>
                 </div>
             </div>
 
@@ -380,10 +386,10 @@
                 <div class="login-card">
 
                     <div class="text-center mb-4">
+                        <!-- AQUÍ ESTÁ LA MAGIA DEL LOGO -->
                         <div class="logo-box">
-                            <h2 class="fw-bold m-0" style="color: #1e3a8a; letter-spacing: -1px;">
-                                <i class="bi bi-cloud-sun-fill text-warning me-1"></i>INAMHI
-                            </h2>
+                            <!-- Cambia 'logo_inamhi.png' por el nombre real de tu imagen en la carpeta static -->
+                            <img src="static/img/inamhi.png" alt="Logo INAMHI" class="logo-institucional">
                         </div>
                         <p class="text-muted small fw-bold text-uppercase">Acceso Seguro al Sistema</p>
                     </div>
@@ -408,7 +414,7 @@
                                     placeholder="ejemplo@inamhi.gob.ec" required
                                     oninput="this.value = this.value.replace(/\s/g, '').toLowerCase()"
                                     title="Ingrese un correo electrónico válido">
-                                <i class="bi bi-envelope-at-fill"></i>
+                                <i class="bi bi-envelope-at-fill left-icon"></i>
                             </div>
                         </div>
 
@@ -417,8 +423,13 @@
                             <div class="input-group-custom">
                                 <input type="password" name="password" id="passwordInput" class="form-control"
                                     placeholder="Ingrese su credencial secreta" required>
-                                <i class="bi bi-lock-fill"></i>
-                                
+                                <i class="bi bi-lock-fill left-icon"></i>
+
+                                <!-- Se agregó el botón del ojito que te faltaba -->
+                                <button type="button" id="toggleBtn" class="btn-toggle-pass" tabindex="-1">
+                                    <i class="bi bi-eye-fill" id="toggleIcon"
+                                        style="position: static; color: inherit;"></i>
+                                </button>
                             </div>
                         </div>
 
