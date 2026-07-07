@@ -3,35 +3,56 @@
 {% block content %}
 <style>
     /* =========================================
-       ESTILOS DEL DASHBOARD MODERNO (INAMHI)
+       ESTILOS DEL DASHBOARD PREMIUM (INAMHI)
        ========================================= */
     .main-dashboard {
-        animation: fadeIn .8s ease both;
+        animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
         overflow-x: hidden;
         padding-bottom: 40px;
     }
 
-    /* HERO SECTION */
+    /* =========================================
+       1. HERO SECTION (FONDO LIMPIO)
+       ========================================= */
     .hero {
         position: relative;
         overflow: hidden;
-        min-height: 330px;
+        min-height: 340px;
         display: grid;
-        grid-template-columns: 1.5fr 1fr;
-        gap: 28px;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 30px;
         align-items: center;
-        padding: 42px;
-        border-radius: 34px;
-        background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 64, 175, .90)), radial-gradient(circle at top right, rgba(14, 165, 233, .5), transparent 40%);
+        padding: 50px;
+        border-radius: 36px;
+        /* Fondo degradado limpio y elegante, sin la cuadrícula */
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
         color: white;
-        box-shadow: 0 20px 50px rgba(15, 23, 42, .15);
-        animation: fadeDown .75s ease both;
+        box-shadow: 0 25px 50px rgba(15, 23, 42, 0.25);
+        animation: fadeDown 0.8s ease both;
     }
 
-    .hero-overlay {
+    /* Luces atmosféricas suaves en el fondo */
+    .hero::before {
+        content: '';
         position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at 15% 20%, rgba(96, 165, 250, .28), transparent 28%), radial-gradient(circle at 80% 70%, rgba(34, 197, 94, .22), transparent 30%);
+        top: -40%;
+        left: -10%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 60%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .hero::after {
+        content: '';
+        position: absolute;
+        bottom: -50%;
+        right: -20%;
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 60%);
+        border-radius: 50%;
         pointer-events: none;
     }
 
@@ -43,75 +64,117 @@
 
     .badge-oficial {
         display: inline-flex;
+        align-items: center;
         width: fit-content;
-        padding: 8px 15px;
+        padding: 8px 18px;
         border-radius: 999px;
-        background: linear-gradient(135deg, #2563eb, #0ea5e9);
-        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #bae6fd;
         font-size: 11px;
-        font-weight: 900;
-        letter-spacing: .08em;
+        font-weight: 800;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
-        box-shadow: 0 10px 24px rgba(37, 99, 235, .35);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .badge-oficial i {
+        margin-right: 8px;
+        color: #38bdf8;
+        font-size: 13px;
     }
 
     .hero h1 {
-        margin: 18px 0 12px;
-        font-size: clamp(30px, 4vw, 48px);
+        margin: 22px 0 16px;
+        font-size: clamp(2.2rem, 4.5vw, 3.4rem);
         font-weight: 900;
-        line-height: 1.05;
-        letter-spacing: -.04em;
-        color: white;
-        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        color: #ffffff;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
     .hero p {
-        max-width: 600px;
+        max-width: 650px;
         margin: 0;
-        color: #e0e7ff;
-        font-size: 16px;
+        color: #cbd5e1;
+        font-size: 1.05rem;
         line-height: 1.6;
-        font-weight: 500;
+        font-weight: 400;
     }
 
+    /* Cuadros de información cristal */
     .hero-info {
         display: flex;
         flex-wrap: wrap;
-        gap: 14px;
-        margin-top: 28px;
-        margin-bottom: 25px;
+        gap: 18px;
+        margin-top: 35px;
     }
 
     .hero-item {
-        min-width: 140px;
-        padding: 16px;
-        border-radius: 20px;
-        background: rgba(255, 255, 255, .10);
-        border: 1px solid rgba(255, 255, 255, .18);
-        backdrop-filter: blur(14px);
-        transition: 0.3s ease;
+        flex: 1;
+        min-width: 160px;
+        padding: 20px 24px;
+        border-radius: 24px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        transform: translateX(-100%);
+        transition: 0.6s;
     }
 
     .hero-item:hover {
-        transform: translateY(-3px);
-        background: rgba(255, 255, 255, .15);
+        transform: translateY(-5px);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .hero-item:hover::before {
+        transform: translateX(100%);
     }
 
     .hero-item strong {
         display: block;
-        font-size: 26px;
+        font-size: 30px;
         font-weight: 900;
         color: white;
+        line-height: 1;
+        margin-bottom: 6px;
     }
 
     .hero-item span {
-        color: #bfdbfe;
+        color: #93c5fd;
         font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
     }
 
-    /* WEATHER CARD (DERECHA MODIFICADA PARA LOGO) */
+    .hero-item span i {
+        margin-right: 6px;
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    /* =========================================
+       TARJETA DEL LOGO (MODIFICADA PARA QUE RESALTE)
+       ========================================= */
     .hero-right {
         display: flex;
         flex-direction: column;
@@ -123,72 +186,82 @@
     .weather-card {
         position: relative;
         overflow: hidden;
-        padding: 35px 28px;
-        min-height: 230px;
+        padding: 40px 30px;
+        min-height: 250px;
         width: 100%;
-        max-width: 320px;
-        border-radius: 30px;
-        background: rgba(255, 255, 255, .14);
-        border: 1px solid rgba(255, 255, 255, .22);
-        backdrop-filter: blur(18px);
+        max-width: 340px;
+        border-radius: 32px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(25px);
         text-align: center;
         transition: 0.4s ease;
-        cursor: default;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        align-items: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     }
 
     .weather-card:hover {
-        transform: scale(1.02);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transform: scale(1.03);
+        background: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
     }
 
-    /* Contenedor transparente para el logo oficial */
+    /* CONTENEDOR BLANCO PARA EL LOGO */
     .weather-logo-wrap {
         width: 100%;
-        max-width: 220px;
-        height: 80px;
-        margin: 0 auto 15px;
+        max-width: 230px;
+        height: 95px;
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        animation: iconFloat 3s ease-in-out infinite;
+        background: #ffffff;
+        /* El fondo blanco mágico */
+        border-radius: 20px;
+        padding: 15px 25px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+        animation: iconFloat 4s ease-in-out infinite;
     }
 
     .weather-logo-img {
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
-        filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.3));
-        /* Sombra elegante para que resalte sobre el fondo */
+        /* Sin sombras oscuras para que se vea nítido sobre el blanco */
     }
 
     .weather-card p {
-        margin-top: 15px;
+        margin: 0;
         font-size: 13px;
         font-weight: 600;
-        color: #dbeafe;
+        color: #e2e8f0;
         line-height: 1.5;
+        letter-spacing: 0.3px;
     }
 
     .pulse-ring {
         position: absolute;
-        width: 100px;
-        height: 100px;
-        right: -30px;
-        bottom: -30px;
+        width: 140px;
+        height: 140px;
+        right: -50px;
+        bottom: -50px;
         border-radius: 50%;
-        border: 15px solid rgba(34, 197, 94, .25);
-        animation: pulseRing 2.5s ease-in-out infinite;
+        border: 2px solid rgba(56, 189, 248, 0.3);
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.1), transparent);
+        animation: pulseRing 3s ease-in-out infinite;
     }
 
-    /* TARJETAS DE MÉTRICAS */
+    /* =========================================
+       2. TARJETAS DE MÉTRICAS (ANIMACIÓN EN CASCADA)
+       ========================================= */
     .dashboard-grid {
-        margin-top: 30px;
+        margin-top: 35px;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 24px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 25px;
     }
 
     .info-card {
@@ -196,348 +269,513 @@
         overflow: hidden;
         display: flex;
         align-items: center;
-        gap: 18px;
-        padding: 26px;
+        gap: 20px;
+        padding: 30px 25px;
         background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 30px;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, .03);
-        animation: cardUp .75s ease both;
-        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
-        cursor: default;
+        border: 1px solid #f1f5f9;
+        border-radius: 28px;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+        animation: cardUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Retrasos para carga en cascada */
+    .delay-1 {
+        animation-delay: 0.1s;
+    }
+
+    .delay-2 {
+        animation-delay: 0.2s;
+    }
+
+    .delay-3 {
+        animation-delay: 0.3s;
+    }
+
+    .delay-4 {
+        animation-delay: 0.4s;
     }
 
     .info-card:hover {
-        transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 25px 50px rgba(15, 23, 42, .1);
+        transform: translateY(-10px);
+        border-color: transparent;
+    }
+
+    /* Marca de agua (Watermark icon) */
+    .watermark-icon {
+        position: absolute;
+        right: -15px;
+        bottom: -20px;
+        font-size: 120px;
+        opacity: 0.04;
+        transition: 0.4s ease;
+        pointer-events: none;
+    }
+
+    .info-card:hover .watermark-icon {
+        transform: scale(1.1) rotate(-10deg);
+        opacity: 0.08;
     }
 
     .info-card::before {
         content: '';
         position: absolute;
-        inset: 0 0 auto 0;
-        height: 4px;
-        background: linear-gradient(90deg, #2563eb, #0ea5e9);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
         transition: height 0.3s ease;
     }
 
     .info-card:hover::before {
-        height: 6px;
+        height: 8px;
     }
 
     .card-icon {
-        width: 64px;
-        height: 64px;
+        width: 65px;
+        height: 65px;
         display: grid;
         place-items: center;
         flex-shrink: 0;
-        border-radius: 20px;
+        border-radius: 22px;
         font-size: 28px;
-        font-weight: 900;
-        transition: transform 0.3s ease;
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        z-index: 2;
     }
 
     .info-card:hover .card-icon {
-        transform: scale(1.1) rotate(5deg);
+        transform: scale(1.15) rotate(8deg);
+    }
+
+    .info-content {
+        position: relative;
+        z-index: 2;
     }
 
     .info-card .metric-value {
         margin: 0;
         color: #0f172a;
-        font-size: 34px;
+        font-size: 36px;
         font-weight: 900;
         line-height: 1;
         letter-spacing: -1px;
     }
 
     .info-card .metric-label {
-        margin: 5px 0 0;
+        margin: 6px 0 4px;
         color: #64748b;
-        font-size: 13px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 800;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
+    /* Indicador de "En Vivo" */
+    .live-indicator {
+        font-size: 10px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 10px;
+    }
+
+    /* Colores Específicos */
     .info-card.blue .card-icon {
-        background: #dbeafe;
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .info-card.blue::before {
+        background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    }
+
+    .info-card.blue:hover {
+        box-shadow: 0 20px 40px rgba(37, 99, 235, 0.15);
+    }
+
+    .info-card.blue .watermark-icon {
+        color: #2563eb;
+    }
+
+    .info-card.blue .live-indicator {
+        background: #eff6ff;
         color: #2563eb;
     }
 
     .info-card.green .card-icon {
-        background: #dcfce7;
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .info-card.green::before {
+        background: linear-gradient(90deg, #10b981, #34d399);
+    }
+
+    .info-card.green:hover {
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15);
+    }
+
+    .info-card.green .watermark-icon {
+        color: #16a34a;
+    }
+
+    .info-card.green .live-indicator {
+        background: #f0fdf4;
         color: #16a34a;
     }
 
     .info-card.purple .card-icon {
-        background: #ede9fe;
+        background: #faf5ff;
         color: #7e22ce;
-    }
-
-    .info-card.orange .card-icon {
-        background: #fef3c7;
-        color: #d97706;
-    }
-
-    .info-card.green::before {
-        background: linear-gradient(90deg, #22c55e, #16a34a);
     }
 
     .info-card.purple::before {
         background: linear-gradient(90deg, #8b5cf6, #a78bfa);
     }
 
+    .info-card.purple:hover {
+        box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+    }
+
+    .info-card.purple .watermark-icon {
+        color: #7e22ce;
+    }
+
+    .info-card.purple .live-indicator {
+        background: #faf5ff;
+        color: #7e22ce;
+    }
+
+    .info-card.orange .card-icon {
+        background: #fffbeb;
+        color: #d97706;
+    }
+
     .info-card.orange::before {
         background: linear-gradient(90deg, #f59e0b, #fbbf24);
     }
 
-    /* PANEL INSTITUCIONAL */
+    .info-card.orange:hover {
+        box-shadow: 0 20px 40px rgba(245, 158, 11, 0.15);
+    }
+
+    .info-card.orange .watermark-icon {
+        color: #d97706;
+    }
+
+    .info-card.orange .live-indicator {
+        background: #fffbeb;
+        color: #d97706;
+    }
+
+    /* =========================================
+       3. PANEL INSTITUCIONAL (CON SATÉLITE)
+       ========================================= */
     .institution-panel {
-        margin-top: 30px;
+        margin-top: 35px;
         display: grid;
-        grid-template-columns: 1.3fr .7fr;
-        gap: 24px;
+        grid-template-columns: 1.4fr 0.6fr;
+        gap: 25px;
     }
 
     .panel-left,
     .panel-right {
         position: relative;
         overflow: hidden;
-        padding: 34px;
-        border-radius: 30px;
+        padding: 40px;
+        border-radius: 32px;
         background: white;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, .03);
-        animation: cardUp .75s ease both;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+        animation: cardUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
         transition: 0.4s ease;
+        animation-delay: 0.5s;
     }
 
     .panel-left:hover,
     .panel-right:hover {
-        box-shadow: 0 20px 40px rgba(15, 23, 42, .08);
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
     }
 
     .panel-badge {
         display: inline-flex;
-        padding: 7px 14px;
+        align-items: center;
+        padding: 8px 16px;
         border-radius: 999px;
-        background: #dbeafe;
-        color: #1d4ed8;
+        background: #f0fdf4;
+        color: #16a34a;
         font-size: 11px;
         font-weight: 900;
-        letter-spacing: .08em;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
     }
 
     .panel-left h2 {
-        margin: 16px 0 12px;
-        font-size: 28px;
+        margin: 20px 0 15px;
+        font-size: 30px;
         font-weight: 900;
-        letter-spacing: -.03em;
+        letter-spacing: -0.03em;
         color: #0f172a;
     }
 
     .panel-left p {
         color: #64748b;
-        line-height: 1.6;
-        font-size: 14px;
+        line-height: 1.7;
+        font-size: 15px;
         font-weight: 500;
+        max-width: 90%;
     }
 
     .panel-features {
-        margin-top: 26px;
+        margin-top: 30px;
         display: grid;
-        gap: 14px;
+        gap: 16px;
     }
 
     .feature {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 16px;
+        gap: 15px;
+        padding: 18px 20px;
         border-radius: 20px;
         background: #f8fafc;
-        border: 1px solid #f1f5f9;
+        border: 1px solid #e2e8f0;
         transition: 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background: #3b82f6;
+        opacity: 0;
+        transition: 0.3s;
     }
 
     .feature:hover {
-        transform: translateX(8px);
+        transform: translateX(10px);
         background: white;
-        border-color: #dbeafe;
+        border-color: #cbd5e1;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.03);
+    }
+
+    .feature:hover::before {
+        opacity: 1;
     }
 
     .feature span {
-        width: 30px;
-        height: 30px;
+        width: 36px;
+        height: 36px;
         display: grid;
         place-items: center;
         border-radius: 50%;
-        background: #dcfce7;
-        color: #15803d;
+        background: #eff6ff;
+        color: #2563eb;
         font-weight: 900;
-        font-size: 14px;
+        font-size: 16px;
+        flex-shrink: 0;
     }
 
     .feature p {
         margin: 0;
-        color: #475569;
-        font-size: 13px;
+        color: #334155;
+        font-size: 14.5px;
         font-weight: 700;
     }
 
+    /* Animación del radar/satélite en el Panel Derecho */
     .panel-right {
-        min-height: 300px;
+        min-height: 320px;
         display: grid;
         place-items: center;
-        background: radial-gradient(circle at center, rgba(14, 165, 233, .1), transparent 50%), white;
+        background: radial-gradient(circle at center, rgba(14, 165, 233, 0.08), transparent 60%), #f8fafc;
     }
 
     .center-icon {
         position: relative;
         z-index: 4;
-        width: 100px;
-        height: 100px;
+        width: 110px;
+        height: 110px;
         border-radius: 35px;
         display: grid;
         place-items: center;
-        font-size: 48px;
-        background: linear-gradient(135deg, #2563eb, #0ea5e9);
-        box-shadow: 0 20px 40px rgba(37, 99, 235, .3);
-        animation: iconFloat 3s ease-in-out infinite;
+        font-size: 50px;
+        color: white;
+        background: linear-gradient(135deg, #1e3a8a, #0ea5e9);
+        box-shadow: 0 25px 45px rgba(37, 99, 235, 0.3);
+        animation: iconFloat 4s ease-in-out infinite;
     }
 
     .circle {
         position: absolute;
         border-radius: 50%;
-        border: 2px dashed rgba(37, 99, 235, .25);
-        animation: rotateCircle 12s linear infinite;
+        border: 2px dashed rgba(37, 99, 235, 0.2);
+        animation: rotateCircle 20s linear infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .circle-1 {
-        width: 220px;
-        height: 220px;
+        width: 230px;
+        height: 230px;
+        border-color: rgba(37, 99, 235, 0.3);
     }
 
     .circle-2 {
-        width: 160px;
-        height: 160px;
-        animation-duration: 9s;
+        width: 170px;
+        height: 170px;
+        animation-duration: 12s;
         animation-direction: reverse;
+        border-style: solid;
+        border-width: 1px;
     }
 
     .circle-3 {
-        width: 280px;
-        height: 280px;
-        animation-duration: 16s;
+        width: 310px;
+        height: 310px;
+        animation-duration: 25s;
+        border-style: solid;
+        border-color: rgba(14, 165, 233, 0.1);
+        border-width: 3px;
     }
 
-    /* FOOTER */
+    /* El Satélite! */
+    .satellite {
+        position: absolute;
+        top: -5px;
+        width: 10px;
+        height: 10px;
+        background: #38bdf8;
+        border-radius: 50%;
+        box-shadow: 0 0 15px #38bdf8, 0 0 30px #38bdf8;
+    }
+
+    /* =========================================
+       4. FOOTER
+       ========================================= */
     .footer-inamhi {
         margin-top: 50px;
-        padding: 40px;
-        border-radius: 40px;
+        padding: 45px;
+        border-radius: 36px;
         background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
         color: white;
         transition: 0.4s ease;
+        animation: fadeIn 1s ease both;
+        animation-delay: 0.8s;
     }
 
     .footer-inamhi:hover {
-        box-shadow: 0 -10px 40px rgba(15, 23, 42, 0.5) !important;
+        box-shadow: 0 -15px 40px rgba(15, 23, 42, 0.4) !important;
     }
 
     .footer-grid {
         display: grid;
-        grid-template-columns: 1fr 2fr;
+        grid-template-columns: 1.2fr 1.8fr;
         gap: 40px;
-        margin-bottom: 30px;
+        margin-bottom: 35px;
     }
 
     .footer-brand h3 {
-        color: #bfdbfe;
-        font-size: 22px;
+        color: #e2e8f0;
+        font-size: 24px;
         font-weight: 900;
-        margin: 0 0 10px;
+        margin: 0 0 12px;
+        letter-spacing: -0.5px;
     }
 
     .footer-brand p {
         color: #94a3b8;
-        font-size: 13px;
-        line-height: 1.6;
+        font-size: 14px;
+        line-height: 1.7;
         margin: 0;
+        max-width: 90%;
     }
 
     .footer-sites {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
+        gap: 18px;
     }
 
     .footer-card {
-        padding: 20px;
+        padding: 22px;
         border-radius: 24px;
-        background: rgba(255, 255, 255, .05);
-        border: 1px solid rgba(255, 255, 255, .1);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         transition: 0.3s;
     }
 
     .footer-card:hover {
-        background: rgba(255, 255, 255, .1);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.15);
         transform: translateY(-5px);
     }
 
     .footer-card h4 {
-        font-size: 16px;
-        font-weight: bold;
+        font-size: 15px;
+        font-weight: 800;
         margin: 0 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .footer-card p {
-        font-size: 11px;
+        font-size: 12px;
         color: #94a3b8;
         margin: 0;
-        line-height: 1.5;
+        line-height: 1.6;
     }
 
     .footer-bottom {
-        padding-top: 20px;
-        border-top: 1px solid rgba(255, 255, 255, .1);
+        padding-top: 25px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
         justify-content: space-between;
         font-size: 12px;
         color: #64748b;
-        font-weight: bold;
+        font-weight: 700;
+        letter-spacing: 0.5px;
     }
 
-    /* ANIMACIONES */
+    /* ANIMACIONES BÁSICAS */
     @keyframes fadeDown {
-        from {
+        0% {
             opacity: 0;
-            transform: translateY(-20px);
+            transform: translateY(-30px);
         }
 
-        to {
+        100% {
             opacity: 1;
             transform: translateY(0);
         }
     }
 
     @keyframes fadeIn {
-        from {
+        0% {
             opacity: 0;
         }
 
-        to {
+        100% {
             opacity: 1;
         }
     }
 
     @keyframes cardUp {
-        from {
+        0% {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(30px);
         }
 
-        to {
+        100% {
             opacity: 1;
             transform: translateY(0);
         }
@@ -551,7 +789,7 @@
         }
 
         50% {
-            transform: translateY(-7px);
+            transform: translateY(-10px);
         }
     }
 
@@ -560,12 +798,12 @@
         0%,
         100% {
             transform: scale(1);
-            opacity: .5;
+            opacity: 0.4;
         }
 
         50% {
-            transform: scale(1.1);
-            opacity: .8;
+            transform: scale(1.15);
+            opacity: 0.8;
         }
     }
 
@@ -575,128 +813,151 @@
         }
     }
 
+    /* RESPONSIVE */
     @media (max-width: 1100px) {
+        .hero {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
 
-        .hero,
-        .institution-panel,
+        .hero-info {
+            justify-content: center;
+        }
+
+        .hero p {
+            margin: 0 auto;
+        }
+
+        .hero-right {
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .institution-panel {
+            grid-template-columns: 1fr;
+        }
+
         .footer-grid {
             grid-template-columns: 1fr;
         }
 
-        .hero-right {
-            align-items: flex-start;
-            margin-top: 20px;
+        .footer-sites {
+            grid-template-columns: 1fr;
+        }
+
+        .footer-bottom {
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
         }
     }
 </style>
 
 <div class="main-dashboard container-fluid px-0">
+
+    <!-- CABECERA PRINCIPAL -->
     <section class="hero">
-        <div class="hero-overlay"></div>
         <div class="hero-content">
-            <span class="badge-oficial">Plataforma Oficial INAMHI</span>
+            <span class="badge-oficial"><i class="bi bi-shield-check"></i> Plataforma Oficial INAMHI</span>
             <h1>Centro de Gestión Institucional</h1>
             <p>
-                Sistema moderno para la administración de documentos, formularios, reportes y procesos institucionales
-                automatizados.
+                Sistema avanzado para la administración de documentos, formularios, reportes y procesos institucionales
+                de forma segura y automatizada.
             </p>
 
             <div class="hero-info">
                 <div class="hero-item">
                     <strong>{{ current_user.rol.nombre }}</strong>
-                    <span>Tu Rol Actual</span>
+                    <span><i class="bi bi-person-badge"></i> Tu Rol Actual</span>
                 </div>
                 <div class="hero-item">
                     <strong>{{ stats.tramites_activos | default(0) }}</strong>
-                    <span>Trámites en Curso</span>
+                    <span><i class="bi bi-folder-symlink"></i> Trámites en Curso</span>
                 </div>
                 <div class="hero-item">
                     <strong>{{ stats.tramites_completados | default(0) }}</strong>
-                    <span>Documentos Firmados</span>
+                    <span><i class="bi bi-file-earmark-check"></i> Exp. Cerrados</span>
                 </div>
             </div>
-
-            {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
-            <form action="/paz-salvo/nueva" method="POST" style="margin-top: 10px;">
-                <input type="hidden" name="cedula" value="9999999999">
-                <button type="submit" class="btn btn-light fw-bold shadow-lg"
-                    style="border-radius: 14px; padding: 14px 28px; color: #1e40af; font-size: 15px; transition: transform 0.3s ease;"
-                    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                    <i class="bi bi-file-earmark-plus-fill me-2"></i> Iniciar Trámite Paz y Salvo
-                </button>
-            </form>
-            {% endif %}
         </div>
 
         <div class="hero-right">
             <div class="weather-card">
-
-                <!-- AQUÍ ESTÁ EL NUEVO CONTENEDOR DEL LOGO -->
+                <!-- AQUÍ ESTÁ EL LOGO CON SU CAJA BLANCA -->
                 <div class="weather-logo-wrap">
-                    <img src="static/img/inamhi.png" alt="Logo INAMHI" class="weather-logo-img">
+                    <img src="/static/img/inamhi.png" alt="Logo INAMHI" class="weather-logo-img">
                 </div>
-
-                <p>Tecnología y gestión institucional al servicio del Ecuador.</p>
+                <p>Tecnología y gestión institucional<br>al servicio del Ecuador.</p>
                 <div class="pulse-ring"></div>
             </div>
         </div>
     </section>
 
+    <!-- GRID DE MÉTRICAS (ANIMACIÓN EN CASCADA) -->
     <section class="dashboard-grid">
-        <div class="info-card blue">
+        <div class="info-card blue delay-1">
+            <i class="bi bi-people-fill watermark-icon"></i>
             <div class="card-icon"><i class="bi bi-people-fill"></i></div>
-            <div>
+            <div class="info-content">
                 <p class="metric-value">{{ stats.total_usuarios | default(0) }}</p>
                 <p class="metric-label">Usuarios Activos</p>
+                <span class="live-indicator"><i class="bi bi-broadcast"></i> En línea</span>
             </div>
         </div>
 
-        <div class="info-card green">
+        <div class="info-card green delay-2">
+            <i class="bi bi-folder-check watermark-icon"></i>
             <div class="card-icon"><i class="bi bi-folder-check"></i></div>
-            <div>
+            <div class="info-content">
                 <p class="metric-value">{{ stats.areas_control | default(8) }}</p>
                 <p class="metric-label">Áreas de Control</p>
+                <span class="live-indicator"><i class="bi bi-shield-check"></i> Activas</span>
             </div>
         </div>
 
-        <div class="info-card purple">
+        <div class="info-card purple delay-3">
+            <i class="bi bi-pen-fill watermark-icon"></i>
             <div class="card-icon"><i class="bi bi-pen-fill"></i></div>
-            <div>
+            <div class="info-content">
                 <p class="metric-value">{{ stats.firmas_validadas | default(0) }}</p>
-                <p class="metric-label">Firmas Validadas (FirmaEC)</p>
+                <p class="metric-label">Firmas Validadas (PAdES)</p>
+                <span class="live-indicator"><i class="bi bi-check-circle-fill"></i> Sincronizado</span>
             </div>
         </div>
 
-        <div class="info-card orange">
-            <div class="card-icon"><i class="bi bi-shield-check"></i></div>
-            <div>
+        <div class="info-card orange delay-4">
+            <i class="bi bi-shield-lock watermark-icon"></i>
+            <div class="card-icon"><i class="bi bi-shield-lock"></i></div>
+            <div class="info-content">
                 <p class="metric-value">{{ stats.logs_auditoria | default(0) }}</p>
                 <p class="metric-label">Registros de Auditoría</p>
+                <span class="live-indicator"><i class="bi bi-database-check"></i> Actualizado</span>
             </div>
         </div>
     </section>
 
+    <!-- PANEL DE INFORMACIÓN INSTITUCIONAL -->
     <section class="institution-panel">
         <div class="panel-left">
-            <span class="panel-badge">INAMHI ECUADOR</span>
+            <span class="panel-badge"><i class="bi bi-cpu-fill me-1"></i> INFRAESTRUCTURA INAMHI</span>
             <h2>Innovación tecnológica para la gestión institucional</h2>
             <p>
                 Esta plataforma fortalece la organización administrativa, optimiza procesos internos y asegura la
-                legalidad documental mediante estándares criptográficos.
+                legalidad y trazabilidad documental mediante estrictos estándares criptográficos.
             </p>
 
             <div class="panel-features">
                 <div class="feature">
-                    <span>✔</span>
-                    <p>Integración obligatoria con certificados .p12 y FirmaEC.</p>
+                    <span><i class="bi bi-shield-lock-fill"></i></span>
+                    <p>Integración obligatoria con certificados .p12 y validación criptográfica FirmaEC.</p>
                 </div>
                 <div class="feature">
-                    <span>✔</span>
-                    <p>Flujo secuencial paralelo y autoguardado en tiempo real.</p>
+                    <span><i class="bi bi-diagram-3-fill"></i></span>
+                    <p>Flujo secuencial paralelo y aislamiento atómico de datos en tiempo real.</p>
                 </div>
                 <div class="feature">
-                    <span>✔</span>
-                    <p>Generación de copias fieles en formato PDF (ReportLab).</p>
+                    <span><i class="bi bi-file-earmark-pdf-fill"></i></span>
+                    <p>Generación de expedientes certificados y copias fieles en formato PDF.</p>
                 </div>
             </div>
         </div>
@@ -704,37 +965,42 @@
         <div class="panel-right">
             <div class="circle circle-1"></div>
             <div class="circle circle-2"></div>
-            <div class="circle circle-3"></div>
-            <div class="center-icon text-white">🌎</div>
+            <div class="circle circle-3">
+                <div class="satellite"></div> <!-- Satélite orbitando -->
+            </div>
+            <div class="center-icon"><i class="bi bi-globe-americas"></i></div>
         </div>
     </section>
 
-    <footer class="footer-inamhi shadow-lg">
+    <!-- PIE DE PÁGINA (FOOTER) -->
+    <footer class="footer-inamhi">
         <div class="footer-grid">
             <div class="footer-brand">
                 <h3>Tiempo, Clima y Agua</h3>
                 <p>Comprometidos con la generación de datos precisos para la prevención de riesgos y el desarrollo
-                    sostenible del Ecuador.</p>
+                    sostenible del Ecuador, aplicando ciencia y tecnología en cada proceso administrativo y operativo.
+                </p>
             </div>
             <div class="footer-sites">
                 <div class="footer-card">
                     <h4 class="text-primary">Sede Guayas</h4>
-                    <p>Campus Gustavo Galindo, ESPOL. Monitoreo del Litoral.</p>
+                    <p>Campus Gustavo Galindo, ESPOL. Monitoreo constante del perfil Litoral.</p>
                 </div>
                 <div class="footer-card">
                     <h4 class="text-success">Sede Pastaza</h4>
-                    <p>Centro neurálgico en la Amazonía, operando desde la ESPOCH.</p>
+                    <p>Centro neurálgico en la Amazonía ecuatoriana, operando desde la ESPOCH.</p>
                 </div>
                 <div class="footer-card">
                     <h4 style="color: #a78bfa;">Sede Loja</h4>
-                    <p>Edificio Zonal 7. Coordinación para la cuenca del Jubones.</p>
+                    <p>Edificio Zonal 7. Coordinación estratégica para la cuenca del río Jubones.</p>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2026 INAMHI - Sistema Institucional</span>
-            <span>Dirección Matriz: Corea N36-14 y Iñaquito, Quito - Ecuador | 593-2 397-1100</span>
+            <span>© 2026 INAMHI ECUADOR - Sistema de Gestión Interna</span>
+            <span>Dirección Matriz: Corea N36-14 y Iñaquito, Quito - Ecuador | Tel: +593-2 397-1100</span>
         </div>
     </footer>
+
 </div>
 {% endblock %}
