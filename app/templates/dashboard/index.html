@@ -2,18 +2,12 @@
 
 {% block content %}
 <style>
-    /* =========================================
-       ESTILOS DEL DASHBOARD PREMIUM (INAMHI)
-       ========================================= */
     .main-dashboard {
         animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
         overflow-x: hidden;
         padding-bottom: 40px;
     }
 
-    /* =========================================
-       1. HERO SECTION (FONDO LIMPIO)
-       ========================================= */
     .hero {
         position: relative;
         overflow: hidden;
@@ -24,14 +18,12 @@
         align-items: center;
         padding: 50px;
         border-radius: 36px;
-        /* Fondo degradado limpio y elegante, sin la cuadrícula */
         background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
         color: white;
         box-shadow: 0 25px 50px rgba(15, 23, 42, 0.25);
         animation: fadeDown 0.8s ease both;
     }
 
-    /* Luces atmosféricas suaves en el fondo */
     .hero::before {
         content: '';
         position: absolute;
@@ -87,7 +79,7 @@
 
     .hero h1 {
         margin: 22px 0 16px;
-        font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+        font-size: clamp(2rem, 4vw, 3rem);
         font-weight: 900;
         line-height: 1.1;
         letter-spacing: -0.03em;
@@ -104,7 +96,6 @@
         font-weight: 400;
     }
 
-    /* Cuadros de información cristal */
     .hero-info {
         display: flex;
         flex-wrap: wrap;
@@ -172,9 +163,6 @@
         opacity: 0.8;
     }
 
-    /* =========================================
-       TARJETA DEL LOGO (MODIFICADA PARA QUE RESALTE)
-       ========================================= */
     .hero-right {
         display: flex;
         flex-direction: column;
@@ -209,7 +197,6 @@
         box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
     }
 
-    /* CONTENEDOR BLANCO PARA EL LOGO */
     .weather-logo-wrap {
         width: 100%;
         max-width: 230px;
@@ -219,7 +206,6 @@
         align-items: center;
         justify-content: center;
         background: #ffffff;
-        /* El fondo blanco mágico */
         border-radius: 20px;
         padding: 15px 25px;
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
@@ -230,7 +216,6 @@
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
-        /* Sin sombras oscuras para que se vea nítido sobre el blanco */
     }
 
     .weather-card p {
@@ -254,9 +239,6 @@
         animation: pulseRing 3s ease-in-out infinite;
     }
 
-    /* =========================================
-       2. TARJETAS DE MÉTRICAS (ANIMACIÓN EN CASCADA)
-       ========================================= */
     .dashboard-grid {
         margin-top: 35px;
         display: grid;
@@ -279,7 +261,6 @@
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    /* Retrasos para carga en cascada */
     .delay-1 {
         animation-delay: 0.1s;
     }
@@ -301,7 +282,6 @@
         border-color: transparent;
     }
 
-    /* Marca de agua (Watermark icon) */
     .watermark-icon {
         position: absolute;
         right: -15px;
@@ -371,7 +351,6 @@
         letter-spacing: 0.5px;
     }
 
-    /* Indicador de "En Vivo" */
     .live-indicator {
         font-size: 10px;
         font-weight: 700;
@@ -382,7 +361,6 @@
         border-radius: 10px;
     }
 
-    /* Colores Específicos */
     .info-card.blue .card-icon {
         background: #eff6ff;
         color: #2563eb;
@@ -471,9 +449,6 @@
         color: #d97706;
     }
 
-    /* =========================================
-       3. PANEL INSTITUCIONAL (CON SATÉLITE)
-       ========================================= */
     .institution-panel {
         margin-top: 35px;
         display: grid;
@@ -591,7 +566,6 @@
         font-weight: 700;
     }
 
-    /* Animación del radar/satélite en el Panel Derecho */
     .panel-right {
         min-height: 320px;
         display: grid;
@@ -648,7 +622,6 @@
         border-width: 3px;
     }
 
-    /* El Satélite! */
     .satellite {
         position: absolute;
         top: -5px;
@@ -659,9 +632,6 @@
         box-shadow: 0 0 15px #38bdf8, 0 0 30px #38bdf8;
     }
 
-    /* =========================================
-       4. FOOTER
-       ========================================= */
     .footer-inamhi {
         margin-top: 50px;
         padding: 45px;
@@ -740,13 +710,13 @@
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
         justify-content: space-between;
+        align-items: center;
         font-size: 12px;
         color: #64748b;
         font-weight: 700;
         letter-spacing: 0.5px;
     }
 
-    /* ANIMACIONES BÁSICAS */
     @keyframes fadeDown {
         0% {
             opacity: 0;
@@ -813,7 +783,6 @@
         }
     }
 
-    /* RESPONSIVE */
     @media (max-width: 1100px) {
         .hero {
             grid-template-columns: 1fr;
@@ -855,11 +824,12 @@
 
 <div class="main-dashboard container-fluid px-0">
 
-    <!-- CABECERA PRINCIPAL -->
     <section class="hero">
         <div class="hero-content">
             <span class="badge-oficial"><i class="bi bi-shield-check"></i> Plataforma Oficial INAMHI</span>
-            <h1>Centro de Gestión Institucional</h1>
+
+            <h1>Sistema de Gestión de Paz y Salvo Institucional</h1>
+
             <p>
                 Sistema avanzado para la administración de documentos, formularios, reportes y procesos institucionales
                 de forma segura y automatizada.
@@ -867,8 +837,8 @@
 
             <div class="hero-info">
                 <div class="hero-item">
-                    <strong>{{ current_user.rol.nombre }}</strong>
-                    <span><i class="bi bi-person-badge"></i> Tu Rol Actual</span>
+                    <strong>¡Hola, {{ current_user.nombres | default('Usuario') }}!</strong>
+                    <span><i class="bi bi-person-badge"></i> Tu Rol Actual: {{ current_user.rol.nombre }}</span>
                 </div>
                 <div class="hero-item">
                     <strong>{{ stats.tramites_activos | default(0) }}</strong>
@@ -883,9 +853,8 @@
 
         <div class="hero-right">
             <div class="weather-card">
-                <!-- AQUÍ ESTÁ EL LOGO CON SU CAJA BLANCA -->
                 <div class="weather-logo-wrap">
-                    <img src="/static/img/inamhi.png" alt="Logo INAMHI" class="weather-logo-img">
+                    <img src="/static/img/logo_inamhi.png" alt="Logo INAMHI" class="weather-logo-img">
                 </div>
                 <p>Tecnología y gestión institucional<br>al servicio del Ecuador.</p>
                 <div class="pulse-ring"></div>
@@ -893,7 +862,6 @@
         </div>
     </section>
 
-    <!-- GRID DE MÉTRICAS (ANIMACIÓN EN CASCADA) -->
     <section class="dashboard-grid">
         <div class="info-card blue delay-1">
             <i class="bi bi-people-fill watermark-icon"></i>
@@ -936,7 +904,6 @@
         </div>
     </section>
 
-    <!-- PANEL DE INFORMACIÓN INSTITUCIONAL -->
     <section class="institution-panel">
         <div class="panel-left">
             <span class="panel-badge"><i class="bi bi-cpu-fill me-1"></i> INFRAESTRUCTURA INAMHI</span>
@@ -966,13 +933,12 @@
             <div class="circle circle-1"></div>
             <div class="circle circle-2"></div>
             <div class="circle circle-3">
-                <div class="satellite"></div> <!-- Satélite orbitando -->
+                <div class="satellite"></div>
             </div>
             <div class="center-icon"><i class="bi bi-globe-americas"></i></div>
         </div>
     </section>
 
-    <!-- PIE DE PÁGINA (FOOTER) -->
     <footer class="footer-inamhi">
         <div class="footer-grid">
             <div class="footer-brand">
@@ -997,8 +963,16 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2026 INAMHI ECUADOR - Sistema de Gestión Interna</span>
-            <span>Dirección Matriz: Corea N36-14 y Iñaquito, Quito - Ecuador | Tel: +593-2 397-1100</span>
+            <span>
+                © 2026 INAMHI ECUADOR | Sistema de Gestión de Paz y Salvo Institucional
+            </span>
+            <div style="text-align: right;">
+                <span>Dirección Matriz: Corea N36-14 y Iñaquito, Quito - Ecuador | Tel: +593-2 397-1100</span><br>
+                <span
+                    style="font-size: 10px; opacity: 0.7; font-weight: normal; margin-top: 4px; display: inline-block;">
+                    Desarrollado por: Oliver Fabricio Velasque Quito (ITSQMET)
+                </span>
+            </div>
         </div>
     </footer>
 

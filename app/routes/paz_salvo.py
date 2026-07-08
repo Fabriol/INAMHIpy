@@ -118,20 +118,27 @@ def asignar_campos(solicitud_id):
         return "<div class='alert alert-danger py-2 mt-2'>Debe seleccionar campos y un servidor.</div>"
         
     try:
+        # Se fuerza el entero para evitar el bug de las bandejas vacías
+        usuario_id_int = int(usuario_asignado_id)
         for campo in campos_seleccionados:
             respuesta_existente = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo).first()
             if respuesta_existente:
-                respuesta_existente.usuario_asignado_id = usuario_asignado_id
+                respuesta_existente.usuario_asignado_id = usuario_id_int
             else:
                 nueva_resp = Respuesta(
                     solicitud_id=solicitud_id,
                     campo_formulario=campo,
-                    usuario_asignado_id=usuario_asignado_id,
+                    usuario_asignado_id=usuario_id_int,
                     valor_respuesta=""
                 )
                 db.session.add(nueva_resp)
         db.session.commit()
-        return f"<div class='alert alert-success py-2 mt-2 fw-bold'><i class='bi bi-check-circle-fill'></i> Se delegaron {len(campos_seleccionados)} campos exitosamente.</div>"
+        return f"""
+        <div class='alert alert-success py-2 mt-2 fw-bold text-success' style='background-color: #dcfce7; border: 1px solid #86efac;'>
+            <i class='bi bi-check-circle-fill me-2'></i> Se delegaron {len(campos_seleccionados)} campos exitosamente.
+        </div>
+        <script>setTimeout(() => {{ window.location.reload(); }}, 1200);</script>
+        """
     except Exception as e:
         db.session.rollback()
         return f"<div class='alert alert-danger py-2 mt-2'>Error en BD: {str(e)}</div>"
@@ -153,7 +160,7 @@ def llenar_formulario(solicitud_id):
     asignaciones_dict = {}
     for r in respuestas_db:
         if r.usuario_asignado_id:
-            user_asignado = Usuario.query.get(r.usuario_asignado_id)
+            user_asignado = Usuario.query.get(int(r.usuario_asignado_id))
             if user_asignado:
                 asignaciones_dict[r.campo_formulario] = f"{user_asignado.nombres} {user_asignado.apellidos}"
 
@@ -161,7 +168,8 @@ def llenar_formulario(solicitud_id):
     campos_bloqueados = []
     
     for r in respuestas_db:
-        es_su_campo = (r.usuario_asignado_id == current_user.id)
+        # Usamos str() para que valide correctamente al usuario logueado
+        es_su_campo = (str(r.usuario_asignado_id) == str(current_user.id))
         if es_su_campo:
             campos_asignados_al_usuario.append(r.campo_formulario)
             
@@ -445,7 +453,7 @@ def mis_campos_asignados(solicitud_id):
     mis_campos_bloqueados = []
     
     for r in todas_las_respuestas:
-        if r.usuario_asignado_id == current_user.id:
+        if str(r.usuario_asignado_id) == str(current_user.id):
             mis_campos_asignados.append(r.campo_formulario)
             # Si el campo ya tiene texto o está firmado, lo bloqueamos para que no lo altere por error
             if r.valor_respuesta and r.valor_respuesta.strip() != "":
