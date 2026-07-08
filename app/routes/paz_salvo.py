@@ -322,8 +322,16 @@ def subir_firma_pades(solicitud_id):
     archivo_p12.save(ruta_temp_p12)
 
     try:
+        import hashlib # Necesario para las coordenadas dispersas
+
+        # 1. ESCUDO DE CONTRASEÑA: Si escriben mal la clave, avisa y no rompe el servidor
+        try:
+            signer = signers.SimpleSigner.load_pkcs12(ruta_temp_p12, passphrase=password.encode('utf-8'))
+        except ValueError:
+            os.remove(ruta_temp_p12)
+            return jsonify({'mensaje': 'Contraseña incorrecta o certificado dañado. Intente de nuevo.'}), 401
+
         # A. Cargar Certificado y extraer nombre limpio
-        signer = signers.SimpleSigner.load_pkcs12(ruta_temp_p12, passphrase=password.encode('utf-8'))
         diccionario_certificado = signer.signing_cert.subject.native
         if 'common_name' in diccionario_certificado:
             nombre_firmante = diccionario_certificado['common_name']
@@ -342,33 +350,49 @@ def subir_firma_pades(solicitud_id):
         else: db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma, usuario_asignado_id=current_user.id, valor_respuesta=nombre_firmante.upper()))
         db.session.commit()
 
-        # C. Generar PDF Base (El HTML dibujará tu QR y tu nombre)
+        # C. Generar PDF Base
         ruta_pdf_original = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}.pdf')
-        solicitud_temp = SolicitudPazSalvo.query.get(solicitud_id)
-        solicitud_temp.ex_funcionario = Usuario.query.get(solicitud_temp.ex_funcionario_id)
-        resp_temp = Respuesta.query.filter_by(solicitud_id=solicitud_id).all()
-        generar_documento_paz_salvo(solicitud_temp, solicitud_temp.ex_funcionario, resp_temp, ruta_pdf_original)
+        
+        # 2. EL CANDADO: Solo genera el PDF visual si NO existe
+        if not os.path.exists(ruta_pdf_original):
+            solicitud_temp = SolicitudPazSalvo.query.get(solicitud_id)
+            solicitud_temp.ex_funcionario = Usuario.query.get(solicitud_temp.ex_funcionario_id)
+            resp_temp = Respuesta.query.filter_by(solicitud_id=solicitud_id).all()
+            generar_documento_paz_salvo(solicitud_temp, solicitud_temp.ex_funcionario, resp_temp, ruta_pdf_original)
 
         # D. FIRMA CRIPTOGRÁFICA INVISIBLE Y ESTRICTA PARA FIRMAEC
+        ruta_pdf_temporal_firmado = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}_sellando.pdf')
+        
+        # 3. Coordenadas dispersas. SOLUCIÓN DEL ERROR DE MARGINS: La caja ahora es de 50x50
+        hash_val = int(hashlib.md5(campo_firma.encode()).hexdigest(), 16)
+        coord_x = (hash_val % 300) + 10  
+        coord_y = ((hash_val // 300) % 500) + 10 
+        caja_unica = (coord_x, coord_y, coord_x + 50, coord_y + 50)
+
         with open(ruta_pdf_original, 'rb') as inf:
             w = IncrementalPdfFileWriter(inf)
             
-            # Caja en 0,0,0,0 asegura que pyHanko no tape tu diseño HTML
-            append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma, box=(0, 0, 0, 0)))
+            # Caja en posición única asegura que pyHanko no tape tu diseño HTML ni otras firmas
+            append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma, box=caja_unica))
             
-            # Subfilter PADES asegura validación del Gobierno (FirmaEC)
+            # Subfilter PADES y AGREGAMOS REASON/LOCATION para eliminar el "null"
             meta = signers.PdfSignatureMetadata(
                 field_name=campo_firma,
-                subfilter=fields.SigSeedSubFilter.PADES
+                subfilter=fields.SigSeedSubFilter.PADES,
+                reason=f"Validación Legal: {campo_firma.upper()}",
+                location="Quito, Ecuador",
+                contact_info="Sistema INAMHI"
             )
             
-            # Firmamos SIN el argumento style para que sea transparente
+            # Firmamos en memoria para evitar el error de archivo bloqueado
             pdf_en_memoria = signers.sign_pdf(w, signature_meta=meta, signer=signer)
 
         # Sobreescribimos el PDF con la versión ya firmada y segura
-        with open(ruta_pdf_original, 'wb') as outf:
+        with open(ruta_pdf_temporal_firmado, 'wb') as outf:
             pdf_en_memoria.seek(0)
             outf.write(pdf_en_memoria.read())
+            
+        os.replace(ruta_pdf_temporal_firmado, ruta_pdf_original)
         
         if os.path.exists(ruta_temp_p12): os.remove(ruta_temp_p12)
         return jsonify({'status': 'success', 'mensaje': 'Firma estampada'}), 200
@@ -376,7 +400,6 @@ def subir_firma_pades(solicitud_id):
     except Exception as e:
         if os.path.exists(ruta_temp_p12): os.remove(ruta_temp_p12)
         return jsonify({'mensaje': f'Error de firma: {str(e)}'}), 500
-
 # ====================================================================
 # 8. RUTA: ELIMINAR SOLICITUD (SOLO ADMINISTRADOR)
 # ====================================================================

@@ -1715,13 +1715,13 @@
     };
 
     // ==========================================
-    // SISTEMA DE FIRMA PAdES (AUTO-FOCUS + ENTER)
+    // SISTEMA DE FIRMA PAdES (AUTO-FOCUS + ENTER + DISEÑO PREMIUM)
     // ==========================================
     window.abrirModalFirmaEC = (campoFirma, labelFirma = 'Firma Institucional') => {
         let form = document.getElementById('formularioOficial');
         let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
         let faltanDatos = false;
-
+        
         requeridos.forEach((el) => {
             if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); faltanDatos = true; }
         });
@@ -1769,8 +1769,10 @@
                 const toggleBtn = document.getElementById('swal-toggle-pass');
                 const eyeIcon = document.getElementById('swal-eye-icon');
 
+                // 1. Auto-enfoque: cuando subes el archivo, el cursor salta solo a la contraseña
                 fileInput.addEventListener('change', () => { passInput.focus(); });
 
+                // 2. El ojito para ver la contraseña
                 toggleBtn.addEventListener('click', () => {
                     if (passInput.type === 'password') {
                         passInput.type = 'text';
@@ -1784,10 +1786,11 @@
                     passInput.focus();
                 });
 
+                // 3. LA MAGIA DEL ENTER: Detecta si presionas Enter y firma sin usar el mouse
                 passInput.addEventListener('keypress', function (e) {
                     if (e.key === 'Enter') {
-                        e.preventDefault();
-                        Swal.clickConfirm();
+                        e.preventDefault(); // Evita que se recargue la página
+                        Swal.clickConfirm(); // Hace clic invisible en "Estampar Firma"
                     }
                 });
             },
@@ -1796,13 +1799,13 @@
                 let fileInput = document.getElementById('swal-p12-file').files[0];
                 let passInput = document.getElementById('swal-p12-pass').value;
 
-                if (!fileInput || !passInput) {
-                    Swal.showValidationMessage('⚠️ Adjunte su archivo .p12 y escriba la contraseña.');
-                    return false;
+                if (!fileInput || !passInput) { 
+                    Swal.showValidationMessage('⚠️ Adjunte su archivo .p12 y escriba la contraseña.'); 
+                    return false; 
                 }
 
                 let formPayload = new FormData(form);
-                try { await fetch(form.action, { method: 'POST', body: formPayload }); } catch (e) { }
+                try { await fetch(form.action, { method: 'POST', body: formPayload }); } catch(e) {}
 
                 let formData = new FormData();
                 formData.append('pdf_firmado', fileInput);
