@@ -1828,21 +1828,26 @@
         });
     };
 
+   // ==========================================
+    // SISTEMA DE GUARDADO INVISIBLE (AJAX) Y BLOQUEO AUTOMÁTICO
+    // ==========================================
     window.validarYGuardarTodo = (btnContext) => {
         let form = document.getElementById('formularioOficial');
         let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
         let firmas = form.querySelectorAll('input[type="hidden"][id^="input_"]');
         let valido = true;
 
+        // 1. Validar que no haya campos vacíos
         requeridos.forEach((el) => {
             if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); valido = false; }
         });
 
+        // 2. Validar que todas las firmas obligatorias estén estampadas
         firmas.forEach((el) => {
             if (el.value !== 'FIRMADO') {
                 valido = false;
                 let cajaFirma = el.closest('div.p-3');
-                if (cajaFirma) {
+                if(cajaFirma) {
                     cajaFirma.style.borderColor = '#ef4444';
                     cajaFirma.style.backgroundColor = '#fef2f2';
                 }
@@ -1854,24 +1859,69 @@
             return;
         }
 
-        Swal.fire({
-            title: '¿Sellar Trámite?',
-            text: 'Se bloquearán los campos y la información quedará guardada de forma irreversible.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, Guardar y Sellar',
+        Swal.fire({ 
+            title: '¿Sellar Trámite?', 
+            text: 'Se bloquearán los campos y la información quedará guardada de forma irreversible.', 
+            icon: 'warning', 
+            showCancelButton: true, 
+            confirmButtonText: '<i class="bi bi-shield-lock-fill me-2"></i> Sí, Guardar y Sellar', 
             confirmButtonColor: '#16a34a',
             cancelButtonText: 'Revisar de nuevo'
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                if (btnContext) {
+                // Bloqueo visual preventivo del botón
+                if(btnContext) {
                     btnContext.disabled = true;
-                    btnContext.innerHTML = '<span class="spinner-grow spinner-grow-sm me-2"></span> Procesando...';
+                    btnContext.innerHTML = '<span class="spinner-grow spinner-grow-sm me-2"></span> Sellando información...';
                     btnContext.classList.replace('btn-success', 'btn-secondary');
                 }
-
+                
                 Swal.fire({ title: 'Guardando de forma segura...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-                form.submit();
+                
+                try {
+                    // Enviamos los datos "por debajo" sin recargar la página
+                    let formData = new FormData(form);
+                    let response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        redirect: 'follow'
+                    });
+
+                    if (response.ok) {
+                        // Alerta de éxito
+                        Swal.fire({
+                            title: '¡Guardado Exitoso!',
+                            text: 'La información ha sido sellada y sincronizada correctamente.',
+                            icon: 'success',
+                            confirmButtonColor: '#1e3a8a'
+                        });
+
+                        // BLOQUEO DEFINITIVO DEL BOTÓN
+                        if(btnContext) {
+                            btnContext.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Trámite Sellado y Bloqueado';
+                            btnContext.style.cursor = 'not-allowed';
+                        }
+
+                        // BLOQUEO DEFINITIVO DE LOS CAMPOS (Para que ya no puedan escribir)
+                        requeridos.forEach(el => {
+                            el.setAttribute('readonly', true);
+                            el.style.backgroundColor = '#e2e8f0'; // Fondo gris de bloqueo
+                            el.style.pointerEvents = 'none';
+                            el.style.color = '#64748b';
+                        });
+
+                    } else {
+                        throw new Error('Error al guardar en el servidor');
+                    }
+                } catch (error) {
+                    Swal.fire('Error de conexión', 'Hubo un problema al intentar guardar. Intente nuevamente.', 'error');
+                    // Si falla, reactivamos el botón para que vuelva a intentar
+                    if(btnContext) {
+                        btnContext.disabled = false;
+                        btnContext.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> Guardar Mis Respuestas';
+                        btnContext.classList.replace('btn-secondary', 'btn-success');
+                    }
+                }
             }
         });
     };
