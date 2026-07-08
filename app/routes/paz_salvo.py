@@ -195,11 +195,13 @@ def llenar_formulario(solicitud_id):
                            datos=datos_diccionario)
 
 # ====================================================================
-# 4. RUTA: GUARDADO ATÓMICO CON PROTECCIÓN DE FIRMA
+# 4. RUTA: GUARDADO ATÓMICO CON PROTECCIÓN DE FIRMA Y AJAX
 # ====================================================================
 @paz_salvo_bp.route('/paz-salvo/guardar/<int:solicitud_id>', methods=['POST'])
 @login_required
 def guardar_formulario(solicitud_id):
+    from datetime import datetime, timedelta, timezone # Importación para hora de Ecuador
+    
     datos_formulario = request.form.to_dict()
     datos_formulario.pop('solicitud_id', None) 
 
@@ -209,7 +211,6 @@ def guardar_formulario(solicitud_id):
                 continue 
             
             respuesta_existente = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo).first()
-            
             if respuesta_existente:
                 if respuesta_existente.valor_respuesta != 'FIRMADO':
                     respuesta_existente.valor_respuesta = str(valor).upper()
@@ -221,8 +222,19 @@ def guardar_formulario(solicitud_id):
                     valor_respuesta=str(valor).upper()
                 ))
 
+        # AUDITORÍA EN TIEMPO REAL (HORA EXACTA DE ECUADOR UTC-5)
+        ecuador_tz = timezone(timedelta(hours=-5))
+        hora_actual = datetime.now(ecuador_tz).strftime("%Y-%m-%d %H:%M:%S")
+        log = LogAuditoria(
+            usuario_id=current_user.id, 
+            modulo='Formularios', 
+            accion='GUARDAR AVANCE', 
+            detalle=f"Guardó o actualizó información del trámite #{solicitud_id} a las {hora_actual}"
+        )
+        db.session.add(log)
         db.session.commit()
         
+        # PDF Logic
         solicitud = SolicitudPazSalvo.query.get(solicitud_id)
         solicitud.ex_funcionario = Usuario.query.get(solicitud.ex_funcionario_id)
         respuestas_db = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
@@ -231,20 +243,23 @@ def guardar_formulario(solicitud_id):
         os.makedirs(directorio_temp, exist_ok=True)
         ruta_pdf = os.path.join(directorio_temp, f'PazSalvo_{solicitud.id}.pdf')
         
-        # PROTECCIÓN: Si el documento ya tiene firmas, NO lo regeneramos para no aplastar el sello criptográfico.
         tiene_firmas = any(r.valor_respuesta == 'FIRMADO' for r in respuestas_db)
         if not tiene_firmas:
             generar_documento_paz_salvo(solicitud, solicitud.ex_funcionario, respuestas_db, ruta_pdf)
         
-        flash('Trámite guardado exitosamente. Los datos han sido sellados.', 'success')
+        # LA MAGIA PARA QUE NO SALTE LA PÁGINA: Si es una petición silenciosa (AJAX), devuelve JSON.
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'status': 'success', 'mensaje': 'Datos guardados exitosamente.'})
+        
+        flash('Trámite guardado exitosamente.', 'success')
         
     except Exception as e:
         db.session.rollback() 
-        print(f"Error en guardado atómico: {e}")
-        flash('Error de conexión. No se guardó ninguna información.', 'danger')
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'status': 'error', 'mensaje': str(e)}), 500
+        flash('Error de conexión.', 'danger')
 
     return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=solicitud_id))
-
 # ====================================================================
 # 5. RUTA: ESPEJO EN TIEMPO REAL (HTMX - SIN GUARDADO BD)
 # ====================================================================

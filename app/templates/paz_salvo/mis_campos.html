@@ -370,8 +370,8 @@
                 {% endfor %}
             </form>
 
-            <button type="button" class="btn btn-success w-100 fw-bold py-3 mt-4"
-                onclick="window.validarYGuardarTodo()">
+            <button type="button" id="btnGuardarPrincipal" class="btn btn-success fw-bold px-4 py-2"
+                onclick="window.validarYGuardarTodo(this)">
                 <i class="bi bi-cloud-check-fill me-2"></i> Guardar Mis Respuestas
             </button>
         </div>
@@ -587,23 +587,135 @@
         });
     };
 
-    window.validarYGuardarTodo = () => {
+    // ==========================================
+    // SISTEMA DE GUARDADO INVISIBLE BLINDADO (AJAX)
+    // ==========================================
+    window.validarYGuardarTodo = (btnContext) => {
+        // Freno de mano automático (por si el botón intenta actuar como submit)
+        if (typeof event !== 'undefined') { event.preventDefault(); }
+
         let form = document.getElementById('formularioOficial');
         let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
         let firmas = form.querySelectorAll('input[type="hidden"][id^="input_"]');
         let valido = true;
 
-        requeridos.forEach((el) => { if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); valido = false; } else { window.quitarError(el); } });
-        firmas.forEach((el) => { if (el.value !== 'FIRMADO') { valido = false; } });
+        requeridos.forEach((el) => {
+            if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); valido = false; }
+        });
+
+        firmas.forEach((el) => {
+            if (el.value !== 'FIRMADO') {
+                valido = false;
+                let cajaFirma = el.closest('div.p-3');
+                if (cajaFirma) {
+                    cajaFirma.style.borderColor = '#ef4444';
+                    cajaFirma.style.backgroundColor = '#fef2f2';
+                }
+            }
+        });
 
         if (!valido || document.querySelectorAll('.has-error').length > 0) {
-            Swal.fire('Trámite Incompleto', 'Debe llenar todo el texto correctamente y estampar todas las firmas asignadas.', 'error');
+            Swal.fire('Trámite Incompleto', 'Debe llenar todos los campos habilitados y estampar TODAS las firmas antes de sellar su asignación.', 'warning');
             return;
         }
 
-        Swal.fire({ title: '¿Guardar Trámite?', text: 'Se sellará su información exclusivamente bajo el Trámite #{{ solicitud.id }}.', icon: 'question', showCancelButton: true, confirmButtonColor: '#16a34a' }).then((result) => {
-            if (result.isConfirmed) { form.submit(); }
+        Swal.fire({
+            title: '¿Sellar Trámite?',
+            text: 'Se bloquearán los campos y la información quedará guardada de forma irreversible.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '<i class="bi bi-shield-lock-fill me-2"></i> Sí, Guardar y Sellar',
+            confirmButtonColor: '#16a34a',
+            cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+
+                // 1. Bloqueamos el botón INMEDIATAMENTE para evitar dobles clics
+                if (btnContext) {
+                    btnContext.disabled = true;
+                    btnContext.innerHTML = '<span class="spinner-grow spinner-grow-sm me-2"></span> Sellando información...';
+                    btnContext.classList.replace('btn-success', 'btn-secondary');
+                }
+
+                Swal.fire({ title: 'Guardando de forma segura...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+
+                try {
+                    let formData = new FormData(form);
+
+                    // 2. Enviamos los datos a Python de forma 100% invisible
+                    let response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (response.ok) {
+                        // 3. Bloqueamos todos los cuadros de texto visualmente
+                        requeridos.forEach(el => {
+                            el.setAttribute('readonly', true);
+                            el.style.backgroundColor = '#e2e8f0';
+                            el.style.pointerEvents = 'none';
+                            el.style.color = '#64748b';
+                            el.style.border = '1px solid #cbd5e1';
+                        });
+
+                        // 4. Transformamos el botón en un candado gris
+                        if (btnContext) {
+                            btnContext.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Trámite Sellado y Bloqueado';
+                            btnContext.style.cursor = 'not-allowed';
+                        }
+
+                        // 5. Mensaje de éxito sin recargar nada
+                        Swal.fire({
+                            title: '¡Guardado Exitoso!',
+                            text: 'La información ha sido sellada y registrada en auditoría.',
+                            icon: 'success',
+                            confirmButtonColor: '#1e3a8a'
+                        });
+
+                    } else {
+                        throw new Error('El servidor rechazó el guardado.');
+                    }
+
+                } catch (error) {
+                    Swal.fire('Error de conexión', 'Hubo un problema de red al intentar guardar.', 'error');
+                    // Si falla, reactivamos el botón para que pueda intentar de nuevo
+                    if (btnContext) {
+                        btnContext.disabled = false;
+                        btnContext.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> Guardar Mis Respuestas';
+                        btnContext.classList.replace('btn-secondary', 'btn-success');
+                    }
+                }
+            }
         });
     };
+
+    // ==========================================
+    // AUTO-BLOQUEO PERMANENTE AL CARGAR LA PÁGINA
+    // ==========================================
+    document.addEventListener("DOMContentLoaded", () => {
+        let form = document.getElementById('formularioOficial');
+        let btnGuardar = document.getElementById('btnGuardarPrincipal');
+
+        if (form && btnGuardar) {
+            // El sistema escanea si te queda algún cuadro de texto libre para escribir
+            let inputsLibres = form.querySelectorAll('.doc-input:not([disabled]):not([readonly]):not([type="hidden"])');
+
+            // El sistema escanea si te queda algún botón azul de "Firmar PAdES" activo
+            let botonesFirmaLibres = form.querySelectorAll('.btn-firmaec');
+
+            // Si ambos están en CERO, significa que ya llenaste y firmaste TODO tu trabajo.
+            if (inputsLibres.length === 0 && botonesFirmaLibres.length === 0) {
+                btnGuardar.disabled = true;
+                btnGuardar.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Trámite Sellado y Completado';
+                btnGuardar.classList.remove('btn-success');
+                btnGuardar.classList.add('btn-secondary');
+                btnGuardar.style.cursor = 'not-allowed';
+                btnGuardar.style.opacity = '0.8';
+            }
+        }
+    });
 </script>
 {% endblock %}
