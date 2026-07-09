@@ -2,56 +2,204 @@
     /* =====================================================================
    ESPEJO A4 PREMIUM Y COLOR — FORMATO INSTITUCIONAL INAMHI
    ===================================================================== */
-    .ep-doc { background: #ffffff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 7.5px; color: #1e293b; border: 1px solid #94a3b8; width: 100%; box-sizing: border-box; line-height: 1.15; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .ep-header__stripe { height: 4px; background: linear-gradient(90deg, #1e3a8a, #3b82f6, #0ea5e9, #10b981); }
-    .ep-header__body { display: grid; grid-template-columns: 60px 1fr 90px; align-items: center; background: #f8fafc; border-bottom: 3px solid #1e3a8a; padding: 6px 10px; }
-    .ep-header__logo-wrap { font-weight: 900; color: #1e3a8a; font-size: 16px; text-align: center; border-right: 2px solid #cbd5e1; padding-right: 8px;}
-    .ep-header__center { text-align: center; border-right: 2px solid #cbd5e1; padding: 0 8px; }
-    .ep-header__inst { font-size: 9px; font-weight: 900; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.5px;}
-    .ep-header__title { font-size: 8.5px; font-weight: 800; color: #334155; margin-top: 3px; }
-    .ep-header__code-wrap { text-align: center; font-size: 6.5px; font-weight: bold; color: #64748b; }
-    .ep-bloque__head { display: flex; align-items: center; padding: 4px 8px; color: #ffffff; font-size: 8px; font-weight: 900; background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 100%); text-transform: uppercase; letter-spacing: 0.5px; border-top: 1px solid #fff; border-bottom: 1px solid #1e3a8a; }
-    .ep-tabla { width: 100%; border-collapse: collapse; font-size: 7px; table-layout: fixed; margin-bottom: 0px; }
-    .ep-tabla th, .ep-tabla td { border: 1px solid #94a3b8; padding: 3px 5px; vertical-align: middle; word-wrap: break-word; }
-    .ep-th { background: #e2e8f0; color: #0f172a; font-weight: 900; text-transform: uppercase; font-size: 6.5px; }
-    .ep-tfh { background: #cbd5e1; color: #0f172a; font-weight: 900; text-align: center; text-transform: uppercase; font-size: 6.5px; }
-    .ep-td { color: #000000; font-weight: bold; text-transform: uppercase; font-size: 7px;}
-    .ep-yn { padding: 1.5px 4px; font-weight: 900; text-align: center; display: inline-block; min-width: 16px; border-radius: 2px;}
-    .ep-yn--s { color: #166534; background: #dcfce7; border: 1px solid #22c55e;}
-    .ep-yn--n { color: #991b1b; background: #fee2e2; border: 1px solid #ef4444;}
-    .ep-firma-box { width: 100%; height: 38px; display: flex; align-items: center; justify-content: center; background-color: #ffffff; }
+    .ep-doc {
+        background: #ffffff;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 7.5px;
+        color: #1e293b;
+        border: 1px solid #94a3b8;
+        width: 100%;
+        box-sizing: border-box;
+        line-height: 1.15;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .ep-header__stripe {
+        height: 4px;
+        background: linear-gradient(90deg, #1e3a8a, #3b82f6, #0ea5e9, #10b981);
+    }
+
+    .ep-header__body {
+        display: grid;
+        grid-template-columns: 60px 1fr 90px;
+        align-items: center;
+        background: #f8fafc;
+        border-bottom: 3px solid #1e3a8a;
+        padding: 6px 10px;
+    }
+
+    .ep-header__logo-wrap {
+        font-weight: 900;
+        color: #1e3a8a;
+        font-size: 16px;
+        text-align: center;
+        border-right: 2px solid #cbd5e1;
+        padding-right: 8px;
+    }
+
+    .ep-header__center {
+        text-align: center;
+        border-right: 2px solid #cbd5e1;
+        padding: 0 8px;
+    }
+
+    .ep-header__inst {
+        font-size: 9px;
+        font-weight: 900;
+        color: #1e3a8a;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .ep-header__title {
+        font-size: 8.5px;
+        font-weight: 800;
+        color: #334155;
+        margin-top: 3px;
+    }
+
+    .ep-header__code-wrap {
+        text-align: center;
+        font-size: 6.5px;
+        font-weight: bold;
+        color: #64748b;
+    }
+
+    .ep-bloque__head {
+        display: flex;
+        align-items: center;
+        padding: 4px 8px;
+        color: #ffffff;
+        font-size: 8px;
+        font-weight: 900;
+        background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 100%);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-top: 1px solid #fff;
+        border-bottom: 1px solid #1e3a8a;
+    }
+
+    .ep-tabla {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 7px;
+        table-layout: fixed;
+        margin-bottom: 0px;
+    }
+
+    .ep-tabla th,
+    .ep-tabla td {
+        border: 1px solid #94a3b8;
+        padding: 3px 5px;
+        vertical-align: middle;
+        word-wrap: break-word;
+    }
+
+    .ep-th {
+        background: #e2e8f0;
+        color: #0f172a;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 6.5px;
+    }
+
+    .ep-tfh {
+        background: #cbd5e1;
+        color: #0f172a;
+        font-weight: 900;
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 6.5px;
+    }
+
+    .ep-td {
+        color: #000000;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 7px;
+    }
+
+    .ep-yn {
+        padding: 1.5px 4px;
+        font-weight: 900;
+        text-align: center;
+        display: inline-block;
+        min-width: 16px;
+        border-radius: 2px;
+    }
+
+    .ep-yn--s {
+        color: #166534;
+        background: #dcfce7;
+        border: 1px solid #22c55e;
+    }
+
+    .ep-yn--n {
+        color: #991b1b;
+        background: #fee2e2;
+        border: 1px solid #ef4444;
+    }
+
+    .ep-firma-box {
+        width: 100%;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #ffffff;
+    }
+
     /* Aumentamos la altura de la caja de firma en tu CSS */
-    .ep-firma-box { width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; }
+    .ep-firma-box {
+        width: 100%;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
     /* DISEÑO IDÉNTICO A FIRMAEC FOTOGRAFÍA */
     .firmaec-sello {
         display: flex;
         align-items: center;
         width: 100%;
-        max-width: 130px; /* IMPORTANTE: Ajusta esto al ancho de tu celda */
+        max-width: 130px;
+        /* IMPORTANTE: Ajusta esto al ancho de tu celda */
         margin: 0 auto;
     }
+
     .firmaec-qr {
-        width: 30px; /* Tamaño del QR */
+        width: 30px;
+        /* Tamaño del QR */
         height: 30px;
         margin-right: 5px;
     }
+
     /* Para que el SVG nativo se dibuje en negro puro y nítido */
-    .firmaec-qr path { fill: #000 !important; shape-rendering: crispEdges; }
-    
+    .firmaec-qr path {
+        fill: #000 !important;
+        shape-rendering: crispEdges;
+    }
+
     .firmaec-text-col {
         display: flex;
         flex-direction: column;
         justify-content: center;
         overflow: hidden;
     }
-    .firmaec-label-top, .firmaec-label {
+
+    .firmaec-label-top,
+    .firmaec-label {
         font-family: 'Courier New', Courier, monospace;
         font-size: 5px;
         color: #000;
         line-height: 1.1;
     }
-    .firmaec-label { margin-bottom: 1.5px; }
+
+    .firmaec-label {
+        margin-bottom: 1.5px;
+    }
+
     .firmaec-name {
         font-family: 'Courier New', Courier, monospace;
         font-size: 7.5px;
@@ -63,11 +211,30 @@
     }
 
     @media print {
-        body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        .ep-doc { border: none !important; margin: 0 !important; box-shadow: none !important; page-break-after: auto; }
-        .ep-tabla tr { page-break-inside: avoid !important; }
-        .ep-bloque__head { page-break-after: avoid !important; page-break-inside: avoid !important; }
-        .firmaec-qr path { fill: #000 !important; }
+        body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .ep-doc {
+            border: none !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            page-break-after: auto;
+        }
+
+        .ep-tabla tr {
+            page-break-inside: avoid !important;
+        }
+
+        .ep-bloque__head {
+            page-break-after: avoid !important;
+            page-break-inside: avoid !important;
+        }
+
+        .firmaec-qr path {
+            fill: #000 !important;
+        }
     }
 </style>
 
@@ -80,11 +247,17 @@
     <div class="firmaec-sello" style="display: flex; align-items: center; max-width: 150px; margin: 0 auto;">
         <!-- Aquí se inyecta el QR vectorial de alta calidad -->
         {{ generar_qr_svg(dat.get(campo ~ '_nombre')) | safe }}
-        
-        <div class="firmaec-text-col" style="display: flex; flex-direction: column; justify-content: center; text-align: left; overflow: hidden;">
-            <span class="firmaec-label-top" style="font-family: 'Courier New', Courier, monospace; font-size: 5px; color: #000; line-height: 1.1;">Validar únicamente en FirmaEC.</span>
-            <span class="firmaec-label" style="font-family: 'Courier New', Courier, monospace; font-size: 5px; color: #000; line-height: 1.1; margin-bottom: 1.5px;">Firmado electrónicamente por:</span>
-            <span class="firmaec-name" id="name_{{ campo }}" style="font-family: 'Courier New', Courier, monospace; font-size: 7.5px; font-weight: 900; color: #000; line-height: 1; text-transform: uppercase; word-wrap: break-word;">
+
+        <div class="firmaec-text-col"
+            style="display: flex; flex-direction: column; justify-content: center; text-align: left; overflow: hidden;">
+            <span class="firmaec-label-top"
+                style="font-family: 'Courier New', Courier, monospace; font-size: 5px; color: #000; line-height: 1.1;">Validar
+                únicamente en FirmaEC.</span>
+            <span class="firmaec-label"
+                style="font-family: 'Courier New', Courier, monospace; font-size: 5px; color: #000; line-height: 1.1; margin-bottom: 1.5px;">Firmado
+                electrónicamente por:</span>
+            <span class="firmaec-name" id="name_{{ campo }}"
+                style="font-family: 'Courier New', Courier, monospace; font-size: 7.5px; font-weight: 900; color: #000; line-height: 1; text-transform: uppercase; word-wrap: break-word;">
                 {{ dat.get(campo ~ '_nombre') | default('RESPONSABLE', true) | upper }}
             </span>
         </div>
@@ -95,278 +268,460 @@
 </div>
 {% endmacro %}
 
-<div class="ep-doc">
-    <div class="ep-header">
-        <div class="ep-header__stripe"></div>
-        <div class="ep-header__body">
-            <div class="ep-header__logo-wrap">INAMHI</div>
-            <div class="ep-header__center">
-                <div class="ep-header__inst">Instituto Nacional de Meteorología e Hidrología</div>
-                <div class="ep-header__title">FORMULARIO PAZ Y SALVO — LIQUIDACIÓN DE HABERES</div>
-            </div>
-            <div class="ep-header__code-wrap">INAMHI-RH-001 <br> PÁGINA 1/2</div>
+<div class="ep-header">
+    <div class="ep-header__stripe"></div>
+    <div class="ep-header__body">
+
+        <div class="ep-header__logo-wrap">
+            <img src="{{ url_for('static', filename='img/logo.jpg', _external=True) }}" alt="Logo INAMHI"
+                style="max-height: 55px; width: auto; object-fit: contain;">
         </div>
-    </div>
 
-    <div class="ep-bloque__head">01. DATOS PERSONALES DEL SERVIDOR SALIENTE</div>
-    <table class="ep-tabla">
-        <tr><th class="ep-th" width="18%">NOMBRES</th><td class="ep-td" colspan="3">{{ dat.get('nombres_apellidos') | default(ex.nombres ~ ' ' ~ ex.apellidos, true) }}</td></tr>
-        <tr><th class="ep-th">CÉDULA</th><td class="ep-td">{{ dat.get('cedula') | default(ex.cedula, true) }}</td><th class="ep-th" width="18%">MODALIDAD</th><td class="ep-td">{{ dat.get('modalidad') | default('—', true) }}</td></tr>
-        <tr><th class="ep-th">INGRESO</th><td class="ep-td">{{ dat.get('fecha_ingreso') | default('—', true) }}</td><th class="ep-th">SALIDA</th><td class="ep-td">{{ dat.get('fecha_salida') | default('—', true) }}</td></tr>
-        <tr><th class="ep-th">DIRECCIÓN</th><td class="ep-td" colspan="3">{{ dat.get('direccion') | default('—', true) }} {% if dat.get('numero_domicilio') %}Telf: {{ dat.get('numero_domicilio') }}{% endif %}</td></tr>
-        <tr><th class="ep-th">PROV / CANTÓN</th><td class="ep-td">{{ dat.get('provincia') | default('—', true) }} / {{ dat.get('canton') | default('—', true) }}</td><th class="ep-th">CEL / EMERGENCIA</th><td class="ep-td">{{ dat.get('celular') | default('—', true) }} / {{ dat.get('emergencia') | default('—', true) }}</td></tr>
-        <tr><th class="ep-th">EMAIL 1</th><td class="ep-td" style="text-transform: lowercase;">{{ dat.get('email1') | default('—', true) }}</td><th class="ep-th">EMAIL 2</th><td class="ep-td" style="text-transform: lowercase;">{{ dat.get('email2') | default('—', true) }}</td></tr>
-    </table>
-
-    <div class="ep-bloque__head" style="background: linear-gradient(90deg, #1d4ed8 0%, #3b82f6 100%);">02. DIRECCIÓN / UNIDAD</div>
-    <table class="ep-tabla">
-        <tr><th class="ep-th" width="18%">LUGAR TRABAJO</th><td class="ep-td">{{ dat.get('lugar_trabajo') | default('—', true) }}</td><th class="ep-th" width="18%">GRUPO OCUP.</th><td class="ep-td">{{ dat.get('grupo_ocupacional') | default('—', true) }}</td></tr>
-        <tr><th class="ep-th">UNIDAD</th><td class="ep-td" colspan="3">{{ dat.get('unidad') | default('—', true) }}</td></tr>
-        <tr><th class="ep-th">CARGO</th><td class="ep-td" colspan="3">{{ dat.get('cargo') | default('—', true) }}</td></tr>
-    </table>
-
-    <div class="ep-bloque__head" style="background: linear-gradient(90deg, #0284c7 0%, #0ea5e9 100%);">03. GESTIÓN DOCUMENTAL Y TRÁMITES</div>
-    <table class="ep-tabla">
-        <tr><th class="ep-tfh" width="22%">DESCRIPCIÓN</th><th class="ep-tfh" width="6%">S/N</th><th class="ep-tfh" width="22%">DESCRIPCIÓN</th><th class="ep-tfh" width="6%">S/N</th><th class="ep-tfh" width="20%">RESPONSABLE</th><th class="ep-tfh" width="24%">FIRMA ELECTRÓNICA</th></tr>
-        <tr>
-            <td>Informe fin gestión</td><td align="center"><span class="ep-yn {% if dat.get('tramites_informe')=='SI' %}ep-yn--s{% elif dat.get('tramites_informe')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('tramites_informe') | default('-', true) }}</span></td>
-            <td>QUIPUX en cero</td><td align="center"><span class="ep-yn {% if dat.get('tramites_quipux_cero')=='SI' %}ep-yn--s{% elif dat.get('tramites_quipux_cero')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('tramites_quipux_cero') | default('-', true) }}</span></td>
-            <td class="ep-td" align="center">{{ dat.get('tramites_nombre_resp1') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('tramites_r1') }}</td>
-        </tr>
-        <tr>
-            <td>Fe presentación</td><td align="center"><span class="ep-yn {% if dat.get('tramites_fe_presentacion')=='SI' %}ep-yn--s{% elif dat.get('tramites_fe_presentacion')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('tramites_fe_presentacion') | default('-', true) }}</span></td>
-            <td>Claves asignadas</td><td align="center"><span class="ep-yn {% if dat.get('tramites_claves_asignadas')=='SI' %}ep-yn--s{% elif dat.get('tramites_claves_asignadas')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('tramites_claves_asignadas') | default('-', true) }}</span></td>
-            <td class="ep-td" align="center">{{ dat.get('tramites_nombre_resp2') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('tramites_r2') }}</td>
-        </tr>
-        <tr>
-            <td>Archivo físico LOSEP</td><td align="center"><span class="ep-yn {% if dat.get('tramites_losep')=='SI' %}ep-yn--s{% elif dat.get('tramites_losep')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('tramites_losep') | default('-', true) }}</span></td>
-            <td>Acta entrega claves</td><td align="center"><span class="ep-yn {% if dat.get('tramites_acta_claves')=='SI' %}ep-yn--s{% elif dat.get('tramites_acta_claves')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('tramites_acta_claves') | default('-', true) }}</span></td>
-            <td class="ep-td" align="center">{{ dat.get('tramites_nombre_resp3') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('tramites_r3') }}</td>
-        </tr>
-        <tr style="background: #f8fafc;">
-            <td colspan="4"><strong>Admin. Contrato:</strong> {{ dat.get('tramites_admin_contrato') | default('-', true) }} | <strong>Desc:</strong> {{ dat.get('tramites_desc_contrato') | default('-', true) }} | <strong>Memo:</strong> {{ dat.get('tramites_memo') | default('-', true) }}<br>
-                <strong>Jefe Inmediato:</strong> {{ dat.get('tramites_jefe_inmediato') | default('-', true) }} | <strong>Recibe:</strong> {{ dat.get('tramites_servidor_recibe') | default('-', true) }} | <strong>Obs:</strong> {{ dat.get('tramites_obs') | default('-', true) }}
-            </td>
-            <td class="ep-td" align="center">{{ dat.get('tramites_nombre_responsable') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('tramites_jefe') }}</td>
-        </tr>
-    </table>
-
-    <div class="ep-bloque__head" style="background: linear-gradient(90deg, #334155 0%, #64748b 100%);">04. GESTIÓN ADMINISTRATIVA</div>
-    <table class="ep-tabla">
-        <tr><th class="ep-tfh" width="30%">DESCRIPCIÓN</th><th class="ep-tfh" width="6%">S/N</th><th class="ep-tfh" width="20%">DATO ADICIONAL</th><th class="ep-tfh" width="20%">RESPONSABLE</th><th class="ep-tfh" width="24%">FIRMA ELECTRÓNICA</th></tr>
-        <tr>
-            <td>Entrega informe actividades</td><td align="center"><span class="ep-yn {% if dat.get('admin_informe')=='SI' %}ep-yn--s{% elif dat.get('admin_informe')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('admin_informe') | default('-', true) }}</span></td>
-            <td align="center">—</td>
-            <td class="ep-td" align="center">{{ dat.get('admin_nombre_resp1') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('admin_r1') }}</td>
-        </tr>
-        <tr>
-            <td>Entrega bienes y muebles</td><td align="center"><span class="ep-yn {% if dat.get('admin_bienes')=='SI' %}ep-yn--s{% elif dat.get('admin_bienes')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('admin_bienes') | default('-', true) }}</span></td>
-            <td align="center">Val: ${{ dat.get('admin_valor_bienes') | default('0', true) }} | Acta: {{ dat.get('admin_acta_bienes') | default('-', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('admin_nombre_resp2') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('admin_r2') }}</td>
-        </tr>
-        <tr>
-            <td>Deducibles pendientes</td><td align="center"><span class="ep-yn {% if dat.get('admin_deducibles')=='SI' %}ep-yn--s{% elif dat.get('admin_deducibles')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('admin_deducibles') | default('-', true) }}</span></td>
-            <td align="center">Valor: ${{ dat.get('admin_deducibles_valor') | default('0', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('admin_nombre_resp3') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('admin_r3') }}</td>
-        </tr>
-        <tr>
-            <td>Pasajes justificar</td><td align="center"><span class="ep-yn {% if dat.get('admin_pasajes')=='SI' %}ep-yn--s{% elif dat.get('admin_pasajes')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('admin_pasajes') | default('-', true) }}</span></td>
-            <td align="center">Valor: ${{ dat.get('admin_pasajes_valor') | default('0', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('admin_nombre_resp4') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('admin_r4') }}</td>
-        </tr>
-        <tr style="background: #f8fafc;">
-            <td colspan="3" align="right"><strong>DIRECTOR/A ADMINISTRATIVO FINANCIERO:</strong></td>
-            <td class="ep-td" align="center">{{ dat.get('admin_responsable') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('admin_dir') }}</td>
-        </tr>
-    </table>
-
-    <div class="ep-bloque__head" style="background: linear-gradient(90deg, #6d28d9 0%, #8b5cf6 100%);">05. GESTIÓN TIC</div>
-    <table class="ep-tabla">
-        <tr><th class="ep-tfh" width="30%">DESCRIPCIÓN</th><th class="ep-tfh" width="6%">S/N</th><th class="ep-tfh" width="20%">DATO ADICIONAL</th><th class="ep-tfh" width="20%">RESPONSABLE</th><th class="ep-tfh" width="24%">FIRMA ELECTRÓNICA</th></tr>
-        <tr>
-            <td>Verificación equipo</td><td align="center"><span class="ep-yn {% if dat.get('tic_verificacion')=='SI' %}ep-yn--s{% elif dat.get('tic_verificacion')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('tic_verificacion') | default('-', true) }}</span></td>
-            <td align="center">IP: {{ dat.get('tic_ip_fija') | default('-', true) }} | Liberó: {{ dat.get('tic_liberacion') | default('-', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('tic_nombre_resp1') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('tic_r1') }}</td>
-        </tr>
-        <tr>
-            <td>Entrega Backup</td><td align="center"><span class="ep-yn {% if dat.get('tic_backup')=='SI' %}ep-yn--s{% elif dat.get('tic_backup')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('tic_backup') | default('-', true) }}</span></td>
-            <td align="center">Ruta: {{ dat.get('tic_ruta_backup') | default('-', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('tic_nombre_resp2') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('tic_r2') }}</td>
-        </tr>
-        <tr>
-            <td>Cierre Cuentas / Accesos</td><td align="center"><span class="ep-yn {% if dat.get('tic_retiro_acceso')=='SI' %}ep-yn--s{% elif dat.get('tic_retiro_acceso')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('tic_retiro_acceso') | default('-', true) }}</span></td>
-            <td align="center">C: {{ dat.get('tic_cierre_correo') | default('-', true) }} | Q: {{ dat.get('tic_quipux') | default('-', true) }}<br>S: {{ dat.get('tic_esigef') | default('-', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('tic_nombre_resp3') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('tic_r3') }}</td>
-        </tr>
-        <tr>
-            <td>Tarjeta Acceso</td><td align="center"><span class="ep-yn {% if dat.get('tic_tarjeta_cuentas')=='SI' %}ep-yn--s{% elif dat.get('tic_tarjeta_cuentas')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('tic_tarjeta_cuentas') | default('-', true) }}</span></td>
-            <td align="center">Obs: {{ dat.get('tic_obs') | default('-', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('tic_nombre_resp4') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('tic_r4') }}</td>
-        </tr>
-        <tr style="background: #f8fafc;">
-            <td colspan="3" align="right"><strong>RESPONSABLE TIC GENERAL:</strong></td>
-            <td class="ep-td" align="center">{{ dat.get('tic_responsable') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('tic_r5') }}</td>
-        </tr>
-    </table>
-
-    <div class="ep-bloque__head" style="background: linear-gradient(90deg, #047857 0%, #10b981 100%); margin-top: 10px;">06. GESTIÓN FINANCIERA</div>
-    <table class="ep-tabla">
-        <tr><th class="ep-tfh" width="30%">DESCRIPCIÓN</th><th class="ep-tfh" width="6%">S/N</th><th class="ep-tfh" width="20%">VALOR</th><th class="ep-tfh" width="20%">RESPONSABLE</th><th class="ep-tfh" width="24%">FIRMA ELECTRÓNICA</th></tr>
-        <tr>
-            <td>Saldos contables</td><td align="center"><span class="ep-yn {% if dat.get('fin_saldos')=='SI' %}ep-yn--s{% elif dat.get('fin_saldos')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('fin_saldos') | default('-', true) }}</span></td>
-            <td align="center">Valor: ${{ dat.get('fin_saldos_valor') | default('0', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('fin_nombre_resp1') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('fin_r1') }}</td>
-        </tr>
-        <tr>
-            <td>Anticipo sueldos</td><td align="center"><span class="ep-yn {% if dat.get('fin_anticipo')=='SI' %}ep-yn--s{% elif dat.get('fin_anticipo')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('fin_anticipo') | default('-', true) }}</span></td>
-            <td align="center">Valor: ${{ dat.get('fin_anticipo_valor') | default('0', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('fin_nombre_resp2') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('fin_r2') }}</td>
-        </tr>
-        <tr>
-            <td>Recuperación valores</td><td align="center"><span class="ep-yn {% if dat.get('fin_recuperacion')=='SI' %}ep-yn--s{% elif dat.get('fin_recuperacion')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('fin_recuperacion') | default('-', true) }}</span></td>
-            <td align="center">Valor: ${{ dat.get('fin_recuperacion_valor') | default('0', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('fin_nombre_resp3') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('fin_r3') }}</td>
-        </tr>
-        <tr>
-            <td>Devolución muebles</td><td align="center"><span class="ep-yn {% if dat.get('fin_devolucion')=='SI' %}ep-yn--s{% elif dat.get('fin_devolucion')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('fin_devolucion') | default('-', true) }}</span></td>
-            <td align="center">Valor: ${{ dat.get('fin_devolucion_valor') | default('0', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('fin_nombre_resp4') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('fin_r4') }}</td>
-        </tr>
-        <tr style="background: #f8fafc;">
-            <td colspan="3" align="right"><strong>DIRECTOR/A FINANCIERO:</strong></td>
-            <td class="ep-td" align="center">{{ dat.get('fin_director') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('fin_dir') }}</td>
-        </tr>
-    </table>
-
-    <div class="ep-bloque__head" style="background: linear-gradient(90deg, #b45309 0%, #d97706 100%);">07. SEGURIDAD (EGSI)</div>
-    <table class="ep-tabla">
-        <tr>
-            <td width="30%">Archivos Digitales</td><td width="6%" align="center"><span class="ep-yn {% if dat.get('seg_archivos')=='SI' %}ep-yn--s{% elif dat.get('seg_archivos')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('seg_archivos') | default('-', true) }}</span></td>
-            <td width="20%" align="center">Copia: {{ dat.get('seg_entrega_copia') | default('-', true) }}</td>
-            <td class="ep-td" width="20%" align="center">{{ dat.get('seg_nombre_resp1') | default('—', true) }}</td>
-            <td width="24%" style="padding: 1px;">{{ firma_espejo('seg_r1') }}</td>
-        </tr>
-        <tr>
-            <td>Archivos Físicos</td><td align="center"><span class="ep-yn {% if dat.get('seg_archivos_fisicos')=='SI' %}ep-yn--s{% elif dat.get('seg_archivos_fisicos')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('seg_archivos_fisicos') | default('-', true) }}</span></td>
-            <td align="center">Info: {{ dat.get('seg_verificacion_info') | default('-', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('seg_nombre_resp2') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('seg_r2') }}</td>
-        </tr>
-        <tr style="background: #f8fafc;">
-            <td colspan="3" align="right"><strong>OFICIAL SEGURIDAD:</strong> {{ dat.get('seg_oficial') | default('-', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('seg_responsable') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('seg_oficial_sig') }}</td>
-        </tr>
-    </table>
-
-    <div class="ep-bloque__head" style="background: linear-gradient(90deg, #0369a1 0%, #0284c7 100%);">08. RECURSOS HUMANOS</div>
-    <table class="ep-tabla">
-        <tr>
-            <td width="30%">Capacitación</td><td width="6%" align="center"><span class="ep-yn {% if dat.get('rrhh_capacitacion')=='SI' %}ep-yn--s{% elif dat.get('rrhh_capacitacion')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('rrhh_capacitacion') | default('-', true) }}</span></td>
-            <td width="20%" align="center">Cursos: {{ dat.get('rrhh_cursos_eval') | default('-', true) }}</td>
-            <td class="ep-td" width="20%" align="center">{{ dat.get('rrhh_resp_capacitacion') | default('—', true) }}</td>
-            <td width="24%" style="padding: 1px;">{{ firma_espejo('rrhh_r1') }}</td>
-        </tr>
-        <tr>
-            <td>Evaluación</td><td align="center"><span class="ep-yn {% if dat.get('rrhh_evaluacion')=='SI' %}ep-yn--s{% elif dat.get('rrhh_evaluacion')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('rrhh_evaluacion') | default('-', true) }}</span></td>
-            <td align="center">—</td>
-            <td class="ep-td" align="center">{{ dat.get('rrhh_resp_evaluacion') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('rrhh_r2') }}</td>
-        </tr>
-        <tr>
-            <td>Viajes exterior</td><td align="center"><span class="ep-yn {% if dat.get('rrhh_viajes')=='SI' %}ep-yn--s{% elif dat.get('rrhh_viajes')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('rrhh_viajes') | default('-', true) }}</span></td>
-            <td align="center">—</td>
-            <td class="ep-td" align="center">{{ dat.get('rrhh_resp_viajes') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('rrhh_r3') }}</td>
-        </tr>
-        <tr>
-            <td>SIITH</td><td align="center"><span class="ep-yn {% if dat.get('rrhh_siith')=='SI' %}ep-yn--s{% elif dat.get('rrhh_siith')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('rrhh_siith') | default('-', true) }}</span></td>
-            <td align="center">—</td>
-            <td class="ep-td" align="center">{{ dat.get('rrhh_resp_siith') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('rrhh_r4') }}</td>
-        </tr>
-        <tr>
-            <td>Vacaciones</td><td align="center"><span class="ep-yn">{{ dat.get('rrhh_vacaciones') | default('0', true) }}</span></td>
-            <td align="center">Cert: {{ dat.get('rrhh_num_certificado') | default('-', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('rrhh_resp_vacaciones') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('rrhh_r5') }}</td>
-        </tr>
-        <tr>
-            <td>Juramentada</td><td align="center"><span class="ep-yn {% if dat.get('rrhh_juramentada')=='SI' %}ep-yn--s{% elif dat.get('rrhh_juramentada')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('rrhh_juramentada') | default('-', true) }}</span></td>
-            <td align="center">N°: {{ dat.get('rrhh_num_declaracion') | default('-', true) }}</td>
-            <td class="ep-td" align="center">{{ dat.get('rrhh_resp_juramentada') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('rrhh_r6') }}</td>
-        </tr>
-        <tr>
-            <td>Credencial</td><td align="center"><span class="ep-yn {% if dat.get('rrhh_credencial')=='SI' %}ep-yn--s{% elif dat.get('rrhh_credencial')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('rrhh_credencial') | default('-', true) }}</span></td>
-            <td align="center">—</td>
-            <td class="ep-td" align="center">{{ dat.get('rrhh_resp_credencial2') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('rrhh_r7') }}</td>
-        </tr>
-        <tr>
-            <td>Acta Bienes / CD</td><td align="center"><span class="ep-yn {% if dat.get('rrhh_acta_bienes')=='SI' %}ep-yn--s{% elif dat.get('rrhh_acta_bienes')=='NO' %}ep-yn--n{% endif %}">{{ dat.get('rrhh_acta_bienes') | default('-', true) }}</span></td>
-            <td align="center">—</td>
-            <td class="ep-td" align="center">{{ dat.get('rrhh_resp_acta') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('rrhh_r8') }}</td>
-        </tr>
-        <tr style="background: #f8fafc;">
-            <td colspan="3" align="right"><strong>DIRECTOR/A RRHH:</strong></td>
-            <td class="ep-td" align="center">{{ dat.get('rrhh_director') | default('—', true) }}</td>
-            <td style="padding: 1px;">{{ firma_espejo('rrhh_dir') }}</td>
-        </tr>
-    </table>
-
-    <div class="ep-bloque__head" style="background: linear-gradient(90deg, #166534 0%, #22c55e 100%);">09. RECEPCIÓN DOCUMENTOS</div>
-    <table class="ep-tabla">
-        <tr>
-            <td width="30%">Fecha Recepción</td><td width="15%" align="center">{{ dat.get('recepcion_fecha') | default('-', true) }}</td>
-            <td width="11%" align="right"><strong>Hojas:</strong></td><td class="ep-td" width="20%" align="center">{{ dat.get('recepcion_hojas') | default('-', true) }}</td>
-            <td width="24%" rowspan="2" style="padding: 1px;">{{ firma_espejo('recepcion_r1') }}</td>
-        </tr>
-        <tr>
-            <td align="right"><strong>Servidor:</strong></td><td class="ep-td" colspan="3" align="center">{{ dat.get('recepcion_servidor') | default('-', true) }} | Cargo: {{ dat.get('recepcion_cargo') | default('-', true) }}</td>
-        </tr>
-    </table>
-
-    <div class="ep-bloque__head" style="background: linear-gradient(90deg, #4c1d95 0%, #8b5cf6 100%);">10. AUTORIZACIÓN — SERVIDOR SALIENTE</div>
-    <div style="padding: 6px 10px; text-align: justify; font-size: 7.5px; background: #faf5ff;">
-        Conforme lo establecido en el Reglamento General a la Ley Orgánica de Servicio Público (LOSEP), quien suscribe el presente formulario de "Paz y Salvo para la liquidación de haberes que me corresponde", <strong>AUTORIZO</strong> a la DIRECCIÓN ADMINISTRATIVA FINANCIERA del INAMHI, para que efectúe los descuentos detallados en el presente documento por reintegro y/o recuperación de valores, bienes y/o especies que se hayan encontrado a mi cargo y no hayan sido devueltos en las condiciones recibidas, los mismos que serán DESCONTADOS a través de mi liquidación definitiva de haberes.
-    </div>
-    <div style="text-align: center; margin-top: 5px; background: #faf5ff; padding-bottom: 10px;">
-        <div style="width: 175px; margin: 0 auto; display: flex; justify-content: center;">
-            {% if dat.get('servidor_saliente') == 'FIRMADO' %}
-            <div class="firmaec-sello" style="max-width: 100%; border: 1.5px solid #000; box-shadow: 3px 3px 0px rgba(76, 29, 149, 0.2); padding: 4px;">
-                {{ generar_qr_svg(dat.get('servidor_saliente_nombre')) | safe }}
-                <div class="firmaec-text-col">
-                    <span class="firmaec-label-top" style="font-size: 5.5px;">Validar únicamente en FirmaEC.</span>
-                    <span class="firmaec-label" style="font-size: 5.5px;">Firmado electrónicamente por:</span>
-                    <span class="firmaec-name" style="font-size: 8px;">{{ dat.get('servidor_saliente_nombre') | default(ex.nombres ~ ' ' ~ ex.apellidos, true) | upper }}</span>
-                </div>
-            </div>
-            {% else %}
-            <span style="color: #6d28d9; font-style: italic; font-weight: 800; border: 1.5px dashed #a78bfa; padding: 6px; width: 100%; display: block; border-radius: 4px; background: #fff;">[ FirmaEC PAdES — Servidor Saliente ]</span>
-            {% endif %}
+        <div class="ep-header__center">
+            <div class="ep-header__inst">Instituto Nacional de Meteorología e Hidrología</div>
+            <div class="ep-header__title">FORMULARIO PAZ Y SALVO — LIQUIDACIÓN DE HABERES</div>
         </div>
-        <div style="margin-top: 6px; font-weight: 900; font-size: 8px; color: #1e293b;" class="ep-td">C.C: {{ dat.get('cedula_firmante') | default('-', true) }} &nbsp;&nbsp;|&nbsp;&nbsp; FECHA: {{ dat.get('fecha_firma') | default('-', true) }}</div>
-        <div style="font-size: 6.5px; color: #dc2626; font-weight: bold; margin-top: 4px;">(ESTE DOCUMENTO ES NULO SIN LA FIRMA ELECTRÓNICA .P12 / FIRMAEC)</div>
+        <div class="ep-header__code-wrap">INAMHI-RH-001 <br> PÁGINA 1/2</div>
     </div>
+</div>
+
+<div class="ep-bloque__head">01. DATOS PERSONALES DEL SERVIDOR SALIENTE</div>
+<table class="ep-tabla">
+    <tr>
+        <th class="ep-th" width="18%">NOMBRES</th>
+        <td class="ep-td" colspan="3">{{ dat.get('nombres_apellidos') | default(ex.nombres ~ ' ' ~ ex.apellidos, true)
+            }}</td>
+    </tr>
+    <tr>
+        <th class="ep-th">CÉDULA</th>
+        <td class="ep-td">{{ dat.get('cedula') | default(ex.cedula, true) }}</td>
+        <th class="ep-th" width="18%">MODALIDAD</th>
+        <td class="ep-td">{{ dat.get('modalidad') | default('—', true) }}</td>
+    </tr>
+    <tr>
+        <th class="ep-th">INGRESO</th>
+        <td class="ep-td">{{ dat.get('fecha_ingreso') | default('—', true) }}</td>
+        <th class="ep-th">SALIDA</th>
+        <td class="ep-td">{{ dat.get('fecha_salida') | default('—', true) }}</td>
+    </tr>
+    <tr>
+        <th class="ep-th">DIRECCIÓN</th>
+        <td class="ep-td" colspan="3">{{ dat.get('direccion') | default('—', true) }} {% if dat.get('numero_domicilio')
+            %}Telf: {{ dat.get('numero_domicilio') }}{% endif %}</td>
+    </tr>
+    <tr>
+        <th class="ep-th">PROV / CANTÓN</th>
+        <td class="ep-td">{{ dat.get('provincia') | default('—', true) }} / {{ dat.get('canton') | default('—', true) }}
+        </td>
+        <th class="ep-th">CEL / EMERGENCIA</th>
+        <td class="ep-td">{{ dat.get('celular') | default('—', true) }} / {{ dat.get('emergencia') | default('—', true)
+            }}</td>
+    </tr>
+    <tr>
+        <th class="ep-th">EMAIL 1</th>
+        <td class="ep-td" style="text-transform: lowercase;">{{ dat.get('email1') | default('—', true) }}</td>
+        <th class="ep-th">EMAIL 2</th>
+        <td class="ep-td" style="text-transform: lowercase;">{{ dat.get('email2') | default('—', true) }}</td>
+    </tr>
+</table>
+
+<div class="ep-bloque__head" style="background: linear-gradient(90deg, #1d4ed8 0%, #3b82f6 100%);">02. DIRECCIÓN /
+    UNIDAD</div>
+<table class="ep-tabla">
+    <tr>
+        <th class="ep-th" width="18%">LUGAR TRABAJO</th>
+        <td class="ep-td">{{ dat.get('lugar_trabajo') | default('—', true) }}</td>
+        <th class="ep-th" width="18%">GRUPO OCUP.</th>
+        <td class="ep-td">{{ dat.get('grupo_ocupacional') | default('—', true) }}</td>
+    </tr>
+    <tr>
+        <th class="ep-th">UNIDAD</th>
+        <td class="ep-td" colspan="3">{{ dat.get('unidad') | default('—', true) }}</td>
+    </tr>
+    <tr>
+        <th class="ep-th">CARGO</th>
+        <td class="ep-td" colspan="3">{{ dat.get('cargo') | default('—', true) }}</td>
+    </tr>
+</table>
+
+<div class="ep-bloque__head" style="background: linear-gradient(90deg, #0284c7 0%, #0ea5e9 100%);">03. GESTIÓN
+    DOCUMENTAL Y TRÁMITES</div>
+<table class="ep-tabla">
+    <tr>
+        <th class="ep-tfh" width="22%">DESCRIPCIÓN</th>
+        <th class="ep-tfh" width="6%">S/N</th>
+        <th class="ep-tfh" width="22%">DESCRIPCIÓN</th>
+        <th class="ep-tfh" width="6%">S/N</th>
+        <th class="ep-tfh" width="20%">RESPONSABLE</th>
+        <th class="ep-tfh" width="24%">FIRMA ELECTRÓNICA</th>
+    </tr>
+    <tr>
+        <td>Informe fin gestión</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('tramites_informe')=='SI' %}ep-yn--s{% elif dat.get('tramites_informe')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('tramites_informe') | default('-', true) }}</span></td>
+        <td>QUIPUX en cero</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('tramites_quipux_cero')=='SI' %}ep-yn--s{% elif dat.get('tramites_quipux_cero')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('tramites_quipux_cero') | default('-', true) }}</span></td>
+        <td class="ep-td" align="center">{{ dat.get('tramites_nombre_resp1') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('tramites_r1') }}</td>
+    </tr>
+    <tr>
+        <td>Fe presentación</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('tramites_fe_presentacion')=='SI' %}ep-yn--s{% elif dat.get('tramites_fe_presentacion')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('tramites_fe_presentacion') | default('-', true) }}</span></td>
+        <td>Claves asignadas</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('tramites_claves_asignadas')=='SI' %}ep-yn--s{% elif dat.get('tramites_claves_asignadas')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('tramites_claves_asignadas') | default('-', true) }}</span></td>
+        <td class="ep-td" align="center">{{ dat.get('tramites_nombre_resp2') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('tramites_r2') }}</td>
+    </tr>
+    <tr>
+        <td>Archivo físico LOSEP</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('tramites_losep')=='SI' %}ep-yn--s{% elif dat.get('tramites_losep')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('tramites_losep') | default('-', true) }}</span></td>
+        <td>Acta entrega claves</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('tramites_acta_claves')=='SI' %}ep-yn--s{% elif dat.get('tramites_acta_claves')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('tramites_acta_claves') | default('-', true) }}</span></td>
+        <td class="ep-td" align="center">{{ dat.get('tramites_nombre_resp3') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('tramites_r3') }}</td>
+    </tr>
+    <tr style="background: #f8fafc;">
+        <td colspan="4"><strong>Admin. Contrato:</strong> {{ dat.get('tramites_admin_contrato') | default('-', true) }}
+            | <strong>Desc:</strong> {{ dat.get('tramites_desc_contrato') | default('-', true) }} |
+            <strong>Memo:</strong> {{ dat.get('tramites_memo') | default('-', true) }}<br>
+            <strong>Jefe Inmediato:</strong> {{ dat.get('tramites_jefe_inmediato') | default('-', true) }} |
+            <strong>Recibe:</strong> {{ dat.get('tramites_servidor_recibe') | default('-', true) }} |
+            <strong>Obs:</strong> {{ dat.get('tramites_obs') | default('-', true) }}
+        </td>
+        <td class="ep-td" align="center">{{ dat.get('tramites_nombre_responsable') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('tramites_jefe') }}</td>
+    </tr>
+</table>
+
+<div class="ep-bloque__head" style="background: linear-gradient(90deg, #334155 0%, #64748b 100%);">04. GESTIÓN
+    ADMINISTRATIVA</div>
+<table class="ep-tabla">
+    <tr>
+        <th class="ep-tfh" width="30%">DESCRIPCIÓN</th>
+        <th class="ep-tfh" width="6%">S/N</th>
+        <th class="ep-tfh" width="20%">DATO ADICIONAL</th>
+        <th class="ep-tfh" width="20%">RESPONSABLE</th>
+        <th class="ep-tfh" width="24%">FIRMA ELECTRÓNICA</th>
+    </tr>
+    <tr>
+        <td>Entrega informe actividades</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('admin_informe')=='SI' %}ep-yn--s{% elif dat.get('admin_informe')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('admin_informe') | default('-', true) }}</span></td>
+        <td align="center">—</td>
+        <td class="ep-td" align="center">{{ dat.get('admin_nombre_resp1') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('admin_r1') }}</td>
+    </tr>
+    <tr>
+        <td>Entrega bienes y muebles</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('admin_bienes')=='SI' %}ep-yn--s{% elif dat.get('admin_bienes')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('admin_bienes') | default('-', true) }}</span></td>
+        <td align="center">Val: ${{ dat.get('admin_valor_bienes') | default('0', true) }} | Acta: {{
+            dat.get('admin_acta_bienes') | default('-', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('admin_nombre_resp2') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('admin_r2') }}</td>
+    </tr>
+    <tr>
+        <td>Deducibles pendientes</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('admin_deducibles')=='SI' %}ep-yn--s{% elif dat.get('admin_deducibles')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('admin_deducibles') | default('-', true) }}</span></td>
+        <td align="center">Valor: ${{ dat.get('admin_deducibles_valor') | default('0', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('admin_nombre_resp3') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('admin_r3') }}</td>
+    </tr>
+    <tr>
+        <td>Pasajes justificar</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('admin_pasajes')=='SI' %}ep-yn--s{% elif dat.get('admin_pasajes')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('admin_pasajes') | default('-', true) }}</span></td>
+        <td align="center">Valor: ${{ dat.get('admin_pasajes_valor') | default('0', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('admin_nombre_resp4') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('admin_r4') }}</td>
+    </tr>
+    <tr style="background: #f8fafc;">
+        <td colspan="3" align="right"><strong>DIRECTOR/A ADMINISTRATIVO FINANCIERO:</strong></td>
+        <td class="ep-td" align="center">{{ dat.get('admin_responsable') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('admin_dir') }}</td>
+    </tr>
+</table>
+
+<div class="ep-bloque__head" style="background: linear-gradient(90deg, #6d28d9 0%, #8b5cf6 100%);">05. GESTIÓN TIC</div>
+<table class="ep-tabla">
+    <tr>
+        <th class="ep-tfh" width="30%">DESCRIPCIÓN</th>
+        <th class="ep-tfh" width="6%">S/N</th>
+        <th class="ep-tfh" width="20%">DATO ADICIONAL</th>
+        <th class="ep-tfh" width="20%">RESPONSABLE</th>
+        <th class="ep-tfh" width="24%">FIRMA ELECTRÓNICA</th>
+    </tr>
+    <tr>
+        <td>Verificación equipo</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('tic_verificacion')=='SI' %}ep-yn--s{% elif dat.get('tic_verificacion')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('tic_verificacion') | default('-', true) }}</span></td>
+        <td align="center">IP: {{ dat.get('tic_ip_fija') | default('-', true) }} | Liberó: {{ dat.get('tic_liberacion')
+            | default('-', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('tic_nombre_resp1') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('tic_r1') }}</td>
+    </tr>
+    <tr>
+        <td>Entrega Backup</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('tic_backup')=='SI' %}ep-yn--s{% elif dat.get('tic_backup')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('tic_backup') | default('-', true) }}</span></td>
+        <td align="center">Ruta: {{ dat.get('tic_ruta_backup') | default('-', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('tic_nombre_resp2') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('tic_r2') }}</td>
+    </tr>
+    <tr>
+        <td>Cierre Cuentas / Accesos</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('tic_retiro_acceso')=='SI' %}ep-yn--s{% elif dat.get('tic_retiro_acceso')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('tic_retiro_acceso') | default('-', true) }}</span></td>
+        <td align="center">C: {{ dat.get('tic_cierre_correo') | default('-', true) }} | Q: {{ dat.get('tic_quipux') |
+            default('-', true) }}<br>S: {{ dat.get('tic_esigef') | default('-', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('tic_nombre_resp3') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('tic_r3') }}</td>
+    </tr>
+    <tr>
+        <td>Tarjeta Acceso</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('tic_tarjeta_cuentas')=='SI' %}ep-yn--s{% elif dat.get('tic_tarjeta_cuentas')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('tic_tarjeta_cuentas') | default('-', true) }}</span></td>
+        <td align="center">Obs: {{ dat.get('tic_obs') | default('-', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('tic_nombre_resp4') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('tic_r4') }}</td>
+    </tr>
+    <tr style="background: #f8fafc;">
+        <td colspan="3" align="right"><strong>RESPONSABLE TIC GENERAL:</strong></td>
+        <td class="ep-td" align="center">{{ dat.get('tic_responsable') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('tic_r5') }}</td>
+    </tr>
+</table>
+
+<div class="ep-bloque__head" style="background: linear-gradient(90deg, #047857 0%, #10b981 100%); margin-top: 10px;">06.
+    GESTIÓN FINANCIERA</div>
+<table class="ep-tabla">
+    <tr>
+        <th class="ep-tfh" width="30%">DESCRIPCIÓN</th>
+        <th class="ep-tfh" width="6%">S/N</th>
+        <th class="ep-tfh" width="20%">VALOR</th>
+        <th class="ep-tfh" width="20%">RESPONSABLE</th>
+        <th class="ep-tfh" width="24%">FIRMA ELECTRÓNICA</th>
+    </tr>
+    <tr>
+        <td>Saldos contables</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('fin_saldos')=='SI' %}ep-yn--s{% elif dat.get('fin_saldos')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('fin_saldos') | default('-', true) }}</span></td>
+        <td align="center">Valor: ${{ dat.get('fin_saldos_valor') | default('0', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('fin_nombre_resp1') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('fin_r1') }}</td>
+    </tr>
+    <tr>
+        <td>Anticipo sueldos</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('fin_anticipo')=='SI' %}ep-yn--s{% elif dat.get('fin_anticipo')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('fin_anticipo') | default('-', true) }}</span></td>
+        <td align="center">Valor: ${{ dat.get('fin_anticipo_valor') | default('0', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('fin_nombre_resp2') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('fin_r2') }}</td>
+    </tr>
+    <tr>
+        <td>Recuperación valores</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('fin_recuperacion')=='SI' %}ep-yn--s{% elif dat.get('fin_recuperacion')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('fin_recuperacion') | default('-', true) }}</span></td>
+        <td align="center">Valor: ${{ dat.get('fin_recuperacion_valor') | default('0', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('fin_nombre_resp3') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('fin_r3') }}</td>
+    </tr>
+    <tr>
+        <td>Devolución muebles</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('fin_devolucion')=='SI' %}ep-yn--s{% elif dat.get('fin_devolucion')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('fin_devolucion') | default('-', true) }}</span></td>
+        <td align="center">Valor: ${{ dat.get('fin_devolucion_valor') | default('0', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('fin_nombre_resp4') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('fin_r4') }}</td>
+    </tr>
+    <tr style="background: #f8fafc;">
+        <td colspan="3" align="right"><strong>DIRECTOR/A FINANCIERO:</strong></td>
+        <td class="ep-td" align="center">{{ dat.get('fin_director') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('fin_dir') }}</td>
+    </tr>
+</table>
+
+<div class="ep-bloque__head" style="background: linear-gradient(90deg, #b45309 0%, #d97706 100%);">07. SEGURIDAD (EGSI)
+</div>
+<table class="ep-tabla">
+    <tr>
+        <td width="30%">Archivos Digitales</td>
+        <td width="6%" align="center"><span
+                class="ep-yn {% if dat.get('seg_archivos')=='SI' %}ep-yn--s{% elif dat.get('seg_archivos')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('seg_archivos') | default('-', true) }}</span></td>
+        <td width="20%" align="center">Copia: {{ dat.get('seg_entrega_copia') | default('-', true) }}</td>
+        <td class="ep-td" width="20%" align="center">{{ dat.get('seg_nombre_resp1') | default('—', true) }}</td>
+        <td width="24%" style="padding: 1px;">{{ firma_espejo('seg_r1') }}</td>
+    </tr>
+    <tr>
+        <td>Archivos Físicos</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('seg_archivos_fisicos')=='SI' %}ep-yn--s{% elif dat.get('seg_archivos_fisicos')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('seg_archivos_fisicos') | default('-', true) }}</span></td>
+        <td align="center">Info: {{ dat.get('seg_verificacion_info') | default('-', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('seg_nombre_resp2') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('seg_r2') }}</td>
+    </tr>
+    <tr style="background: #f8fafc;">
+        <td colspan="3" align="right"><strong>OFICIAL SEGURIDAD:</strong> {{ dat.get('seg_oficial') | default('-', true)
+            }}</td>
+        <td class="ep-td" align="center">{{ dat.get('seg_responsable') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('seg_oficial_sig') }}</td>
+    </tr>
+</table>
+
+<div class="ep-bloque__head" style="background: linear-gradient(90deg, #0369a1 0%, #0284c7 100%);">08. RECURSOS HUMANOS
+</div>
+<table class="ep-tabla">
+    <tr>
+        <td width="30%">Capacitación</td>
+        <td width="6%" align="center"><span
+                class="ep-yn {% if dat.get('rrhh_capacitacion')=='SI' %}ep-yn--s{% elif dat.get('rrhh_capacitacion')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('rrhh_capacitacion') | default('-', true) }}</span></td>
+        <td width="20%" align="center">Cursos: {{ dat.get('rrhh_cursos_eval') | default('-', true) }}</td>
+        <td class="ep-td" width="20%" align="center">{{ dat.get('rrhh_resp_capacitacion') | default('—', true) }}</td>
+        <td width="24%" style="padding: 1px;">{{ firma_espejo('rrhh_r1') }}</td>
+    </tr>
+    <tr>
+        <td>Evaluación</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('rrhh_evaluacion')=='SI' %}ep-yn--s{% elif dat.get('rrhh_evaluacion')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('rrhh_evaluacion') | default('-', true) }}</span></td>
+        <td align="center">—</td>
+        <td class="ep-td" align="center">{{ dat.get('rrhh_resp_evaluacion') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('rrhh_r2') }}</td>
+    </tr>
+    <tr>
+        <td>Viajes exterior</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('rrhh_viajes')=='SI' %}ep-yn--s{% elif dat.get('rrhh_viajes')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('rrhh_viajes') | default('-', true) }}</span></td>
+        <td align="center">—</td>
+        <td class="ep-td" align="center">{{ dat.get('rrhh_resp_viajes') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('rrhh_r3') }}</td>
+    </tr>
+    <tr>
+        <td>SIITH</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('rrhh_siith')=='SI' %}ep-yn--s{% elif dat.get('rrhh_siith')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('rrhh_siith') | default('-', true) }}</span></td>
+        <td align="center">—</td>
+        <td class="ep-td" align="center">{{ dat.get('rrhh_resp_siith') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('rrhh_r4') }}</td>
+    </tr>
+    <tr>
+        <td>Vacaciones</td>
+        <td align="center"><span class="ep-yn">{{ dat.get('rrhh_vacaciones') | default('0', true) }}</span></td>
+        <td align="center">Cert: {{ dat.get('rrhh_num_certificado') | default('-', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('rrhh_resp_vacaciones') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('rrhh_r5') }}</td>
+    </tr>
+    <tr>
+        <td>Juramentada</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('rrhh_juramentada')=='SI' %}ep-yn--s{% elif dat.get('rrhh_juramentada')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('rrhh_juramentada') | default('-', true) }}</span></td>
+        <td align="center">N°: {{ dat.get('rrhh_num_declaracion') | default('-', true) }}</td>
+        <td class="ep-td" align="center">{{ dat.get('rrhh_resp_juramentada') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('rrhh_r6') }}</td>
+    </tr>
+    <tr>
+        <td>Credencial</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('rrhh_credencial')=='SI' %}ep-yn--s{% elif dat.get('rrhh_credencial')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('rrhh_credencial') | default('-', true) }}</span></td>
+        <td align="center">—</td>
+        <td class="ep-td" align="center">{{ dat.get('rrhh_resp_credencial2') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('rrhh_r7') }}</td>
+    </tr>
+    <tr>
+        <td>Acta Bienes / CD</td>
+        <td align="center"><span
+                class="ep-yn {% if dat.get('rrhh_acta_bienes')=='SI' %}ep-yn--s{% elif dat.get('rrhh_acta_bienes')=='NO' %}ep-yn--n{% endif %}">{{
+                dat.get('rrhh_acta_bienes') | default('-', true) }}</span></td>
+        <td align="center">—</td>
+        <td class="ep-td" align="center">{{ dat.get('rrhh_resp_acta') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('rrhh_r8') }}</td>
+    </tr>
+    <tr style="background: #f8fafc;">
+        <td colspan="3" align="right"><strong>DIRECTOR/A RRHH:</strong></td>
+        <td class="ep-td" align="center">{{ dat.get('rrhh_director') | default('—', true) }}</td>
+        <td style="padding: 1px;">{{ firma_espejo('rrhh_dir') }}</td>
+    </tr>
+</table>
+
+<div class="ep-bloque__head" style="background: linear-gradient(90deg, #166534 0%, #22c55e 100%);">09. RECEPCIÓN
+    DOCUMENTOS</div>
+<table class="ep-tabla">
+    <tr>
+        <td width="30%">Fecha Recepción</td>
+        <td width="15%" align="center">{{ dat.get('recepcion_fecha') | default('-', true) }}</td>
+        <td width="11%" align="right"><strong>Hojas:</strong></td>
+        <td class="ep-td" width="20%" align="center">{{ dat.get('recepcion_hojas') | default('-', true) }}</td>
+        <td width="24%" rowspan="2" style="padding: 1px;">{{ firma_espejo('recepcion_r1') }}</td>
+    </tr>
+    <tr>
+        <td align="right"><strong>Servidor:</strong></td>
+        <td class="ep-td" colspan="3" align="center">{{ dat.get('recepcion_servidor') | default('-', true) }} | Cargo:
+            {{ dat.get('recepcion_cargo') | default('-', true) }}</td>
+    </tr>
+</table>
+
+<div class="ep-bloque__head" style="background: linear-gradient(90deg, #4c1d95 0%, #8b5cf6 100%);">10. AUTORIZACIÓN —
+    SERVIDOR SALIENTE</div>
+<div style="padding: 6px 10px; text-align: justify; font-size: 7.5px; background: #faf5ff;">
+    Conforme lo establecido en el Reglamento General a la Ley Orgánica de Servicio Público (LOSEP), quien suscribe el
+    presente formulario de "Paz y Salvo para la liquidación de haberes que me corresponde", <strong>AUTORIZO</strong> a
+    la DIRECCIÓN ADMINISTRATIVA FINANCIERA del INAMHI, para que efectúe los descuentos detallados en el presente
+    documento por reintegro y/o recuperación de valores, bienes y/o especies que se hayan encontrado a mi cargo y no
+    hayan sido devueltos en las condiciones recibidas, los mismos que serán DESCONTADOS a través de mi liquidación
+    definitiva de haberes.
+</div>
+<div style="text-align: center; margin-top: 5px; background: #faf5ff; padding-bottom: 10px;">
+    <div style="width: 175px; margin: 0 auto; display: flex; justify-content: center;">
+        {% if dat.get('servidor_saliente') == 'FIRMADO' %}
+        <div class="firmaec-sello"
+            style="max-width: 100%; border: 1.5px solid #000; box-shadow: 3px 3px 0px rgba(76, 29, 149, 0.2); padding: 4px;">
+            {{ generar_qr_svg(dat.get('servidor_saliente_nombre')) | safe }}
+            <div class="firmaec-text-col">
+                <span class="firmaec-label-top" style="font-size: 5.5px;">Validar únicamente en FirmaEC.</span>
+                <span class="firmaec-label" style="font-size: 5.5px;">Firmado electrónicamente por:</span>
+                <span class="firmaec-name" style="font-size: 8px;">{{ dat.get('servidor_saliente_nombre') |
+                    default(ex.nombres ~ ' ' ~ ex.apellidos, true) | upper }}</span>
+            </div>
+        </div>
+        {% else %}
+        <span
+            style="color: #6d28d9; font-style: italic; font-weight: 800; border: 1.5px dashed #a78bfa; padding: 6px; width: 100%; display: block; border-radius: 4px; background: #fff;">[
+            FirmaEC PAdES — Servidor Saliente ]</span>
+        {% endif %}
+    </div>
+    <div style="margin-top: 6px; font-weight: 900; font-size: 8px; color: #1e293b;" class="ep-td">C.C: {{
+        dat.get('cedula_firmante') | default('-', true) }} &nbsp;&nbsp;|&nbsp;&nbsp; FECHA: {{ dat.get('fecha_firma') |
+        default('-', true) }}</div>
+</div>
 </div>
