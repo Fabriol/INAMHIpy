@@ -77,7 +77,6 @@
         color: var(--blue-900);
         text-transform: uppercase;
         margin-bottom: 8px;
-        display: block;
     }
 
     /* Barra de Progreso Personalizada */
@@ -101,25 +100,23 @@
     .progress-100 {
         background: linear-gradient(90deg, #10b981, #059669) !important;
     }
-
-    /* Estilo Especial Panel Final */
-    .panel-veredicto {
-        border: 2px solid #10b981 !important;
-    }
-
-    .header-veredicto {
-        background: linear-gradient(135deg, #059669, #10b981);
-    }
 </style>
 
-<!-- CÁLCULO DE PROGRESO -->
-{% set total_preguntas = 8 %}
-{% set respondidas = solicitud.respuestas|length if solicitud.respuestas else 0 %}
-{% set porcentaje = ((respondidas / total_preguntas) * 100) | round(0) | int %}
+{% set total_campos_fijos = 70 %}
+{% set respuestas_totales = namespace(count=0) %}
+
+{% if respuestas_db %}
+{% for res in respuestas_db %}
+{% if res.valor_respuesta and res.valor_respuesta|trim != '' %}
+{% set respuestas_totales.count = respuestas_totales.count + 1 %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% set porcentaje = ((respuestas_totales.count / total_campos_fijos) * 100) | round(0) | int %}
 {% if porcentaje > 100 %}{% set porcentaje = 100 %}{% endif %}
 
 <div class="page fade-in">
-    <!-- CABECERA -->
     <div class="page-header">
         <div>
             <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Validación Final</span>
@@ -133,7 +130,6 @@
         </div>
     </div>
 
-    <!-- TARJETA DE CONTEXTO DEL EX FUNCIONARIO -->
     <div class="info-card">
         <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-person-badge-fill me-2"></i>Expediente de Paz y Salvo
             #{{ solicitud.id }} perteneciente a:</h6>
@@ -160,12 +156,12 @@
             </div>
         </div>
 
-        <!-- BARRA DE PROGRESO VISUAL -->
         <div class="mt-4 pt-3 border-top border-primary border-opacity-25">
             <div class="d-flex justify-content-between align-items-end">
-                <span class="fw-bold"
-                    style="font-size: 12px; color: var(--slate-500); text-transform: uppercase;">Desarrollo del
-                    Formulario Base</span>
+                <span class="fw-bold" style="font-size: 12px; color: var(--slate-500); text-transform: uppercase;">
+                    <i class="bi bi-bar-chart-fill me-1"></i> Desarrollo de la Hoja Espejo ({{ respuestas_totales.count
+                    }} de {{ total_campos_fijos }} campos)
+                </span>
                 <span class="fw-bold fs-5 {% if porcentaje == 100 %}text-success{% else %}text-primary{% endif %}">{{
                     porcentaje }}%</span>
             </div>
@@ -176,58 +172,37 @@
         </div>
     </div>
 
-    <!-- FORMULARIO ÚNICO: ESTADO FINAL DEL PROCESO -->
+    {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
+    {% if porcentaje >= 95 %}
     <form id="formularioValidacion" method="POST" action="/areas/responder/{{ solicitud.id }}">
-
-        {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
-        <div class="card border-0 shadow-sm rounded-4 mt-2 panel-veredicto" style="overflow: hidden;">
-            <div class="card-header text-white header-veredicto" style="padding: 15px 20px;">
+        <div class="card border-0 shadow-sm rounded-4 mt-4"
+            style="overflow: hidden; border: 2px solid #8b5cf6 !important;">
+            <div class="card-header text-white"
+                style="background: linear-gradient(135deg, #4c1d95, #7c3aed); padding: 15px 20px;">
                 <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase;"><i
-                        class="bi bi-shield-check me-2"></i> Estado Final del Proceso</h5>
+                        class="bi bi-briefcase-fill me-2"></i> Veredicto Final - Talento Humano</h5>
             </div>
             <div class="card-body p-4 bg-white">
-                <p class="text-muted small fw-bold mb-4" style="font-size: 13px;"><i
-                        class="bi bi-info-circle-fill me-1 text-primary"></i> Recursos Humanos define el estado final
-                    del trámite:</p>
-
                 <div class="row align-items-start">
-                    <div class="col-md-5">
-                        <label class="form-label-custom text-dark">Dictamen Oficial <span
+                    <div class="col-md-6">
+                        <label class="form-label-custom text-dark">Estado Final del Trámite Institucional <span
                                 class="text-danger">*</span></label>
                         <select class="doc-input mt-2" name="estado_final" id="estadoFinalSelect"
-                            onchange="window['toggleEstadoFinal']()"
-                            style="border-color: #10b981; font-size: 14px; font-weight: 900 !important;" required>
-                            <option value="">— Seleccione una opción —</option>
-                            <option value="Aprobado">✅ Aprobado</option>
-                            <option value="En revisión">⏳ En revisión</option>
-                            <option value="Negado">❌ Negado</option>
+                            onchange="window['toggleObservacionFinal']()" style="border-color: #8b5cf6;" required>
+                            <option value="">— Defina el Estado Final —</option>
+                            <option value="Aprobado">✅ Aprobado (Documentación Completa)</option>
+                            <option value="En revisión">⏳ En revisión (Validación Interna)</option>
+                            <option value="Negado">❌ Negado (Devuelto al Funcionario)</option>
                         </select>
                     </div>
-
-                    <!-- CAMPO DE OBSERVACIÓN OBLIGATORIA (Aparece si es Negado) -->
-                    <div class="col-md-7" id="divObservacionFinal" style="display: none;">
-                        <label class="form-label-custom text-danger"><i
-                                class="bi bi-exclamation-triangle-fill me-1"></i> Observación Obligatoria <span
-                                class="text-danger">*</span></label>
+                    <div class="col-md-6" id="divObservacionFinal" style="display: none;">
+                        <label class="form-label-custom text-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>
+                            Motivo del Rechazo <span class="text-danger">*</span></label>
                         <input type="text" class="doc-input mt-2" id="observacionFinalInput" name="observacion_final"
-                            placeholder="Detalle por qué se niega el trámite..."
+                            placeholder="Especifique detalladamente el motivo..."
                             oninput="window['convertirMayusculas'](this)"
                             style="border-color: #ef4444; background-color: #fef2f2 !important;">
                     </div>
-                </div>
-
-                <!-- CAJA INFORMATIVA DE CONSECUENCIAS (Aparece si es Aprobado) -->
-                <div id="divAlertaAprobado" class="alert alert-success border-0 shadow-sm mt-4 mb-0 rounded-4"
-                    style="display: none; background-color: #f0fdf4;">
-                    <h6 class="fw-bold mb-3" style="color: #166534; font-size: 14px;"><i
-                            class="bi bi-gear-fill me-2"></i> Acciones del Sistema al Aprobar:</h6>
-                    <ul class="mb-0" style="color: #15803d; font-weight: 700; font-size: 13px; line-height: 1.8;">
-                        <li>El documento queda almacenado en la base de datos de manera irreversible.</li>
-                        <li>El usuario ex funcionario pasa a estado <span
-                                class="badge bg-danger rounded-pill px-2 py-1 ms-1"
-                                style="font-size: 10px;">INHABILITADO</span></li>
-                        <li>Se bloquea instantáneamente su acceso al sistema institucional.</li>
-                    </ul>
                 </div>
             </div>
         </div>
@@ -235,21 +210,22 @@
         <div class="d-flex justify-content-end mt-4 pt-3 border-top gap-3">
             <button type="button" class="btn btn-success fw-bold px-4 py-2"
                 onclick="window['validarYGuardarRespuesta']()" style="border-radius: 8px;">
-                <i class="bi bi-check2-all me-2"></i> Guardar Veredicto Final
+                <i class="bi bi-check-circle-fill me-2"></i> Guardar Veredicto Final
             </button>
         </div>
-        {% else %}
-        <!-- Mensaje de seguridad por si alguien que no es de RRHH intenta entrar -->
-        <div class="alert alert-danger fw-bold rounded-4 shadow-sm p-4 mt-4 text-center border-0"
-            style="background-color: #fef2f2; color: #991b1b;">
-            <i class="bi bi-shield-lock-fill fs-1 d-block mb-2 text-danger"></i>
-            <h5 class="fw-bold">Acceso Restringido</h5>
-            <p class="m-0 small">Solo la dirección de <strong>Talento Humano</strong> o el
-                <strong>Administrador</strong> tienen los permisos necesarios para emitir el dictamen final de este
-                documento.</p>
-        </div>
-        {% endif %}
     </form>
+    {% else %}
+    <div class="alert alert-info border-0 shadow-sm mt-4 fw-bold p-4 d-flex align-items-center rounded-4"
+        style="background-color: #e0e7ff; color: #4338ca;">
+        <i class="bi bi-shield-lock-fill fs-4 me-3"></i>
+        <div>
+            El panel de <strong>Veredicto Final de RRHH</strong> se habilitará cuando el documento espejo alcance el
+            100% de llenado por todas las áreas institucionales (Faltan {{ total_campos_fijos - respuestas_totales.count
+            }} campos).
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
 </div>
 
 <script>
@@ -258,26 +234,18 @@
         el.value = textoLimpio;
     };
 
-    window.toggleEstadoFinal = () => {
+    window.toggleObservacionFinal = () => {
         let estadoSelect = document.getElementById('estadoFinalSelect');
         let divObs = document.getElementById('divObservacionFinal');
         let obsInput = document.getElementById('observacionFinalInput');
-        let divAprobado = document.getElementById('divAlertaAprobado');
 
         if (estadoSelect && estadoSelect.value === 'Negado') {
             divObs.style.display = 'block';
             obsInput.setAttribute('required', 'required');
-            divAprobado.style.display = 'none';
-        } else if (estadoSelect && estadoSelect.value === 'Aprobado') {
+        } else if (estadoSelect) {
             divObs.style.display = 'none';
             obsInput.removeAttribute('required');
-            obsInput.value = ''; 
-            divAprobado.style.display = 'block';
-        } else {
-            divObs.style.display = 'none';
-            obsInput.removeAttribute('required');
-            obsInput.value = ''; 
-            divAprobado.style.display = 'none';
+            obsInput.value = '';
         }
     };
 
@@ -298,55 +266,22 @@
         });
 
         if (!formValido) {
-            Swal.fire('Campos Incompletos', 'Por favor, seleccione el dictamen oficial y la observación antes de guardar.', 'warning');
+            Swal.fire('Campos Incompletos', 'Por favor, defina el Estado Final y el motivo del rechazo (si aplica).', 'warning');
             return;
         }
 
-        // LÓGICA DE ALERTA DINÁMICA SÚPER CHÉVERE
-        let estadoSeleccionado = document.getElementById('estadoFinalSelect').value;
-        let observacion = document.getElementById('observacionFinalInput').value;
-
-        let swalParams = {
+        Swal.fire({
+            title: '¿Sellar Veredicto Final?',
+            text: 'Al guardar, el trámite se cerrará legalmente en la institución.',
+            icon: 'question',
             showCancelButton: true,
+            confirmButtonColor: '#16a34a',
             cancelButtonColor: '#64748b',
-            cancelButtonText: 'Cancelar Operación'
-        };
-
-        if (estadoSeleccionado === 'Negado') {
-            swalParams.title = '¿Rechazar y Notificar al Usuario?';
-            swalParams.html = `
-                <div style="font-size: 14px; text-align: left; background: #fef2f2; padding: 16px; border-radius: 12px; border-left: 5px solid #ef4444; margin-top: 10px; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.1);">
-                    <strong style="color: #991b1b; font-size: 15px;"><i class="bi bi-bell-fill me-2"></i>Vista previa de la alerta a enviar:</strong><br><br>
-                    <span style="color: #7f1d1d; line-height: 1.5;">"Estimado ex-funcionario, su trámite de Paz y Salvo ha sido <b>NEGADO</b>. <br><br><b>Motivo de rechazo:</b><br><i>${observacion}</i>"</span>
-                </div>
-                <p style="margin-top: 15px; font-size: 13px; color: #64748b; font-weight: 600;">El sistema enviará esta notificación automáticamente a su cuenta.</p>
-            `;
-            swalParams.icon = 'error';
-            swalParams.confirmButtonText = '<i class="bi bi-send-x-fill me-1"></i> Sí, Denegar y Notificar';
-            swalParams.confirmButtonColor = '#dc2626';
-
-        } else if (estadoSeleccionado === 'Aprobado') {
-            swalParams.title = '¿Sellar Aprobación Definitiva?';
-            swalParams.html = `
-                <div style="font-size: 14px; text-align: left; background: #f0fdf4; padding: 16px; border-radius: 12px; border-left: 5px solid #16a34a; margin-top: 10px;">
-                    <strong style="color: #166534;"><i class="bi bi-check-circle-fill me-2"></i>El usuario será inhabilitado permanentemente.</strong>
-                </div>
-            `;
-            swalParams.icon = 'warning';
-            swalParams.confirmButtonText = '<i class="bi bi-lock-fill me-1"></i> Sí, Aprobar e Inhabilitar';
-            swalParams.confirmButtonColor = '#16a34a';
-
-        } else {
-            swalParams.title = '¿Guardar en Revisión?';
-            swalParams.text = 'El documento se mantendrá a la espera de validaciones adicionales.';
-            swalParams.icon = 'info';
-            swalParams.confirmButtonText = '<i class="bi bi-save me-1"></i> Sí, Guardar Estado';
-            swalParams.confirmButtonColor = '#3b82f6';
-        }
-
-        Swal.fire(swalParams).then((result) => {
+            confirmButtonText: 'Sí, Sellar Trámite',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
             if (result.isConfirmed) {
-                Swal.fire({ title: 'Procesando dictamen...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+                Swal.fire({ title: 'Procesando Cierre...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
                 form.submit();
             }
         });
