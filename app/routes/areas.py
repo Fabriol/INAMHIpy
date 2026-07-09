@@ -69,13 +69,15 @@ def vista_previa(solicitud_id):
 @areas_bp.route('/areas/responder/<int:solicitud_id>', methods=['GET', 'POST'])
 @login_required
 def responder_preguntas(solicitud_id):
-    # Restricción: Solo el Administrador o RRHH cierran legalmente el expediente
     if current_user.rol.nombre not in ['Administrador', 'Talento Humano - Recepción Documentos']:
         flash('No tiene permisos para emitir el dictamen final de este expediente.', 'danger')
         return redirect(url_for('areas.mis_tareas'))
 
     solicitud = SolicitudPazSalvo.query.get_or_404(solicitud_id)
     solicitud.ex_funcionario = Usuario.query.get(solicitud.ex_funcionario_id)
+
+    # LA MAGIA: Extraemos las respuestas de la base de datos para pasarlas al HTML y calcular el porcentaje
+    respuestas_db = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
 
     if request.method == 'POST':
         estado_final = request.form.get('estado_final')
@@ -85,7 +87,6 @@ def responder_preguntas(solicitud_id):
             flash('Error: Debe seleccionar un veredicto oficial para el trámite.', 'danger')
             return redirect(url_for('areas.responder_preguntas', solicitud_id=solicitud.id))
 
-        # Actualizamos de forma irreversible el estado del Paz y Salvo
         solicitud.estado = str(estado_final).upper()
         detalle_auditoria = f"Emitió veredicto final: {estado_final}."
 
@@ -93,24 +94,26 @@ def responder_preguntas(solicitud_id):
             solicitud.observacion_rechazo = str(observacion_final).upper()
             detalle_auditoria += f" Motivo de Rechazo: {observacion_final}"
             flash('Trámite negado de forma oficial. Se registró el motivo del rechazo en el sistema.', 'warning')
-
         elif estado_final == 'Aprobado':
-            # Bloqueo total e inmediato de autenticación para el Ex Funcionario en la nube
             ex_funcionario = Usuario.query.get(solicitud.ex_funcionario_id)
             if ex_funcionario:
                 ex_funcionario.activo = False
             flash('Trámite Aprobado Exitosamente. El expediente se ha cerrado y las credenciales del ex-funcionario fueron inhabilitadas.', 'success')
 
-        # Registro de seguridad y rastreabilidad en la auditoría del sistema
+        from datetime import datetime, timedelta, timezone 
+        ecuador_tz = timezone(timedelta(hours=-5))
+        hora_real_ec = datetime.now(ecuador_tz).strftime("%d/%m/%Y %H:%M:%S")
+
         log = LogAuditoria(
             usuario_id=current_user.id, 
             modulo='Validación de Áreas', 
             accion='DICTAMEN FINAL', 
-            detalle=f"El usuario {current_user.rol.nombre} procesó el trámite #{solicitud.id}. {detalle_auditoria}"
+            detalle=f"El usuario {current_user.rol.nombre} procesó el trámite #{solicitud.id} a las {hora_real_ec}. {detalle_auditoria}"
         )
         db.session.add(log)
         db.session.commit()
         
         return redirect(url_for('areas.mis_tareas'))
 
-    return render_template('areas/responder.html', solicitud=solicitud)
+    # ENVIAMOS LAS RESPUESTAS AL HTML PARA LA MATEMÁTICA
+    return render_template('areas/responder.html', solicitud=solicitud, respuestas_db=respuestas_db)

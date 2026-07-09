@@ -52,21 +52,6 @@
         margin-bottom: 24px;
     }
 
-    .question-box {
-        background: #fff;
-        border: 1px solid var(--slate-300);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 16px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-        transition: transform 0.2s;
-    }
-
-    .question-box:hover {
-        transform: translateY(-2px);
-        border-color: var(--blue-600);
-    }
-
     .doc-input {
         width: 100%;
         padding: 10px 14px;
@@ -117,17 +102,24 @@
     }
 </style>
 
-<!-- CÁLCULO DE PROGRESO -->
-{% set total_preguntas = 8 %}
-{% set respondidas = solicitud.respuestas|length if solicitud.respuestas else 0 %}
-{% set porcentaje = ((respondidas / total_preguntas) * 100) | round(0) | int %}
+{% set total_campos_fijos = 70 %}
+{% set respuestas_totales = namespace(count=0) %}
+
+{% if respuestas_db %}
+{% for res in respuestas_db %}
+{% if res.valor_respuesta and res.valor_respuesta|trim != '' %}
+{% set respuestas_totales.count = respuestas_totales.count + 1 %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% set porcentaje = ((respuestas_totales.count / total_campos_fijos) * 100) | round(0) | int %}
 {% if porcentaje > 100 %}{% set porcentaje = 100 %}{% endif %}
 
 <div class="page fade-in">
-    <!-- CABECERA -->
     <div class="page-header">
         <div>
-            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Validación de Área</span>
+            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Validación Final</span>
             <h1 style="font-size: 24px; font-weight: 900; color: var(--blue-900); margin: 0;">{{ current_user.rol.nombre
                 }}</h1>
         </div>
@@ -138,7 +130,6 @@
         </div>
     </div>
 
-    <!-- TARJETA DE CONTEXTO DEL EX FUNCIONARIO -->
     <div class="info-card">
         <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-person-badge-fill me-2"></i>Expediente de Paz y Salvo
             #{{ solicitud.id }} perteneciente a:</h6>
@@ -165,12 +156,12 @@
             </div>
         </div>
 
-        <!-- BARRA DE PROGRESO VISUAL -->
         <div class="mt-4 pt-3 border-top border-primary border-opacity-25">
             <div class="d-flex justify-content-between align-items-end">
-                <span class="fw-bold"
-                    style="font-size: 12px; color: var(--slate-500); text-transform: uppercase;">Desarrollo del
-                    Formulario Base</span>
+                <span class="fw-bold" style="font-size: 12px; color: var(--slate-500); text-transform: uppercase;">
+                    <i class="bi bi-bar-chart-fill me-1"></i> Desarrollo de la Hoja Espejo ({{ respuestas_totales.count
+                    }} de {{ total_campos_fijos }} campos)
+                </span>
                 <span class="fw-bold fs-5 {% if porcentaje == 100 %}text-success{% else %}text-primary{% endif %}">{{
                     porcentaje }}%</span>
             </div>
@@ -181,128 +172,63 @@
         </div>
     </div>
 
-    <!-- FORMULARIO DE RESPUESTAS -->
-    <div class="card border-0 shadow-sm rounded-4" style="overflow: hidden;">
-        <div class="card-header border-bottom-0 text-white"
-            style="background: linear-gradient(135deg, var(--blue-900), var(--blue-600)); padding: 15px 20px;">
-            <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase;"><i
-                    class="bi bi-ui-checks me-2"></i> Formulario de Revisión y Descargo</h5>
+    {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
+    {% if porcentaje >= 95 %}
+    <form id="formularioValidacion" method="POST" action="/areas/responder/{{ solicitud.id }}">
+        <div class="card border-0 shadow-sm rounded-4 mt-4"
+            style="overflow: hidden; border: 2px solid #8b5cf6 !important;">
+            <div class="card-header text-white"
+                style="background: linear-gradient(135deg, #4c1d95, #7c3aed); padding: 15px 20px;">
+                <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase;"><i
+                        class="bi bi-briefcase-fill me-2"></i> Veredicto Final - Talento Humano</h5>
+            </div>
+            <div class="card-body p-4 bg-white">
+                <div class="row align-items-start">
+                    <div class="col-md-6">
+                        <label class="form-label-custom text-dark">Estado Final del Trámite Institucional <span
+                                class="text-danger">*</span></label>
+                        <select class="doc-input mt-2" name="estado_final" id="estadoFinalSelect"
+                            onchange="window['toggleObservacionFinal']()" style="border-color: #8b5cf6;" required>
+                            <option value="">— Defina el Estado Final —</option>
+                            <option value="Aprobado">✅ Aprobado (Documentación Completa)</option>
+                            <option value="En revisión">⏳ En revisión (Validación Interna)</option>
+                            <option value="Negado">❌ Negado (Devuelto al Funcionario)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6" id="divObservacionFinal" style="display: none;">
+                        <label class="form-label-custom text-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>
+                            Motivo del Rechazo <span class="text-danger">*</span></label>
+                        <input type="text" class="doc-input mt-2" id="observacionFinalInput" name="observacion_final"
+                            placeholder="Especifique detalladamente el motivo..."
+                            oninput="window['convertirMayusculas'](this)"
+                            style="border-color: #ef4444; background-color: #fef2f2 !important;">
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body p-4 bg-light">
-            <form id="formularioValidacion" method="POST" action="/areas/responder/{{ solicitud.id }}">
 
-                {% for pregunta in preguntas %}
-                <div class="question-box">
-                    <div class="row align-items-start">
-                        <!-- Lado de la Pregunta -->
-                        <div class="col-md-6 border-end">
-                            <label class="form-label-custom">{{ pregunta.enunciado }} <span
-                                    class="text-danger">*</span></label>
-
-                            {% if pregunta.tipo_respuesta == 'SI_NO' %}
-                            <select class="doc-input mt-2" name="pregunta_{{ pregunta.id }}" required>
-                                <option value="">— Seleccione SÍ o NO —</option>
-                                <option value="SI">SÍ</option>
-                                <option value="NO">NO</option>
-                            </select>
-                            {% elif pregunta.tipo_respuesta == 'NUMERO' %}
-                            <div class="input-group mt-2">
-                                <span class="input-group-text bg-white fw-bold border-end-0"
-                                    style="border-color: var(--slate-300);">$</span>
-                                <input type="text" class="doc-input border-start-0" name="pregunta_{{ pregunta.id }}"
-                                    placeholder="0.00" required oninput="window['soloMoneda'](this)">
-                            </div>
-                            {% else %}
-                            <input type="text" class="doc-input mt-2" name="pregunta_{{ pregunta.id }}"
-                                placeholder="Ingrese su respuesta..." required
-                                oninput="window['convertirMayusculas'](this)">
-                            {% endif %}
-                        </div>
-
-                        <!-- Lado de la Observación -->
-                        <div class="col-md-6 ps-4">
-                            <label class="form-label-custom text-muted"><i class="bi bi-chat-left-text me-1"></i>
-                                Detalle / Observación (Opcional)</label>
-                            <input type="text" class="doc-input mt-2 bg-white" name="observacion_{{ pregunta.id }}"
-                                placeholder="Escriba novedades o detalles aquí..."
-                                oninput="window['convertirMayusculas'](this)"
-                                style="font-weight: 500 !important; color: var(--slate-500) !important;">
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <div class="alert alert-warning border-0 fw-bold rounded-3 shadow-sm">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i> No se encontraron preguntas configuradas para
-                    su área. Consulte con el Administrador.
-                </div>
-                {% endfor %}
-
-                <!-- VEREDICTO FINAL DE RECURSOS HUMANOS / ADMINISTRADOR -->
-                {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
-                {% if porcentaje == 100 %}
-                <div class="card border-0 shadow-sm rounded-4 mt-4"
-                    style="overflow: hidden; border: 2px solid #8b5cf6 !important;">
-                    <div class="card-header text-white"
-                        style="background: linear-gradient(135deg, #4c1d95, #7c3aed); padding: 15px 20px;">
-                        <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase;"><i
-                                class="bi bi-briefcase-fill me-2"></i> Veredicto Final - Talento Humano</h5>
-                    </div>
-                    <div class="card-body p-4 bg-white">
-                        <div class="row align-items-start">
-                            <div class="col-md-6">
-                                <label class="form-label-custom text-dark">Estado Final del Trámite Institucional <span
-                                        class="text-danger">*</span></label>
-                                <select class="doc-input mt-2" name="estado_final" id="estadoFinalSelect"
-                                    onchange="window['toggleObservacionFinal']()" style="border-color: #8b5cf6;"
-                                    required>
-                                    <option value="">— Defina el Estado Final —</option>
-                                    <option value="Aprobado">✅ Aprobado (Documentación Completa)</option>
-                                    <option value="En revisión">⏳ En revisión (Validación Interna)</option>
-                                    <option value="Negado">❌ Negado (Devuelto al Funcionario)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6" id="divObservacionFinal" style="display: none;">
-                                <label class="form-label-custom text-danger"><i
-                                        class="bi bi-exclamation-circle-fill me-1"></i> Motivo del Rechazo <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="doc-input mt-2" id="observacionFinalInput"
-                                    name="observacion_final" placeholder="Especifique detalladamente el motivo..."
-                                    oninput="window['convertirMayusculas'](this)"
-                                    style="border-color: #ef4444; background-color: #fef2f2 !important;">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <div class="alert alert-info border-0 shadow-sm mt-4 fw-bold p-4 d-flex align-items-center rounded-4"
-                    style="background-color: #e0e7ff; color: #4338ca;">
-                    <i class="bi bi-info-circle-fill fs-4 me-3"></i>
-                    <div>
-                        El panel de <strong>Veredicto Final de RRHH</strong> se habilitará automáticamente en esta
-                        sección cuando el documento espejo alcance el 100% de llenado por todas las áreas
-                        institucionales.
-                    </div>
-                </div>
-                {% endif %}
-                {% endif %}
-
-                <div class="d-flex justify-content-end mt-4 pt-3 border-top gap-3">
-                    <button type="button" class="btn btn-success fw-bold px-4 py-2"
-                        onclick="window['validarYGuardarRespuesta']()" style="border-radius: 8px;">
-                        <i class="bi bi-check2-all me-2"></i> Guardar y Finalizar Revisión
-                    </button>
-                </div>
-            </form>
+        <div class="d-flex justify-content-end mt-4 pt-3 border-top gap-3">
+            <button type="button" class="btn btn-success fw-bold px-4 py-2"
+                onclick="window['validarYGuardarRespuesta']()" style="border-radius: 8px;">
+                <i class="bi bi-check-circle-fill me-2"></i> Guardar Veredicto Final
+            </button>
+        </div>
+    </form>
+    {% else %}
+    <div class="alert alert-info border-0 shadow-sm mt-4 fw-bold p-4 d-flex align-items-center rounded-4"
+        style="background-color: #e0e7ff; color: #4338ca;">
+        <i class="bi bi-shield-lock-fill fs-4 me-3"></i>
+        <div>
+            El panel de <strong>Veredicto Final de RRHH</strong> se habilitará cuando el documento espejo alcance el
+            100% de llenado por todas las áreas institucionales (Faltan {{ total_campos_fijos - respuestas_totales.count
+            }} campos).
         </div>
     </div>
+    {% endif %}
+    {% endif %}
 </div>
 
 <script>
-    window.soloMoneda = (el) => {
-        let valor = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
-        el.value = valor;
-    };
-
     window.convertirMayusculas = (el) => {
         let textoLimpio = el.value.toUpperCase();
         el.value = textoLimpio;
@@ -340,22 +266,22 @@
         });
 
         if (!formValido) {
-            Swal.fire('Campos Incompletos', 'Por favor, responda todas las preguntas obligatorias y los veredictos marcados con asterisco.', 'warning');
+            Swal.fire('Campos Incompletos', 'Por favor, defina el Estado Final y el motivo del rechazo (si aplica).', 'warning');
             return;
         }
 
         Swal.fire({
-            title: '¿Confirmar Revisión?',
-            text: 'Al guardar, estos datos se reflejarán en el documento de Paz y Salvo del ex-funcionario.',
+            title: '¿Sellar Veredicto Final?',
+            text: 'Al guardar, el trámite se cerrará legalmente en la institución.',
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#16a34a',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'Sí, Sellar Revisión',
-            cancelButtonText: 'Revisar de nuevo'
+            confirmButtonText: 'Sí, Sellar Trámite',
+            cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+                Swal.fire({ title: 'Procesando Cierre...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
                 form.submit();
             }
         });
