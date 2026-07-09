@@ -172,59 +172,74 @@
         </div>
     </div>
 
+    <!-- VEREDICTO FINAL DE RECURSOS HUMANOS / ADMINISTRADOR -->
     {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
-    {% if porcentaje >= 95 %}
-    <form id="formularioValidacion" method="POST" action="/areas/responder/{{ solicitud.id }}">
-        <div class="card border-0 shadow-sm rounded-4 mt-4"
-            style="overflow: hidden; border: 2px solid #8b5cf6 !important;">
-            <div class="card-header text-white"
-                style="background: linear-gradient(135deg, #4c1d95, #7c3aed); padding: 15px 20px;">
-                <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase;"><i
-                        class="bi bi-briefcase-fill me-2"></i> Veredicto Final - Talento Humano</h5>
-            </div>
-            <div class="card-body p-4 bg-white">
-                <div class="row align-items-start">
-                    <div class="col-md-6">
-                        <label class="form-label-custom text-dark">Estado Final del Trámite Institucional <span
-                                class="text-danger">*</span></label>
-                        <select class="doc-input mt-2" name="estado_final" id="estadoFinalSelect"
-                            onchange="window['toggleObservacionFinal']()" style="border-color: #8b5cf6;" required>
-                            <option value="">— Defina el Estado Final —</option>
-                            <option value="Aprobado">✅ Aprobado (Documentación Completa)</option>
-                            <option value="En revisión">⏳ En revisión (Validación Interna)</option>
-                            <option value="Negado">❌ Negado (Devuelto al Funcionario)</option>
-                        </select>
+        {% if porcentaje >= 95 %}
+            <form id="formularioValidacion" method="POST" action="/areas/responder/{{ solicitud.id }}">
+                <div class="card border-0 shadow-sm rounded-4 mt-4" style="overflow: hidden; border: 2px solid #8b5cf6 !important;">
+                    <div class="card-header text-white" style="background: linear-gradient(135deg, #4c1d95, #7c3aed); padding: 15px 20px;">
+                        <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase;"><i class="bi bi-briefcase-fill me-2"></i> Veredicto Final - Talento Humano</h5>
                     </div>
-                    <div class="col-md-6" id="divObservacionFinal" style="display: none;">
-                        <label class="form-label-custom text-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>
-                            Motivo del Rechazo <span class="text-danger">*</span></label>
-                        <input type="text" class="doc-input mt-2" id="observacionFinalInput" name="observacion_final"
-                            placeholder="Especifique detalladamente el motivo..."
-                            oninput="window['convertirMayusculas'](this)"
-                            style="border-color: #ef4444; background-color: #fef2f2 !important;">
+                    <div class="card-body p-4 bg-white">
+                        <div class="row align-items-start">
+                            
+                            <!-- MAGIA: Variable para detectar si este trámite ya fue sellado en la Base de Datos -->
+                            {% set ya_sellado = solicitud.estado in ['APROBADO', 'NEGADO', 'EN REVISIÓN'] %}
+                            
+                            <div class="col-md-6">
+                                <label class="form-label-custom text-dark">Estado Final del Trámite Institucional <span class="text-danger">*</span></label>
+                                
+                                <!-- VS Code ya no marcará error porque usamos clases en lugar de style="" -->
+                                <select class="doc-input mt-2 {% if ya_sellado %}campo-bloqueado{% endif %}" name="estado_final" id="estadoFinalSelect" 
+                                        onchange="window['toggleObservacionFinal']()" 
+                                        style="border-color: #8b5cf6;" 
+                                        required {% if ya_sellado %}readonly tabindex="-1"{% endif %}>
+                                    
+                                    <option value="">— Defina el Estado Final —</option>
+                                    <option value="Aprobado" {% if solicitud.estado == 'APROBADO' %}selected{% endif %}>✅ Aprobado (Documentación Completa)</option>
+                                    <option value="En revisión" {% if solicitud.estado == 'EN REVISIÓN' %}selected{% endif %}>⏳ En revisión (Validación Interna)</option>
+                                    <option value="Negado" {% if solicitud.estado == 'NEGADO' %}selected{% endif %}>❌ Negado (Devuelto al Funcionario)</option>
+                                </select>
+                            </div>
+                            
+                            <!-- El div también lo limpiamos -->
+                            <div class="col-md-6" id="divObservacionFinal" {% if solicitud.estado != 'NEGADO' %}style="display: none;"{% endif %}>
+                                <label class="form-label-custom text-danger"><i class="bi bi-exclamation-circle-fill me-1"></i> Motivo del Rechazo <span class="text-danger">*</span></label>
+                                
+                                <!-- Usamos las nuevas clases para los colores -->
+                                <input type="text" class="doc-input mt-2 {% if ya_sellado %}campo-bloqueado{% else %}campo-rechazo{% endif %}" 
+                                       id="observacionFinalInput" name="observacion_final" 
+                                       placeholder="Especifique detalladamente el motivo..." 
+                                       oninput="window['convertirMayusculas'](this)" 
+                                       value="{{ solicitud.observacion_rechazo | default('', true) }}"
+                                       {% if ya_sellado %}readonly{% endif %}>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="d-flex justify-content-end mt-4 pt-3 border-top gap-3">
-            <button type="button" class="btn btn-success fw-bold px-4 py-2"
-                onclick="window['validarYGuardarRespuesta']()" style="border-radius: 8px;">
-                <i class="bi bi-check-circle-fill me-2"></i> Guardar Veredicto Final
-            </button>
-        </div>
-    </form>
-    {% else %}
-    <div class="alert alert-info border-0 shadow-sm mt-4 fw-bold p-4 d-flex align-items-center rounded-4"
-        style="background-color: #e0e7ff; color: #4338ca;">
-        <i class="bi bi-shield-lock-fill fs-4 me-3"></i>
-        <div>
-            El panel de <strong>Veredicto Final de RRHH</strong> se habilitará cuando el documento espejo alcance el
-            100% de llenado por todas las áreas institucionales (Faltan {{ total_campos_fijos - respuestas_totales.count
-            }} campos).
-        </div>
-    </div>
-    {% endif %}
+                <div class="d-flex justify-content-end mt-4 pt-3 border-top gap-3">
+                    {% if ya_sellado %}
+                        <!-- SI YA SE GUARDÓ ANTES, EL BOTÓN VERDE DESAPARECE Y QUEDA ESTE CANDADO GRIS -->
+                        <button type="button" class="btn btn-secondary fw-bold px-4 py-2" disabled style="border-radius: 8px; cursor: not-allowed; opacity: 0.8;">
+                            <i class="bi bi-lock-fill me-2"></i> Trámite Sellado Permanentemente
+                        </button>
+                    {% else %}
+                        <!-- SI ES NUEVO, MUESTRA EL BOTÓN VERDE NORMAL -->
+                        <button type="button" class="btn btn-success fw-bold px-4 py-2" onclick="window.validarYGuardarRespuesta(this)" style="border-radius: 8px;">
+                            <i class="bi bi-check-circle-fill me-2"></i> Guardar Veredicto Final
+                        </button>
+                    {% endif %}
+                </div>
+            </form>
+        {% else %}
+            <div class="alert alert-info border-0 shadow-sm mt-4 fw-bold p-4 d-flex align-items-center rounded-4" style="background-color: #e0e7ff; color: #4338ca;">
+                <i class="bi bi-shield-lock-fill fs-4 me-3"></i>
+                <div>
+                    El panel de <strong>Veredicto Final de RRHH</strong> se habilitará cuando el documento espejo alcance el 100% de llenado por todas las áreas institucionales (Faltan {{ total_campos_fijos - respuestas_totales.count }} campos).
+                </div>
+            </div>
+        {% endif %}
     {% endif %}
 </div>
 
@@ -241,48 +256,116 @@
 
         if (estadoSelect && estadoSelect.value === 'Negado') {
             divObs.style.display = 'block';
-            obsInput.setAttribute('required', 'required');
+            estadoSelect.style.borderColor = '#8b5cf6'; // Quitamos el rojo si corrige
+            estadoSelect.style.backgroundColor = '#fff';
         } else if (estadoSelect) {
             divObs.style.display = 'none';
-            obsInput.removeAttribute('required');
             obsInput.value = '';
+            estadoSelect.style.borderColor = '#8b5cf6';
+            estadoSelect.style.backgroundColor = '#fff';
         }
     };
 
-    window.validarYGuardarRespuesta = () => {
+    // ==============================================================
+    // VALIDACIÓN ESTRICTA Y GUARDADO SEGURO
+    // ==============================================================
+    window.validarYGuardarRespuesta = (btnContext) => {
         let form = document.getElementById('formularioValidacion');
-        let requeridos = form.querySelectorAll('input[required], select[required]');
-        let formValido = true;
+        let estadoSelect = document.getElementById('estadoFinalSelect');
+        let obsInput = document.getElementById('observacionFinalInput');
 
-        requeridos.forEach(el => {
-            if (el.value.trim() === '') {
-                el.style.borderColor = '#ef4444';
-                el.style.backgroundColor = '#fff5f5';
-                formValido = false;
-            } else {
-                el.style.borderColor = '#cbd5e1';
-                el.style.backgroundColor = '#fff';
-            }
-        });
+        // 1. REGLA CRÍTICA: NO SE PUEDE GUARDAR SI ESTÁ VACÍO
+        if (!estadoSelect || estadoSelect.value.trim() === '') {
+            Swal.fire({
+                title: 'Acción Denegada',
+                text: 'Es OBLIGATORIO definir el "Estado Final del Trámite Institucional". No puede guardar el formulario en blanco.',
+                icon: 'error',
+                confirmButtonColor: '#ef4444'
+            });
 
-        if (!formValido) {
-            Swal.fire('Campos Incompletos', 'Por favor, defina el Estado Final y el motivo del rechazo (si aplica).', 'warning');
+            // Pintamos el cuadro de rojo para que el usuario sepa dónde le falta
+            estadoSelect.style.borderColor = '#ef4444';
+            estadoSelect.style.backgroundColor = '#fff5f5';
             return;
         }
 
+        // 2. REGLA: SI NIEGA EL TRÁMITE, DEBE ESCRIBIR EL MOTIVO
+        if (estadoSelect.value === 'Negado' && obsInput.value.trim() === '') {
+            Swal.fire({
+                title: 'Falta Justificación',
+                text: 'Ha seleccionado "Negado". Debe escribir obligatoriamente el motivo del rechazo.',
+                icon: 'warning'
+            });
+            obsInput.style.borderColor = '#ef4444';
+            obsInput.style.backgroundColor = '#fff5f5';
+            return;
+        }
+
+        // Si pasa las validaciones, procedemos a guardar
         Swal.fire({
             title: '¿Sellar Veredicto Final?',
-            text: 'Al guardar, el trámite se cerrará legalmente en la institución.',
-            icon: 'question',
+            text: 'Al guardar, el trámite se cerrará legalmente en la institución y no podrá revertirse.',
+            icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#16a34a',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'Sí, Sellar Trámite',
+            confirmButtonText: '<i class="bi bi-shield-lock-fill me-2"></i> Sí, Sellar Trámite',
             cancelButtonText: 'Cancelar'
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                Swal.fire({ title: 'Procesando Cierre...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-                form.submit();
+
+                // 3. BLOQUEO INMEDIATO DEL BOTÓN PARA EVITAR DOBLE CLIC
+                if (btnContext) {
+                    btnContext.disabled = true;
+                    btnContext.innerHTML = '<span class="spinner-grow spinner-grow-sm me-2"></span> Sellando Veredicto...';
+                    btnContext.classList.replace('btn-success', 'btn-secondary');
+                }
+
+                Swal.fire({ title: 'Procesando Cierre Institucional...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+
+                try {
+                    let formData = new FormData(form);
+
+                    // Enviamos los datos a Python de forma invisible
+                    let response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        // Bloqueamos la lista desplegable visualmente
+                        estadoSelect.setAttribute('readonly', true);
+                        estadoSelect.style.pointerEvents = 'none';
+                        estadoSelect.style.backgroundColor = '#e2e8f0';
+
+                        // El botón queda permanentemente como un candado
+                        if (btnContext) {
+                            btnContext.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Veredicto Sellado';
+                            btnContext.style.cursor = 'not-allowed';
+                        }
+
+                        // Mensaje de éxito y salto a la página de pendientes
+                        Swal.fire({
+                            title: '¡Trámite Cerrado!',
+                            text: 'El veredicto final se guardó exitosamente y se registró en Auditoría.',
+                            icon: 'success',
+                            confirmButtonColor: '#1e3a8a'
+                        }).then(() => {
+                            window.location.href = '/areas/tareas'; // Redirige a la bandeja
+                        });
+
+                    } else {
+                        throw new Error('Error del servidor');
+                    }
+                } catch (error) {
+                    Swal.fire('Error de Red', 'Hubo un problema al intentar guardar. Verifique su conexión.', 'error');
+                    // Si algo falla por internet, reactivamos el botón para que pueda intentar de nuevo
+                    if (btnContext) {
+                        btnContext.disabled = false;
+                        btnContext.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> Guardar Veredicto Final';
+                        btnContext.classList.replace('btn-secondary', 'btn-success');
+                    }
+                }
             }
         });
     };

@@ -16,6 +16,11 @@ from app.models.base import db, SolicitudPazSalvo, Usuario, Pregunta, Respuesta,
 
 reportes_bp = Blueprint('reportes', __name__)
 
+
+# =========================================================================================
+# ================================= MÓDULO DE AUDITORÍA ===================================
+# =========================================================================================
+
 # ==========================================
 # FUNCIÓN AUXILIAR: FILTRADO DE AUDITORÍA
 # ==========================================
@@ -269,3 +274,121 @@ def exportar_auditoria_pdf():
     doc.build(elementos)
 
     return send_file(os.path.abspath(ruta_pdf), as_attachment=True, download_name="Auditoria_Sistema_INAMHI.pdf")
+
+
+# =========================================================================================
+# ================================= MÓDULO DE REPORTES ====================================
+# =========================================================================================
+
+# ==========================================
+# 4. VISTA: PANTALLA PRINCIPAL DE REPORTES (DASHBOARD BI)
+# ==========================================
+@reportes_bp.route('/reportes')
+@login_required
+def vista_reportes():
+    if current_user.rol.nombre not in ['Administrador', 'Talento Humano - Recepción Documentos']:
+        abort(403)
+        
+    estado_filtro = request.args.get('estado')
+    fecha_inicio = request.args.get('fecha_inicio')
+    fecha_fin = request.args.get('fecha_fin')
+    
+    query = SolicitudPazSalvo.query
+    
+    if estado_filtro: query = query.filter_by(estado=estado_filtro)
+        
+    if fecha_inicio:
+        try:
+            fecha_ini_obj = datetime.strptime(fecha_inicio, '%Y-%m-%d')
+            query = query.filter(SolicitudPazSalvo.fecha_creacion >= fecha_ini_obj)
+        except ValueError: pass
+            
+    if fecha_fin:
+        try:
+            fecha_fin_obj = datetime.strptime(f"{fecha_fin} 23:59:59", '%Y-%m-%d %H:%M:%S')
+            query = query.filter(SolicitudPazSalvo.fecha_creacion <= fecha_fin_obj)
+        except ValueError: pass
+            
+    solicitudes = query.order_by(SolicitudPazSalvo.fecha_creacion.desc()).all()
+    
+    # 1. CÁLCULO DE KPIs PARA LOS GRÁFICOS
+    total_tramites = len(solicitudes)
+    aprobados = sum(1 for s in solicitudes if s.estado == 'Aprobado' or s.estado == 'APROBADO')
+    negados = sum(1 for s in solicitudes if s.estado == 'Negado' or s.estado == 'NEGADO')
+    en_revision = total_tramites - aprobados - negados
+
+    # Inyectamos el usuario para la tabla inferior
+    for sol in solicitudes:
+        sol.ex_funcionario = Usuario.query.get(sol.ex_funcionario_id)
+
+    return render_template('admin/reportes.html', 
+                           solicitudes=solicitudes,
+                           kpis={'total': total_tramites, 'aprobados': aprobados, 'negados': negados, 'revision': en_revision})
+
+# ==========================================
+# 5. ACCIÓN: EXPORTAR ESTADÍSTICAS A EXCEL
+# ==========================================
+@reportes_bp.route('/reportes/exportar_excel')
+@login_required
+def exportar_reportes_excel():
+    if current_user.rol.nombre not in ['Administrador', 'Talento Humano - Recepción Documentos']:
+        abort(403)
+        
+    # Aplicamos los mismos filtros
+    estado_filtro = request.args.get('estado')
+    fecha_inicio = request.args.get('fecha_inicio')
+    fecha_fin = request.args.get('fecha_fin')
+    
+    query = SolicitudPazSalvo.query
+    if estado_filtro: query = query.filter_by(estado=estado_filtro)
+    if fecha_inicio:
+        try:
+            query = query.filter(SolicitudPazSalvo.fecha_creacion >= datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+        except ValueError: pass
+    if fecha_fin:
+        try:
+            query = query.filter(SolicitudPazSalvo.fecha_creacion <= datetime.strptime(f"{fecha_fin} 23:59:59", '%Y-%m-%d %H:%M:%S'))
+        except ValueError: pass
+            
+    solicitudes = query.order_by(SolicitudPazSalvo.fecha_creacion.desc()).all()
+
+    # Creación del Excel
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Reporte Trámites"
+    
+    fill_cabecera = PatternFill(start_color="16A34A", end_color="16A34A", fill_type="solid") # Verde Estadísticas
+    font_cabecera = Font(name="Arial", size=11, color="FFFFFF", bold=True)
+    align_center = Alignment(horizontal="center", vertical="center", wrap_text=True)
+
+    columnas = ["Nro. Trámite", "Cédula", "Nombres y Apellidos", "Correo", "Estado del Trámite", "Fecha de Inicio", "Fecha de Finalización"]
+    ws.append(columnas)
+    
+    ws.row_dimensions[1].height = 25
+    for celda in ws[1]:
+        celda.fill = fill_cabecera
+        celda.font = font_cabecera
+        celda.alignment = align_center
+
+    for sol in solicitudes:
+        ex = Usuario.query.get(sol.ex_funcionario_id)
+        ws.append([
+            f"#{sol.id}",
+            ex.cedula,
+            f"{ex.apellidos} {ex.nombres}",
+            ex.email,
+            sol.estado,
+            sol.fecha_creacion.strftime('%Y-%m-%d %H:%M') if sol.fecha_creacion else 'N/A',
+            sol.fecha_cierre.strftime('%Y-%m-%d %H:%M') if getattr(sol, 'fecha_cierre', None) else 'En Proceso'
+        ])
+        
+    for col in ws.columns:
+        col_letter = openpyxl.utils.get_column_letter(col[0].column)
+        ws.column_dimensions[col_letter].width = 25
+        
+    dir_temp = os.path.join('app', 'static', 'temp')
+    os.makedirs(dir_temp, exist_ok=True)
+    ruta_excel = os.path.join(dir_temp, 'Reporte_Estadistico_PazSalvo.xlsx')
+    wb.save(ruta_excel)
+
+    return send_file(os.path.abspath(ruta_excel), as_attachment=True, download_name="Reporte_Estadistico_PazSalvo.xlsx")

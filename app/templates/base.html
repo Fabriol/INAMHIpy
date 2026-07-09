@@ -293,14 +293,10 @@
         </div>
 
         <nav>
-            <!-- DASHBOARD VISIBLE PARA TODOS -->
             <a href="/dashboard" class="{% if request.path == '/dashboard' %}active{% endif %}">
                 <i class="bi bi-grid-1x2-fill"></i><span>Dashboard Principal</span>
             </a>
 
-            <!-- ===================================== -->
-            <!-- MENÚ: ADMINISTRADOR                   -->
-            <!-- ===================================== -->
             {% if current_user.rol.nombre == 'Administrador' %}
             <a href="/paz-salvo/nueva" class="{% if 'nueva' in request.path %}active{% endif %}">
                 <i class="bi bi-file-earmark-plus-fill"></i><span>Nuevo Paz y Salvo</span>
@@ -318,24 +314,17 @@
                 <i class="bi bi-people-fill"></i><span>Gestión de Usuarios</span>
             </a>
 
-            <!-- ===================================== -->
-            <!-- MENÚ: TALENTO HUMANO                  -->
-            <!-- ===================================== -->
             {% elif current_user.rol.nombre == 'Talento Humano - Recepción Documentos' %}
             <a href="/areas/tareas" class="{% if 'areas' in request.path %}active{% endif %}">
                 <i class="bi bi-folder-fill"></i><span>Control de Documentos</span>
             </a>
 
-            <!-- ===================================== -->
-            <!-- MENÚ: LAS DEMÁS ÁREAS                 -->
-            <!-- ===================================== -->
             {% else %}
             <a href="/areas/tareas" class="{% if 'areas' in request.path %}active{% endif %}">
                 <i class="bi bi-ui-checks-grid"></i><span>Mis Formularios</span>
             </a>
             {% endif %}
 
-            <!-- BOTÓN DE CERRAR SESIÓN -->
             <div class="user-profile">
                 <a href="/logout" class="btn-logout">
                     <i class="bi bi-power text-danger"></i><span>Cerrar Sesión</span>

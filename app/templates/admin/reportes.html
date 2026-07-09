@@ -6,19 +6,13 @@
 
 <style>
     :root {
-        --blue-50: #eff6ff;
-        --blue-100: #dbeafe;
-        --blue-600: #2563eb;
         --blue-900: #1e3a8a;
-        --green-50: #f0fdf4;
-        --green-600: #16a34a;
-        --slate-50: #f8fafc;
-        --slate-200: #e2e8f0;
-        --slate-300: #cbd5e1;
+        --blue-600: #2563eb;
+        --blue-100: #dbeafe;
         --slate-500: #64748b;
-        --slate-900: #0f172a;
+        --slate-200: #e2e8f0;
+        --slate-50: #f8fafc;
         --grad-header: linear-gradient(90deg, #2563eb, #0ea5e9, #22c55e);
-        --blur: blur(18px);
     }
 
     .page-header {
@@ -29,7 +23,7 @@
         border-radius: 16px;
         background: rgba(255, 255, 255, .88);
         border: 1px solid rgba(255, 255, 255, .80);
-        backdrop-filter: var(--blur);
+        backdrop-filter: blur(18px);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
         position: relative;
         overflow: hidden;
@@ -44,16 +38,54 @@
         background: var(--grad-header);
     }
 
+    /* Tarjetas de Resumen */
+    .kpi-card {
+        background: #fff;
+        border: 1px solid var(--slate-200);
+        border-radius: 12px;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .kpi-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: white;
+    }
+
+    .kpi-info h3 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 900;
+        color: var(--blue-900);
+    }
+
+    .kpi-info p {
+        margin: 0;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--slate-500);
+        text-transform: uppercase;
+    }
+
     .doc-input {
         width: 100%;
         padding: 10px 14px;
-        border: 1.5px solid var(--slate-300);
+        border: 1.5px solid var(--slate-200);
         border-radius: 8px;
         font-size: 13px;
         font-weight: 600;
         color: #0f172a;
         background: #fff;
-        transition: 0.3s;
+        cursor: pointer;
     }
 
     .doc-input:focus {
@@ -70,12 +102,7 @@
         margin-bottom: 8px;
     }
 
-    /* Estilos para la tabla moderna de reportes */
-    .table-custom {
-        border-collapse: separate;
-        border-spacing: 0 8px;
-    }
-
+    /* Tabla de Reportes */
     .table-custom th {
         background-color: var(--slate-50);
         color: var(--slate-500);
@@ -90,31 +117,13 @@
     .table-custom td {
         background-color: #fff;
         vertical-align: middle;
-        padding: 16px 15px;
+        padding: 14px 15px;
         font-size: 13px;
-        border-top: 1px solid var(--slate-100);
-        border-bottom: 1px solid var(--slate-100);
-    }
-
-    .table-custom tr td:first-child {
-        border-left: 1px solid var(--slate-100);
-        border-top-left-radius: 10px;
-        border-bottom-left-radius: 10px;
-    }
-
-    .table-custom tr td:last-child {
-        border-right: 1px solid var(--slate-100);
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-    }
-
-    .table-custom tr {
-        transition: transform 0.2s, box-shadow 0.2s;
+        border-bottom: 1px solid var(--slate-200);
     }
 
     .table-custom tr:hover td {
         background-color: #f8fafc;
-        cursor: default;
     }
 </style>
 
@@ -122,145 +131,164 @@
     <!-- CABECERA PRINCIPAL -->
     <div class="page-header">
         <div>
-            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Estadísticas y Control</span>
-            <h1 style="font-size: 24px; font-weight: 900; color: var(--blue-900); margin: 0;">Módulo de Reportes</h1>
+            <span class="badge bg-primary rounded-pill mb-2 px-3 py-1">Estadísticas y Control Institucional</span>
+            <h1 style="font-size: 24px; font-weight: 900; color: var(--blue-900); margin: 0;">Reportes y Estadísticas
+            </h1>
         </div>
         <div>
+            <!-- Botón de Excel General -->
             <button class="btn btn-success fw-bold shadow-sm" onclick="window.exportarExcel()">
-                <i class="bi bi-file-earmark-excel-fill me-2"></i> Exportar a Excel
+                <i class="bi bi-file-earmark-excel-fill me-2"></i> Exportar Datos a Excel
             </button>
         </div>
     </div>
 
-    <!-- TARJETA DE FILTROS DE BÚSQUEDA -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4"
-        style="overflow: hidden; border: 1px solid var(--slate-200) !important;">
-        <div class="card-header bg-white border-bottom pt-4 pb-3 px-4">
+    <!-- TARJETAS DE CONTEO RÁPIDO -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="kpi-card" style="border-left: 4px solid #3b82f6;">
+                <div class="kpi-info">
+                    <p>Total Generados</p>
+                    <h3>{{ kpis.total }}</h3>
+                </div>
+                <div class="kpi-icon bg-primary"><i class="bi bi-files"></i></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card" style="border-left: 4px solid #22c55e;">
+                <div class="kpi-info">
+                    <p>Trámites Completos</p>
+                    <h3>{{ kpis.aprobados }}</h3>
+                </div>
+                <div class="kpi-icon bg-success"><i class="bi bi-check-circle-fill"></i></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card" style="border-left: 4px solid #eab308;">
+                <div class="kpi-info">
+                    <p>Usuarios Incompletos</p>
+                    <h3>{{ kpis.revision }}</h3>
+                </div>
+                <div class="kpi-icon bg-warning text-dark"><i class="bi bi-hourglass-split"></i></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="kpi-card" style="border-left: 4px solid #ef4444;">
+                <div class="kpi-info">
+                    <p>Trámites Negados</p>
+                    <h3>{{ kpis.negados }}</h3>
+                </div>
+                <div class="kpi-icon bg-danger"><i class="bi bi-x-circle-fill"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ZONA DE FILTROS AUTOMÁTICOS -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4" style="border: 1px solid var(--slate-200) !important;">
+        <div
+            class="card-header bg-white border-bottom pt-4 pb-3 px-4 d-flex justify-content-between align-items-center">
             <h5 class="m-0 fw-bold" style="font-size: 14px; text-transform: uppercase; color: var(--slate-500);">
-                <i class="bi bi-funnel-fill me-2"></i> Filtros de Búsqueda
+                <i class="bi bi-funnel-fill me-2"></i> Filtros de Reporte
             </h5>
+            <span class="badge bg-light text-secondary border"><i
+                    class="bi bi-lightning-charge-fill text-warning me-1"></i> Auto-actualizable</span>
         </div>
         <div class="card-body p-4 bg-light">
-            <form id="formFiltros" method="GET" action="/reportes"> <!-- Ajusta la ruta action si es necesario -->
+            <form id="formFiltros" method="GET" action="/reportes">
                 <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label-custom"><i class="bi bi-calendar3 me-1"></i> Fecha Inicio</label>
+                    <div class="col-md-4">
+                        <label class="form-label-custom"><i class="bi bi-calendar3 me-1"></i> Desde (Fecha)</label>
+                        <!-- El evento onchange hace que el formulario se envíe solo -->
                         <input type="date" class="doc-input" name="fecha_inicio" id="fecha_inicio"
-                            value="{{ request.args.get('fecha_inicio', '') }}">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label-custom"><i class="bi bi-calendar3-fill me-1"></i> Fecha Fin</label>
-                        <input type="date" class="doc-input" name="fecha_fin" id="fecha_fin"
-                            value="{{ request.args.get('fecha_fin', '') }}">
+                            value="{{ request.args.get('fecha_inicio', '') }}" onchange="this.form.submit()">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label-custom"><i class="bi bi-shield-check me-1"></i> Estado del
-                            Trámite</label>
-                        <select class="doc-input" name="estado">
-                            <option value="">TODOS LOS ESTADOS</option>
-                            <option value="APROBADO" {% if request.args.get('estado')=='APROBADO' %}selected{% endif %}>
-                                ✅ Aprobados</option>
-                            <option value="EN REVISIÓN" {% if request.args.get('estado')=='EN REVISIÓN' %}selected{%
-                                endif %}>⏳ En Revisión</option>
-                            <option value="NEGADO" {% if request.args.get('estado')=='NEGADO' %}selected{% endif %}>❌
-                                Negados</option>
-                        </select>
+                        <label class="form-label-custom"><i class="bi bi-calendar3-fill me-1"></i> Hasta (Fecha)</label>
+                        <input type="date" class="doc-input" name="fecha_fin" id="fecha_fin"
+                            value="{{ request.args.get('fecha_fin', '') }}" onchange="this.form.submit()">
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2" style="border-radius: 8px;">
-                            <i class="bi bi-search me-1"></i> Buscar
-                        </button>
+                    <div class="col-md-4">
+                        <label class="form-label-custom"><i class="bi bi-shield-check me-1"></i> Tipo de Reporte
+                            (Estado)</label>
+                        <select class="doc-input" name="estado" id="estadoFiltro" onchange="this.form.submit()">
+                            <option value="">TODOS LOS TRÁMITES</option>
+                            <option value="Aprobado" {% if request.args.get('estado')=='Aprobado' %}selected{% endif %}>
+                                ✅ Mostrar solo COMPLETADOS</option>
+                            <option value="En revisión" {% if request.args.get('estado')=='En revisión' %}selected{%
+                                endif %}>⏳ Mostrar solo INCOMPLETOS</option>
+                            <option value="Negado" {% if request.args.get('estado')=='Negado' %}selected{% endif %}>❌
+                                Mostrar solo NEGADOS</option>
+                        </select>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- TABLA CENTRAL DE RESULTADOS -->
-    <div class="table-responsive px-1">
-        <table class="table table-custom w-100">
-            <thead>
-                <tr>
-                    <th># Trámite</th>
-                    <th>Cédula</th>
-                    <th>Funcionario Saliente</th>
-                    <th>Fecha de Creación</th>
-                    <th>Estado Final</th>
-                    <th class="text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if solicitudes %}
-                {% for sol in solicitudes %}
-                <tr>
-                    <td class="fw-bold" style="color: var(--blue-600);">#{{ sol.id }}</td>
-                    <td class="fw-bold text-dark">{{ sol.ex_funcionario.cedula }}</td>
-                    <td class="text-uppercase fw-bold text-secondary">{{ sol.ex_funcionario.nombres }} {{
-                        sol.ex_funcionario.apellidos }}</td>
-                    <td class="text-muted fw-bold">{{ sol.fecha_creacion.strftime('%d/%m/%Y %H:%M') if
-                        sol.fecha_creacion else 'N/A' }}</td>
-                    <td>
-                        {% if sol.estado == 'APROBADO' %}
-                        <span class="badge bg-success rounded-pill px-3 py-2 fw-bold"><i
-                                class="bi bi-check-circle-fill me-1"></i> Aprobado</span>
-                        {% elif sol.estado == 'NEGADO' %}
-                        <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold"><i
-                                class="bi bi-x-circle-fill me-1"></i> Negado</span>
-                        {% else %}
-                        <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fw-bold"><i
-                                class="bi bi-hourglass-split me-1"></i> En Revisión</span>
-                        {% endif %}
-                    </td>
-                    <td class="text-center">
-                        <a href="/areas/ver/{{ sol.id }}" class="btn btn-sm btn-outline-primary fw-bold" target="_blank"
-                            title="Auditar Documento">
-                            <i class="bi bi-eye-fill"></i> Ver Espejo
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="6" class="text-center py-5">
-                        <div class="d-flex flex-column align-items-center justify-content-center text-muted">
-                            <i class="bi bi-inbox fs-1 mb-3" style="color: var(--slate-300);"></i>
-                            <h5 class="fw-bold text-dark">No hay registros encontrados</h5>
-                            <p class="mb-0 fs-6">Intente ajustando los filtros de búsqueda o verifique la base de datos.
-                            </p>
-                        </div>
-                    </td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
+    <!-- TABLA CENTRAL DE RESULTADOS PURA (SIN BOTONES INNECESARIOS) -->
+    <div class="card border-0 shadow-sm rounded-4" style="border: 1px solid var(--slate-200) !important;">
+        <div class="table-responsive p-0">
+            <table class="table table-custom w-100 m-0">
+                <thead>
+                    <tr>
+                        <th>Nro. Trámite</th>
+                        <th>Cédula</th>
+                        <th>Funcionario Saliente</th>
+                        <th>Fecha Creado</th>
+                        <th>Estado Actual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if solicitudes %}
+                        {% for sol in solicitudes %}
+                        <tr>
+                            <td class="fw-bold" style="color: var(--blue-600);">#{{ sol.id }}</td>
+                            <td class="fw-bold text-dark">{{ sol.ex_funcionario.cedula }}</td>
+                            <td class="text-uppercase fw-bold text-secondary">{{ sol.ex_funcionario.nombres }} {{ sol.ex_funcionario.apellidos }}</td>
+                            <td class="text-muted fw-bold">{{ sol.fecha_creacion.strftime('%d/%m/%Y') if sol.fecha_creacion else 'N/A' }}</td>
+                            <td class="fw-bold">
+                                {% if sol.estado == 'Aprobado' or sol.estado == 'APROBADO' %}
+                                    <span class="text-success"><i class="bi bi-check-circle-fill me-1"></i> Completo</span>
+                                {% elif sol.estado == 'Negado' or sol.estado == 'NEGADO' %}
+                                    <span class="text-danger"><i class="bi bi-x-circle-fill me-1"></i> Negado</span>
+                                {% else %}
+                                    <span class="text-warning text-dark"><i class="bi bi-hourglass-split me-1"></i> Incompleto</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="bi bi-inbox fs-1 mb-2" style="color: var(--slate-300);"></i>
+                                    <h6 class="fw-bold text-dark mb-0">No se encontraron trámites</h6>
+                                    <p class="mb-0 fs-6">No hay registros con los filtros actuales.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
     window.exportarExcel = () => {
-        let fechaInicio = document.getElementById('fecha_inicio').value;
-        let fechaFin = document.getElementById('fecha_fin').value;
-
-        if (!fechaInicio || !fechaFin) {
-            Swal.fire({
-                title: 'Filtros Incompletos',
-                text: 'Para no saturar el sistema, se recomienda seleccionar un rango de fechas antes de exportar.',
-                icon: 'info',
-                confirmButtonColor: '#2563eb'
-            });
-            // Puedes colocar un return; aquí si quieres obligar a poner fechas antes de descargar
-        }
+        // Obtenemos qué filtro está seleccionado para decírselo al usuario
+        let combo = document.getElementById('estadoFiltro');
+        let tipoReporte = combo.options[combo.selectedIndex].text.replace("Mostrar solo ", "");
+        if (combo.value === "") tipoReporte = "TODOS LOS TRÁMITES";
 
         Swal.fire({
-            title: 'Generando Reporte...',
-            text: 'Descargando archivo Excel con los datos filtrados.',
+            title: 'Generando Reporte',
+            text: `Descargando Excel de: ${tipoReporte}`,
             icon: 'success',
-            timer: 2000,
+            timer: 2500,
             showConfirmButton: false
         });
 
-        // Redirige a la ruta de Python encargada de crear el Excel.
-        // Envía los mismos parámetros del formulario para que el Excel salga igual a la tabla.
         let params = new URLSearchParams(new FormData(document.getElementById('formFiltros'))).toString();
         window.location.href = `/reportes/exportar_excel?${params}`;
     };

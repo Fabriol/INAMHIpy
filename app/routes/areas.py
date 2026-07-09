@@ -1,6 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
 
+import os
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment
+from flask import send_file, current_app
+
 # Modelos oficiales del sistema institucional
 from app.models.base import db, SolicitudPazSalvo, Respuesta, LogAuditoria, Usuario, Rol
 
@@ -117,3 +122,54 @@ def responder_preguntas(solicitud_id):
 
     # ENVIAMOS LAS RESPUESTAS AL HTML PARA LA MATEMÁTICA
     return render_template('areas/responder.html', solicitud=solicitud, respuestas_db=respuestas_db)
+
+# ====================================================================
+# 4. RUTA: EXPORTAR BANDEJA DE TRÁMITES A EXCEL (SOLO ADMIN Y RRHH)
+# ====================================================================
+@areas_bp.route('/areas/exportar_excel')
+@login_required
+def exportar_tramites_excel():
+    if current_user.rol.nombre not in ['Administrador', 'Talento Humano - Recepción Documentos']:
+        flash('No tiene permisos para exportar la base de datos.', 'danger')
+        return redirect(url_for('areas.mis_tareas'))
+
+    solicitudes = SolicitudPazSalvo.query.order_by(SolicitudPazSalvo.fecha_creacion.desc()).all()
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Control de Trámites"
+
+    fill_cabecera = PatternFill(start_color="16A34A", end_color="16A34A", fill_type="solid")
+    font_cabecera = Font(name="Arial", size=11, color="FFFFFF", bold=True)
+    align_center = Alignment(horizontal="center", vertical="center")
+
+    columnas = ["Nro. Trámite", "Cédula", "Nombres y Apellidos", "Correo Institucional", "Estado Actual", "Fecha de Creación"]
+    ws.append(columnas)
+
+    ws.row_dimensions[1].height = 25
+    for celda in ws[1]:
+        celda.fill = fill_cabecera
+        celda.font = font_cabecera
+        celda.alignment = align_center
+
+    for sol in solicitudes:
+        ex = Usuario.query.get(sol.ex_funcionario_id)
+        ws.append([
+            f"#{sol.id}",
+            ex.cedula,
+            f"{ex.nombres} {ex.apellidos}".upper(),
+            ex.email,
+            sol.estado,
+            sol.fecha_creacion.strftime('%d/%m/%Y') if sol.fecha_creacion else 'N/A'
+        ])
+
+    for col in ws.columns:
+        col_letter = openpyxl.utils.get_column_letter(col[0].column)
+        ws.column_dimensions[col_letter].width = 25
+
+    dir_temp = os.path.join(current_app.root_path, 'static', 'temp')
+    os.makedirs(dir_temp, exist_ok=True)
+    ruta_excel = os.path.join(dir_temp, 'Base_Tramites_INAMHI.xlsx')
+    wb.save(ruta_excel)
+
+    return send_file(os.path.abspath(ruta_excel), as_attachment=True, download_name="Base_Tramites_INAMHI.xlsx")
