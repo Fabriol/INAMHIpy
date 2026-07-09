@@ -88,6 +88,11 @@ def nueva_solicitud():
         log = LogAuditoria(usuario_id=current_user.id, modulo='Formularios', accion='NUEVO EXPEDIENTE', detalle=f"Creó expediente CI: {usuario.cedula}")
         db.session.add(log)
         db.session.commit()
+
+        # --- NUEVO: Interceptamos si es una petición AJAX (sin recarga) ---
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'status': 'success', 'mensaje': 'Trámite creado exitosamente.'})
+        # ------------------------------------------------------------------
         
         flash('Expediente creado exitosamente. Los datos de identidad han sido sellados.', 'success')
         return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=nueva_solicitud.id))
