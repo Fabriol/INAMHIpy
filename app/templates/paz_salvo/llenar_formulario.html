@@ -522,13 +522,16 @@
                                 <div class="accordion-body"
                                     style="font-size: 11px; max-height: 250px; overflow-y: auto;">
                                     <div class="row mb-3 pb-2 border-bottom">
-                                        <div class="col-md-4 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                                value="admin_es_contrato" class="form-check-input me-1"> S/N ¿Es Admin.
+                                            Contrato?</div>
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="admin_informe" class="form-check-input me-1"> S/N Entrega informe
                                         </div>
-                                        <div class="col-md-4 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="admin_nombre_resp1" class="form-check-input me-1"> Resp. Informe
                                         </div>
-                                        <div class="col-md-4 mb-2 text-primary"><input type="checkbox" name="campos"
+                                        <div class="col-md-3 mb-2 text-primary"><input type="checkbox" name="campos"
                                                 value="admin_r1" class="form-check-input me-1"> Firma Informe</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom">
@@ -597,13 +600,16 @@
                                 <div class="accordion-body"
                                     style="font-size: 11px; max-height: 250px; overflow-y: auto;">
                                     <div class="row mb-3 pb-2 border-bottom">
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="tic_verificacion" class="form-check-input me-1"> S/N Verific.
                                             equipo</div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="tic_ip_fija" class="form-check-input me-1"> S/N Acceso IP</div>
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="tic_liberacion" class="form-check-input me-1"> S/N Lib. IP</div>
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos" value="tic_obs1"
+                                                class="form-check-input me-1"> Observación Equipo
+                                        </div>
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="tic_nombre_resp1" class="form-check-input me-1"> Resp. Equipos
                                         </div>
@@ -681,55 +687,65 @@
                                 <div class="accordion-body"
                                     style="font-size: 11px; max-height: 250px; overflow-y: auto;">
                                     <div class="row mb-3 pb-2 border-bottom">
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_saldos" class="form-check-input me-1"> S/N Saldos contables
                                         </div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_saldos_valor" class="form-check-input me-1"> Valor Saldos $
                                         </div>
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs1"
+                                                class="form-check-input me-1"> Observación Saldos</div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp1" class="form-check-input me-1"> Resp. Saldos
                                         </div>
-                                        <div class="col-md-3 mb-2 text-primary"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2 text-primary"><input type="checkbox" name="campos"
                                                 value="fin_r1" class="form-check-input me-1"> Firma Saldos</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom">
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_anticipo" class="form-check-input me-1"> S/N Anticipo sueldos
                                         </div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_anticipo_valor" class="form-check-input me-1"> Valor Anticipo
                                             $</div>
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs2"
+                                                class="form-check-input me-1"> Observación Anticipos
+                                        </div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp2" class="form-check-input me-1"> Resp. Anticipos
                                         </div>
-                                        <div class="col-md-3 mb-2 text-primary"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2 text-primary"><input type="checkbox" name="campos"
                                                 value="fin_r2" class="form-check-input me-1"> Firma Anticipos</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom">
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_recuperacion" class="form-check-input me-1"> S/N Recup.
                                             valores</div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_recuperacion_valor" class="form-check-input me-1"> Valor
                                             Recup. $</div>
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs3"
+                                                class="form-check-input me-1"> Observación Recup.</div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp3" class="form-check-input me-1"> Resp. Valores
                                         </div>
-                                        <div class="col-md-3 mb-2 text-primary"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2 text-primary"><input type="checkbox" name="campos"
                                                 value="fin_r3" class="form-check-input me-1"> Firma Valores</div>
                                     </div>
                                     <div class="row mb-3 pb-2 border-bottom">
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_devolucion" class="form-check-input me-1"> S/N Dev. muebles
                                         </div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_devolucion_valor" class="form-check-input me-1"> Valor
                                             Devolución $</div>
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs4"
+                                                class="form-check-input me-1"> Observación Devolución
+                                        </div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp4" class="form-check-input me-1"> Resp. Muebles
                                         </div>
-                                        <div class="col-md-3 mb-2 text-primary"><input type="checkbox" name="campos"
+                                        <div class="col-md-2 mb-2 text-primary"><input type="checkbox" name="campos"
                                                 value="fin_r4" class="form-check-input me-1"> Firma Muebles</div>
                                     </div>
                                     <div class="row">
@@ -846,20 +862,26 @@
                                             Juramentada</div>
                                         <div class="col-md-3 mb-2 text-primary"><input type="checkbox" name="campos"
                                                 value="rrhh_r6" class="form-check-input me-1"> Firma Juramentada</div>
-                                        <div class="col-md-4 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="rrhh_credencial" class="form-check-input me-1"> S/N Credencial
                                         </div>
-                                        <div class="col-md-4 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                                value="rrhh_respaldo_cd" class="form-check-input me-1"> S/N Respaldos
+                                            (CD)</div>
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="rrhh_resp_credencial2" class="form-check-input me-1"> Resp.
                                             Credencial</div>
-                                        <div class="col-md-4 mb-2 text-primary"><input type="checkbox" name="campos"
+                                        <div class="col-md-3 mb-2 text-primary"><input type="checkbox" name="campos"
                                                 value="rrhh_r7" class="form-check-input me-1"> Firma Credencial</div>
-                                        <div class="col-md-4 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="rrhh_acta_bienes" class="form-check-input me-1"> S/N Acta Bienes
                                         </div>
-                                        <div class="col-md-4 mb-2"><input type="checkbox" name="campos"
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                                value="rrhh_ropa_trabajo" class="form-check-input me-1"> S/N Ropa
+                                            Trabajo/EPP</div>
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="rrhh_resp_acta" class="form-check-input me-1"> Resp. Acta</div>
-                                        <div class="col-md-4 mb-2 text-primary"><input type="checkbox" name="campos"
+                                        <div class="col-md-3 mb-2 text-primary"><input type="checkbox" name="campos"
                                                 value="rrhh_r8" class="form-check-input me-1"> Firma Act. Bienes</div>
                                         <div class="col-md-6 mb-2"><input type="checkbox" name="campos"
                                                 value="rrhh_director" class="form-check-input me-1"> Nombre Director/a
@@ -1124,24 +1146,27 @@
                 {% endif %}
 
                 {% set s4_show = namespace(val=admin) %}
-                {% for c in ['admin_informe', 'admin_nombre_resp1', 'admin_r1', 'admin_bienes', 'admin_valor_bienes',
-                'admin_acta_bienes', 'admin_nombre_resp2', 'admin_r2', 'admin_deducibles', 'admin_deducibles_valor',
-                'admin_nombre_resp3', 'admin_r3', 'admin_pasajes', 'admin_pasajes_valor', 'admin_nombre_resp4',
-                'admin_r4', 'admin_responsable', 'admin_dir'] %}
+                {% for c in ['admin_es_contrato', 'admin_informe', 'admin_nombre_resp1', 'admin_r1', 'admin_bienes',
+                'admin_valor_bienes', 'admin_acta_bienes', 'admin_nombre_resp2', 'admin_r2', 'admin_deducibles',
+                'admin_deducibles_valor', 'admin_nombre_resp3', 'admin_r3', 'admin_pasajes', 'admin_pasajes_valor',
+                'admin_nombre_resp4', 'admin_r4', 'admin_responsable', 'admin_dir'] %}
                 {% if c in asignados %}{% set s4_show.val = true %}{% endif %}
                 {% endfor %}
 
                 {% if s4_show.val %}
                 <div class="doc-section-head mt-4">🏛️ 4. Dirección Administrativa</div>
                 <div class="doc-fields-grid">
-                    {{ select_sino('admin_informe', '¿Validación de Informe de Bienes?', '', datos.get('admin_informe',
+                    {{ select_sino('admin_es_contrato', '¿Es Administrador de Contrato?', '',
+                    datos.get('admin_es_contrato', '')) }}
+                    {{ select_sino('admin_informe', '¿Realizó la Entrega del Informe?', '', datos.get('admin_informe',
                     '')) }}
-                    {{ input_text('admin_nombre_resp1', 'Resp. Informe', 'text', '', '100', 'soloLetras',
+                    {{ input_text('admin_nombre_resp1', 'Resp. Informe', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('admin_nombre_resp1', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('admin_r1', 'Firma Validación Informe',
                         datos.get('admin_nombre_resp1', 'SERVIDOR')) }}</div>
 
-                    {{ select_sino('admin_bienes', '¿Devolución de Bienes?', '', datos.get('admin_bienes', '')) }}
+                    {{ select_sino('admin_bienes', '¿Entregó Bienes Muebles y Equipos?', '', datos.get('admin_bienes',
+                    '')) }}
                     {{ input_text('admin_valor_bienes', 'Valorización Faltante $', 'text', '', '15', 'soloMoneda',
                     datos.get('admin_valor_bienes', '')) }}
                     {{ input_text('admin_acta_bienes', 'N° Acta Recepción', 'text', 'span-2', '100', '',
@@ -1176,9 +1201,9 @@
                 {% endif %}
 
                 {% set s5_show = namespace(val=admin) %}
-                {% for c in ['tic_verificacion', 'tic_ip_fija', 'tic_liberacion', 'tic_nombre_resp1', 'tic_r1',
-                'tic_backup', 'tic_ruta_backup', 'tic_nombre_resp2', 'tic_r2', 'tic_retiro_acceso', 'tic_cierre_correo',
-                'tic_esigef', 'tic_quipux', 'tic_spryn', 'tic_esbye', 'tic_nombre_resp3', 'tic_r3',
+                {% for c in ['tic_verificacion', 'tic_ip_fija', 'tic_liberacion', 'tic_obs1', 'tic_nombre_resp1',
+                'tic_r1', 'tic_backup', 'tic_ruta_backup', 'tic_nombre_resp2', 'tic_r2', 'tic_retiro_acceso',
+                'tic_cierre_correo', 'tic_esigef', 'tic_quipux', 'tic_spryn', 'tic_esbye', 'tic_nombre_resp3', 'tic_r3',
                 'tic_tarjeta_cuentas', 'tic_obs', 'tic_nombre_resp4', 'tic_r4', 'tic_responsable', 'tic_r5'] %}
                 {% if c in asignados %}{% set s5_show.val = true %}{% endif %}
                 {% endfor %}
@@ -1192,6 +1217,8 @@
                     {{ select_sino('tic_liberacion', '¿Liberación Accesos?', '', datos.get('tic_liberacion', '')) }}
                     {{ input_text('tic_nombre_resp1', 'Validador Equipos/IP', 'text', '', '100', 'soloLetras',
                     datos.get('tic_nombre_resp1', '')) }}
+                    {{ input_text('tic_obs1', 'Observación Equipo Informático', 'text', 'span-2', '255', '',
+                    datos.get('tic_obs1', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('tic_r1', 'Firma Control Hardware',
                         datos.get('tic_nombre_resp1', 'SERVIDOR')) }}</div>
 
@@ -1232,10 +1259,10 @@
                 {% endif %}
 
                 {% set s6_show = namespace(val=admin) %}
-                {% for c in ['fin_saldos', 'fin_saldos_valor', 'fin_nombre_resp1', 'fin_r1', 'fin_anticipo',
-                'fin_anticipo_valor', 'fin_nombre_resp2', 'fin_r2', 'fin_recuperacion', 'fin_recuperacion_valor',
-                'fin_nombre_resp3', 'fin_r3', 'fin_devolucion', 'fin_devolucion_valor', 'fin_nombre_resp4', 'fin_r4',
-                'fin_director', 'fin_dir'] %}
+                {% for c in ['fin_saldos', 'fin_saldos_valor', 'fin_obs1', 'fin_nombre_resp1', 'fin_r1', 'fin_anticipo',
+                'fin_anticipo_valor', 'fin_obs2', 'fin_nombre_resp2', 'fin_r2', 'fin_recuperacion',
+                'fin_recuperacion_valor', 'fin_obs3', 'fin_nombre_resp3', 'fin_r3', 'fin_devolucion',
+                'fin_devolucion_valor', 'fin_obs4', 'fin_nombre_resp4', 'fin_r4', 'fin_director', 'fin_dir'] %}
                 {% if c in asignados %}{% set s6_show.val = true %}{% endif %}
                 {% endfor %}
 
@@ -1245,6 +1272,8 @@
                     {{ select_sino('fin_saldos', '¿Saldos Pendientes?', '', datos.get('fin_saldos', '')) }}
                     {{ input_text('fin_saldos_valor', 'Monto Saldo $', 'text', '', '15', 'soloMoneda',
                     datos.get('fin_saldos_valor', '')) }}
+                    {{ input_text('fin_obs1', 'Observación Saldos', 'text', 'span-2', '255', '', datos.get('fin_obs1',
+                    '')) }}
                     {{ input_text('fin_nombre_resp1', 'Analista Contable', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('fin_nombre_resp1', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('fin_r1', 'Firma Análisis Contable',
@@ -1253,6 +1282,8 @@
                     {{ select_sino('fin_anticipo', '¿Anticipos Activos?', '', datos.get('fin_anticipo', '')) }}
                     {{ input_text('fin_anticipo_valor', 'Saldo Anticipo $', 'text', '', '15', 'soloMoneda',
                     datos.get('fin_anticipo_valor', '')) }}
+                    {{ input_text('fin_obs2', 'Observación Anticipos', 'text', 'span-2', '255', '',
+                    datos.get('fin_obs2', '')) }}
                     {{ input_text('fin_nombre_resp2', 'Analista Tesorería', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('fin_nombre_resp2', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('fin_r2', 'Firma Tesorería', datos.get('fin_nombre_resp2',
@@ -1262,6 +1293,8 @@
                     '')) }}
                     {{ input_text('fin_recuperacion_valor', 'Valor a Recuperar $', 'text', '', '15', 'soloMoneda',
                     datos.get('fin_recuperacion_valor', '')) }}
+                    {{ input_text('fin_obs3', 'Observación Recuperación', 'text', 'span-2', '255', '',
+                    datos.get('fin_obs3', '')) }}
                     {{ input_text('fin_nombre_resp3', 'Resp. Recuperación', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('fin_nombre_resp3', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('fin_r3', 'Firma Recuperación',
@@ -1270,6 +1303,8 @@
                     {{ select_sino('fin_devolucion', '¿Liquidación Activos?', '', datos.get('fin_devolucion', '')) }}
                     {{ input_text('fin_devolucion_valor', 'Monto Ajuste $', 'text', '', '15', 'soloMoneda',
                     datos.get('fin_devolucion_valor', '')) }}
+                    {{ input_text('fin_obs4', 'Observación Devolución', 'text', 'span-2', '255', '',
+                    datos.get('fin_obs4', '')) }}
                     {{ input_text('fin_nombre_resp4', 'Resp. Ajustes', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('fin_nombre_resp4', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('fin_r4', 'Firma Ajustes Financieros',
@@ -1324,8 +1359,8 @@
                 'rrhh_evaluacion', 'rrhh_resp_evaluacion', 'rrhh_r2', 'rrhh_viajes', 'rrhh_resp_viajes', 'rrhh_r3',
                 'rrhh_siith', 'rrhh_resp_siith', 'rrhh_r4', 'rrhh_vacaciones', 'rrhh_num_certificado',
                 'rrhh_resp_vacaciones', 'rrhh_r5', 'rrhh_juramentada', 'rrhh_num_declaracion', 'rrhh_resp_juramentada',
-                'rrhh_r6', 'rrhh_credencial', 'rrhh_resp_credencial2', 'rrhh_r7', 'rrhh_acta_bienes', 'rrhh_resp_acta',
-                'rrhh_r8', 'rrhh_director', 'rrhh_dir'] %}
+                'rrhh_r6', 'rrhh_credencial', 'rrhh_respaldo_cd', 'rrhh_resp_credencial2', 'rrhh_r7',
+                'rrhh_acta_bienes', 'rrhh_ropa_trabajo', 'rrhh_resp_acta', 'rrhh_r8', 'rrhh_director', 'rrhh_dir'] %}
                 {% if c in asignados %}{% set s8_show.val = true %}{% endif %}
                 {% endfor %}
 
@@ -1380,13 +1415,17 @@
 
                     {{ select_sino('rrhh_credencial', '¿Devolución Credencial?', '', datos.get('rrhh_credencial', ''))
                     }}
+                    {{ select_sino('rrhh_respaldo_cd', '¿Entrega Copia de Actividades y Respaldos (CD)?', '',
+                    datos.get('rrhh_respaldo_cd', '')) }}
                     {{ input_text('rrhh_resp_credencial2', 'Analista Credenciales', 'text', 'span-2', '100',
                     'soloLetras', datos.get('rrhh_resp_credencial2', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r7', 'Firma Credenciales',
                         datos.get('rrhh_resp_credencial2', 'SERVIDOR')) }}</div>
 
-                    {{ select_sino('rrhh_acta_bienes', '¿Cierre Ropa de Trabajo?', '', datos.get('rrhh_acta_bienes',
-                    '')) }}
+                    {{ select_sino('rrhh_acta_bienes', '¿Acta de Bienes del Custodio?', '',
+                    datos.get('rrhh_acta_bienes', '')) }}
+                    {{ select_sino('rrhh_ropa_trabajo', '¿Entrega Ropa de Trabajo o Equipo de Protección?', '',
+                    datos.get('rrhh_ropa_trabajo', '')) }}
                     {{ input_text('rrhh_resp_acta', 'Analista Dotación', 'text', 'span-2', '100', 'soloLetras',
                     datos.get('rrhh_resp_acta', '')) }}
                     <div class="span-2 d-flex">{{ firma_box('rrhh_r8', 'Firma Act. Bienes', datos.get('rrhh_resp_acta',
@@ -1834,7 +1873,7 @@
     window.validarYGuardarTodo = (event, btnContext) => {
         // FRENO DE MANO: Esto bloquea de forma absoluta que la página salte o recargue
         if (event) { event.preventDefault(); }
-        
+
         let form = document.getElementById('formularioOficial');
         let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
         let firmas = form.querySelectorAll('input[type="hidden"][id^="input_"]');
@@ -1848,7 +1887,7 @@
             if (el.value !== 'FIRMADO') {
                 valido = false;
                 let cajaFirma = el.closest('div.p-3');
-                if(cajaFirma) {
+                if (cajaFirma) {
                     cajaFirma.style.borderColor = '#ef4444';
                     cajaFirma.style.backgroundColor = '#fef2f2';
                 }
@@ -1860,28 +1899,28 @@
             return;
         }
 
-        Swal.fire({ 
-            title: '¿Sellar Trámite?', 
-            text: 'Se bloquearán los campos y la información quedará guardada de forma irreversible.', 
-            icon: 'warning', 
-            showCancelButton: true, 
-            confirmButtonText: '<i class="bi bi-shield-lock-fill me-2"></i> Sí, Guardar y Sellar', 
+        Swal.fire({
+            title: '¿Sellar Trámite?',
+            text: 'Se bloquearán los campos y la información quedará guardada de forma irreversible.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '<i class="bi bi-shield-lock-fill me-2"></i> Sí, Guardar y Sellar',
             confirmButtonColor: '#16a34a',
             cancelButtonText: 'Cancelar'
         }).then(async (result) => {
             if (result.isConfirmed) {
                 // Bloqueamos el botón visualmente para que no den doble clic
-                if(btnContext) {
+                if (btnContext) {
                     btnContext.disabled = true;
                     btnContext.innerHTML = '<span class="spinner-grow spinner-grow-sm me-2"></span> Sellando información...';
                     btnContext.classList.replace('btn-success', 'btn-secondary');
                 }
-                
+
                 Swal.fire({ title: 'Guardando de forma segura...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-                
+
                 try {
                     let formData = new FormData(form);
-                    
+
                     // Enviamos los datos por detrás de cámaras
                     let response = await fetch(form.action, {
                         method: 'POST',
@@ -1908,14 +1947,14 @@
                     });
 
                     // El botón se queda bloqueado permanentemente
-                    if(btnContext) {
+                    if (btnContext) {
                         btnContext.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Trámite Sellado';
                         btnContext.style.cursor = 'not-allowed';
                     }
 
                 } catch (error) {
                     Swal.fire('Error de conexión', 'Hubo un problema de red al intentar guardar.', 'error');
-                    if(btnContext) {
+                    if (btnContext) {
                         btnContext.disabled = false;
                         btnContext.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> Guardar Mis Respuestas';
                         btnContext.classList.replace('btn-secondary', 'btn-success');
