@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 <style>
     /* Diseño exacto de la captura de Auditoría */
     .audit-header-card {
@@ -236,7 +239,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="audit-table">
+        <table class="audit-table" id="tablaAuditoria">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -290,12 +293,49 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <script>
-    // Función para exportar conservando los filtros aplicados en la URL usando let y función flecha
+    // Función mejorada para exportar tomando los datos REALES de la tabla visual
     window.exportarReporte = (tipo) => {
-        let parametrosActuales = window.location.search;
-        let url = tipo === 'excel' ? '/admin/auditoria/exportar-excel' : '/admin/auditoria/exportar-pdf';
-        window.location.href = url + parametrosActuales;
+        if (tipo === 'excel') {
+            // 1. Mostrar alerta visual de que se está procesando
+            Swal.fire({
+                title: 'Generando Excel...',
+                text: 'Extrayendo toda la información del historial de auditoría.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+
+            // 2. Capturar la tabla HTML original
+            let tabla = document.getElementById('tablaAuditoria');
+
+            // 3. Convertirla mágicamente a Excel
+            let libro = XLSX.utils.table_to_book(tabla, { sheet: "Auditoria_Logs" });
+
+            // 4. Configurar el ancho de las celdas para que se lea perfecto
+            let hoja = libro.Sheets["Auditoria_Logs"];
+            if (hoja) {
+                hoja['!cols'] = [
+                    { wch: 8 },   // Columna A (ID)
+                    { wch: 45 },  // Columna B (Usuario - Agrupará nombre y cédula en texto)
+                    { wch: 20 },  // Columna C (Rol)
+                    { wch: 25 },  // Columna D (Módulo)
+                    { wch: 20 },  // Columna E (Acción)
+                    { wch: 65 },  // Columna F (Detalle - Lo hacemos bien ancho)
+                    { wch: 22 }   // Columna G (Fecha)
+                ];
+            }
+
+            // 5. Descargar el archivo a tu computadora
+            XLSX.writeFile(libro, 'Historial_Auditoria_INAMHI.xlsx');
+
+        } else {
+            // Para PDF, se sigue enviando por la ruta original que tenías
+            let parametrosActuales = window.location.search;
+            window.location.href = '/admin/auditoria/exportar-pdf' + parametrosActuales;
+        }
     };
 </script>
 {% endblock %}
