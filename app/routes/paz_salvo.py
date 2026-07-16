@@ -53,7 +53,6 @@ def generar_qr_svg(nombre):
     svg_str = svg_str.replace('<svg ', '<svg class="firmaec-qr" preserveAspectRatio="xMidYMid meet" ')
     return svg_str
 
-
 # ====================================================================
 # 1. RUTA: CREAR NUEVA SOLICITUD (INTEGRADA CON GESTIÓN DE USUARIOS)
 # ====================================================================

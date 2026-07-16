@@ -607,8 +607,8 @@
                                                 value="tic_ip_fija" class="form-check-input me-1"> S/N Acceso IP</div>
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="tic_liberacion" class="form-check-input me-1"> S/N Lib. IP</div>
-                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos" value="tic_obs1"
-                                                class="form-check-input me-1"> Observación Equipo
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
+                                                value="tic_obs1" class="form-check-input me-1"> Observación Equipo
                                         </div>
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="tic_nombre_resp1" class="form-check-input me-1"> Resp. Equipos
@@ -693,8 +693,8 @@
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_saldos_valor" class="form-check-input me-1"> Valor Saldos $
                                         </div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs1"
-                                                class="form-check-input me-1"> Observación Saldos</div>
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                                value="fin_obs1" class="form-check-input me-1"> Observación Saldos</div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp1" class="form-check-input me-1"> Resp. Saldos
                                         </div>
@@ -708,8 +708,8 @@
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_anticipo_valor" class="form-check-input me-1"> Valor Anticipo
                                             $</div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs2"
-                                                class="form-check-input me-1"> Observación Anticipos
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                                value="fin_obs2" class="form-check-input me-1"> Observación Anticipos
                                         </div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp2" class="form-check-input me-1"> Resp. Anticipos
@@ -724,8 +724,8 @@
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_recuperacion_valor" class="form-check-input me-1"> Valor
                                             Recup. $</div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs3"
-                                                class="form-check-input me-1"> Observación Recup.</div>
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                                value="fin_obs3" class="form-check-input me-1"> Observación Recup.</div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp3" class="form-check-input me-1"> Resp. Valores
                                         </div>
@@ -739,8 +739,8 @@
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_devolucion_valor" class="form-check-input me-1"> Valor
                                             Devolución $</div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs4"
-                                                class="form-check-input me-1"> Observación Devolución
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
+                                                value="fin_obs4" class="form-check-input me-1"> Observación Devolución
                                         </div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp4" class="form-check-input me-1"> Resp. Muebles
@@ -1873,7 +1873,7 @@
     window.validarYGuardarTodo = (event, btnContext) => {
         // FRENO DE MANO: Esto bloquea de forma absoluta que la página salte o recargue
         if (event) { event.preventDefault(); }
-
+        
         let form = document.getElementById('formularioOficial');
         let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
         let firmas = form.querySelectorAll('input[type="hidden"][id^="input_"]');
@@ -1887,7 +1887,7 @@
             if (el.value !== 'FIRMADO') {
                 valido = false;
                 let cajaFirma = el.closest('div.p-3');
-                if (cajaFirma) {
+                if(cajaFirma) {
                     cajaFirma.style.borderColor = '#ef4444';
                     cajaFirma.style.backgroundColor = '#fef2f2';
                 }
@@ -1899,28 +1899,28 @@
             return;
         }
 
-        Swal.fire({
-            title: '¿Sellar Trámite?',
-            text: 'Se bloquearán los campos y la información quedará guardada de forma irreversible.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: '<i class="bi bi-shield-lock-fill me-2"></i> Sí, Guardar y Sellar',
+        Swal.fire({ 
+            title: '¿Sellar Trámite?', 
+            text: 'Se bloquearán los campos y la información quedará guardada de forma irreversible.', 
+            icon: 'warning', 
+            showCancelButton: true, 
+            confirmButtonText: '<i class="bi bi-shield-lock-fill me-2"></i> Sí, Guardar y Sellar', 
             confirmButtonColor: '#16a34a',
             cancelButtonText: 'Cancelar'
         }).then(async (result) => {
             if (result.isConfirmed) {
                 // Bloqueamos el botón visualmente para que no den doble clic
-                if (btnContext) {
+                if(btnContext) {
                     btnContext.disabled = true;
                     btnContext.innerHTML = '<span class="spinner-grow spinner-grow-sm me-2"></span> Sellando información...';
                     btnContext.classList.replace('btn-success', 'btn-secondary');
                 }
-
+                
                 Swal.fire({ title: 'Guardando de forma segura...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-
+                
                 try {
                     let formData = new FormData(form);
-
+                    
                     // Enviamos los datos por detrás de cámaras
                     let response = await fetch(form.action, {
                         method: 'POST',
@@ -1947,14 +1947,14 @@
                     });
 
                     // El botón se queda bloqueado permanentemente
-                    if (btnContext) {
+                    if(btnContext) {
                         btnContext.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Trámite Sellado';
                         btnContext.style.cursor = 'not-allowed';
                     }
 
                 } catch (error) {
                     Swal.fire('Error de conexión', 'Hubo un problema de red al intentar guardar.', 'error');
-                    if (btnContext) {
+                    if(btnContext) {
                         btnContext.disabled = false;
                         btnContext.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> Guardar Mis Respuestas';
                         btnContext.classList.replace('btn-secondary', 'btn-success');
