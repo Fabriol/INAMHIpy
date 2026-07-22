@@ -23,6 +23,30 @@ def _inicializar_acroform_firmaec(ruta_pdf):
                 root.AcroForm.Fields = pikepdf.Array([])
         pdf.save(ruta_pdf)
 
+def localizar_posicion_firma(ruta_pdf, campo_firma):
+    """
+    Busca el marcador 'espejo_firma_<campo>' (ver bookmark-label en
+    generar_documento_paz_salvo) y devuelve (pagina, x, y) del punto donde
+    empieza esa celda en el PDF ya renderizado. Devuelve None si no se
+    encuentra, para que el llamador pueda usar una firma invisible como
+    respaldo sin romper el flujo de firma.
+    """
+    with pikepdf.open(ruta_pdf) as pdf:
+        outline = pdf.open_outline()
+
+        def recorrer(items):
+            for item in items:
+                yield item
+                yield from recorrer(item.children)
+
+        objetivo = f"espejo_firma_{campo_firma}"
+        for item in recorrer(outline.root):
+            if item.title == objetivo and item.destination:
+                dest = item.destination
+                pagina = pdf.pages.index(dest[0])
+                return pagina, float(dest[2]), float(dest[3])
+    return None
+
 def generar_documento_paz_salvo(solicitud, ex_funcionario, respuestas_db, ruta_salida):
     """
     Convierte la plantilla HTML 'hoja_espejo.html' en un documento PDF A4 perfecto.
@@ -63,6 +87,8 @@ def generar_documento_paz_salvo(solicitud, ex_funcionario, respuestas_db, ruta_s
         .ep-tabla tr { page-break-inside: avoid; }
         .ep-bloque__head { page-break-after: avoid; }
         .ep-firma-box, .firmaec-sello { page-break-inside: avoid; }
+        /* Marcadores internos (invisibles) para ubicar cada celda de firma al momento de firmar */
+        [id^="espejo_firma_"] { bookmark-level: 1; bookmark-label: attr(id); }
     ''')
 
     # 5. Generar el PDF final vectorizado

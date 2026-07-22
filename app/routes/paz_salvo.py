@@ -10,15 +10,48 @@ import qrcode.image.svg
 
 # Modelos
 from app.models.base import db, Usuario, Rol, SolicitudPazSalvo, Respuesta, LogAuditoria
-from app.services.pdf_service import generar_documento_paz_salvo
+from app.services.pdf_service import generar_documento_paz_salvo, localizar_posicion_firma
 
 # Librerías criptográficas para la firma PAdES
 from pyhanko.sign import signers
 from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
-from pyhanko.sign.fields import SigFieldSpec, append_signature_field
+from pyhanko.sign.fields import SigFieldSpec
 from pyhanko.sign import fields # Importación necesaria para el PAdES estricto
+from pyhanko.sign.signers.pdf_signer import PdfSigner
+from pyhanko.stamp.qr import QRStampStyle, QRPosition
+from pyhanko.pdf_utils.text import TextBoxStyle
+from pyhanko.pdf_utils.content import RawContent
+from pyhanko.pdf_utils.layout import BoxConstraints, SimpleBoxLayoutRule, AxisAlignment, Margins, InnerScaling
 
 paz_salvo_bp = Blueprint('paz_salvo', __name__)
+
+# ====================================================================
+# ESTILO DEL SELLO VISUAL DE FIRMA (QR + texto), posicionado sobre la
+# celda "Firma Electrónica" exacta de cada campo al momento de firmar.
+# ====================================================================
+_FONDO_SELLO_FIRMA = RawContent(
+    data=b'1 1 1 rg 0 0 1 1 re f',
+    box=BoxConstraints(width=1, height=1),
+)
+
+ESTILO_SELLO_FIRMA = QRStampStyle(
+    stamp_text="Validar únicamente en FirmaEC.\nFirmado electrónicamente por:\n%(nombre)s",
+    text_box_style=TextBoxStyle(font_size=5, leading=5),
+    qr_position=QRPosition.LEFT_OF_TEXT,
+    border_width=0,
+    background=_FONDO_SELLO_FIRMA,
+    background_layout=SimpleBoxLayoutRule(
+        x_align=AxisAlignment.ALIGN_MID,
+        y_align=AxisAlignment.ALIGN_MID,
+        margins=Margins.uniform(0),
+        inner_content_scaling=InnerScaling.STRETCH_FILL,
+    ),
+    background_opacity=1.0,
+)
+
+# Tamaño del sello visual en la celda "Firma Electrónica" (en puntos PDF)
+_SELLO_ANCHO = 95
+_SELLO_ALTO = 40
 
 # ====================================================================
 # FUNCIÓN GLOBAL: GENERADOR DE QR VECTORIAL EXACTO A FIRMAEC
@@ -323,7 +356,7 @@ def descargar_pdf(solicitud_id):
         return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=solicitud.id))
 
 # ====================================================================
-# 7. RUTA: FIRMA CRIPTOGRÁFICA PAdES INVISIBLE
+# 7. RUTA: FIRMA CRIPTOGRÁFICA PAdES CON SELLO VISUAL POSICIONADO
 # ====================================================================
 @paz_salvo_bp.route('/paz-salvo/subir-firma/<int:solicitud_id>', methods=['POST'])
 @login_required
@@ -341,8 +374,6 @@ def subir_firma_pades(solicitud_id):
     archivo_p12.save(ruta_temp_p12)
 
     try:
-        import hashlib # Necesario para las coordenadas dispersas
-
         # 1. ESCUDO DE CONTRASEÑA: Si escriben mal la clave, avisa y no rompe el servidor
         try:
             signer = signers.SimpleSigner.load_pkcs12(ruta_temp_p12, passphrase=password.encode('utf-8'))
@@ -358,42 +389,49 @@ def subir_firma_pades(solicitud_id):
             texto_bruto = signer.signing_cert.subject.human_friendly
             nombre_firmante = texto_bruto.split(',')[0].replace('COMMON NAME:', '').strip()
 
-        # B. Guardar variables en BD
-        res_firma = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo_firma).first()
-        if res_firma: res_firma.valor_respuesta = 'FIRMADO'
-        else: db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=campo_firma, usuario_asignado_id=current_user.id, valor_respuesta='FIRMADO'))
-        
-        campo_nombre_firma = f"{campo_firma}_nombre"
-        resp_nombre = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma).first()
-        if resp_nombre: resp_nombre.valor_respuesta = nombre_firmante.upper()
-        else: db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma, usuario_asignado_id=current_user.id, valor_respuesta=nombre_firmante.upper()))
-        db.session.commit()
-
-        # C. Generar PDF Base
+        # B. Generar PDF Base (ANTES de marcar 'FIRMADO' en BD, para que la
+        # primera regeneración de este documento no dibuje ya el sello HTML
+        # de este mismo campo y choque con el sello visual que pyHanko va a
+        # estampar a continuación en el mismo lugar)
         ruta_pdf_original = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}.pdf')
-        
-        # 2. EL CANDADO: Solo genera el PDF visual si NO existe
+
+        # EL CANDADO: Solo genera el PDF visual si NO existe
         if not os.path.exists(ruta_pdf_original):
             solicitud_temp = SolicitudPazSalvo.query.get(solicitud_id)
             solicitud_temp.ex_funcionario = Usuario.query.get(solicitud_temp.ex_funcionario_id)
             resp_temp = Respuesta.query.filter_by(solicitud_id=solicitud_id).all()
             generar_documento_paz_salvo(solicitud_temp, solicitud_temp.ex_funcionario, resp_temp, ruta_pdf_original)
 
-        # D. FIRMA CRIPTOGRÁFICA INVISIBLE Y ESTRICTA PARA FIRMAEC
+        # C. Guardar variables en BD
+        res_firma = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo_firma).first()
+        if res_firma: res_firma.valor_respuesta = 'FIRMADO'
+        else: db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=campo_firma, usuario_asignado_id=current_user.id, valor_respuesta='FIRMADO'))
+
+        campo_nombre_firma = f"{campo_firma}_nombre"
+        resp_nombre = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma).first()
+        if resp_nombre: resp_nombre.valor_respuesta = nombre_firmante.upper()
+        else: db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma, usuario_asignado_id=current_user.id, valor_respuesta=nombre_firmante.upper()))
+        db.session.commit()
+
+        # D. FIRMA CRIPTOGRÁFICA PARA FIRMAEC, CON SELLO VISUAL (QR + NOMBRE)
+        # POSICIONADO SOBRE LA CELDA "FIRMA ELECTRÓNICA" EXACTA DE ESTE CAMPO
         ruta_pdf_temporal_firmado = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}_sellando.pdf')
-        
-        # 3. Coordenadas dispersas. SOLUCIÓN DEL ERROR DE MARGINS: La caja ahora es de 50x50
-        hash_val = int(hashlib.md5(campo_firma.encode()).hexdigest(), 16)
-        coord_x = (hash_val % 300) + 10  
-        coord_y = ((hash_val // 300) % 500) + 10 
-        caja_unica = (coord_x, coord_y, coord_x + 50, coord_y + 50)
+
+        posicion = localizar_posicion_firma(ruta_pdf_original, campo_firma)
+        if posicion:
+            pagina, x, y = posicion
+            caja = (x + 1, y - _SELLO_ALTO - 1, x + 1 + _SELLO_ANCHO, y - 1)
+            field_spec = SigFieldSpec(sig_field_name=campo_firma, box=caja, on_page=pagina)
+        else:
+            # Respaldo: si no se encuentra la celda, la firma queda invisible
+            # (sigue siendo válida para FirmaEC, solo sin sello visual)
+            field_spec = SigFieldSpec(sig_field_name=campo_firma)
+
+        texto_sello = f"Validar únicamente en FirmaEC.\nFirmado electrónicamente por:\n{nombre_firmante.upper()}"
 
         with open(ruta_pdf_original, 'rb') as inf:
             w = IncrementalPdfFileWriter(inf)
-            
-            # Caja en posición única asegura que pyHanko no tape tu diseño HTML ni otras firmas
-            append_signature_field(w, SigFieldSpec(sig_field_name=campo_firma, box=caja_unica))
-            
+
             # Subfilter PADES y AGREGAMOS REASON/LOCATION para eliminar el "null"
             meta = signers.PdfSignatureMetadata(
                 field_name=campo_firma,
@@ -402,9 +440,16 @@ def subir_firma_pades(solicitud_id):
                 location="Quito, Ecuador",
                 contact_info="Sistema INAMHI"
             )
-            
+
+            pdf_signer = PdfSigner(
+                meta, signer,
+                stamp_style=ESTILO_SELLO_FIRMA,
+                new_field_spec=field_spec
+            )
             # Firmamos en memoria para evitar el error de archivo bloqueado
-            pdf_en_memoria = signers.sign_pdf(w, signature_meta=meta, signer=signer)
+            pdf_en_memoria = pdf_signer.sign_pdf(
+                w, appearance_text_params={'nombre': nombre_firmante.upper(), 'url': texto_sello}
+            )
 
         # Sobreescribimos el PDF con la versión ya firmada y segura
         with open(ruta_pdf_temporal_firmado, 'wb') as outf:
