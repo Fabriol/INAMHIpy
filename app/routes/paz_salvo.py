@@ -36,8 +36,10 @@ _FONDO_SELLO_FIRMA = RawContent(
 
 ESTILO_SELLO_FIRMA = QRStampStyle(
     stamp_text="Validar únicamente en FirmaEC.\nFirmado electrónicamente por:\n%(nombre)s",
-    text_box_style=TextBoxStyle(font_size=5, leading=5),
+    text_box_style=TextBoxStyle(font_size=6, leading=6),
     qr_position=QRPosition.LEFT_OF_TEXT,
+    qr_inner_size=34,
+    innsep=2,
     border_width=0,
     background=_FONDO_SELLO_FIRMA,
     background_layout=SimpleBoxLayoutRule(
@@ -49,9 +51,17 @@ ESTILO_SELLO_FIRMA = QRStampStyle(
     background_opacity=1.0,
 )
 
-# Tamaño del sello visual en la celda "Firma Electrónica" (en puntos PDF)
-_SELLO_ANCHO = 95
-_SELLO_ALTO = 40
+# Tamaño máximo del sello visual en la celda "Firma Electrónica" (en puntos PDF)
+_SELLO_ANCHO_MAX = 95
+_SELLO_ALTO = 42
+
+# Excepciones: campos cuya celda no es la columna estándar de la tabla
+# (p. ej. el bloque centrado de 175px de "10. AUTORIZACIÓN — SERVIDOR
+# SALIENTE"), y por eso necesitan un ancho de sello distinto al de columna.
+_SELLO_ANCHO_POR_CAMPO = {
+    'servidor_saliente': 128,
+}
+_MARGEN_PAGINA_PT = 8 * 72 / 25.4  # los 8mm de @page margin definidos en pdf_service.py
 
 # ====================================================================
 # FUNCIÓN GLOBAL: GENERADOR DE QR VECTORIAL EXACTO A FIRMAEC
@@ -419,8 +429,13 @@ def subir_firma_pades(solicitud_id):
 
         posicion = localizar_posicion_firma(ruta_pdf_original, campo_firma)
         if posicion:
-            pagina, x, y = posicion
-            caja = (x + 1, y - _SELLO_ALTO - 1, x + 1 + _SELLO_ANCHO, y - 1)
+            pagina, x, y, ancho_pagina = posicion
+            # Ancho dinámico: nunca cruza el margen derecho de la página,
+            # sin importar en qué columna/tabla caiga el campo
+            ancho_max_campo = _SELLO_ANCHO_POR_CAMPO.get(campo_firma, _SELLO_ANCHO_MAX)
+            ancho_disponible = (ancho_pagina - _MARGEN_PAGINA_PT) - (x + 1) - 1
+            ancho_sello = max(40, min(ancho_max_campo, ancho_disponible))
+            caja = (x + 1, y - _SELLO_ALTO - 1, x + 1 + ancho_sello, y - 1)
             field_spec = SigFieldSpec(sig_field_name=campo_firma, box=caja, on_page=pagina)
         else:
             # Respaldo: si no se encuentra la celda, la firma queda invisible

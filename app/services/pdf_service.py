@@ -26,10 +26,10 @@ def _inicializar_acroform_firmaec(ruta_pdf):
 def localizar_posicion_firma(ruta_pdf, campo_firma):
     """
     Busca el marcador 'espejo_firma_<campo>' (ver bookmark-label en
-    generar_documento_paz_salvo) y devuelve (pagina, x, y) del punto donde
-    empieza esa celda en el PDF ya renderizado. Devuelve None si no se
-    encuentra, para que el llamador pueda usar una firma invisible como
-    respaldo sin romper el flujo de firma.
+    generar_documento_paz_salvo) y devuelve (pagina, x, y, ancho_pagina) del
+    punto donde empieza esa celda en el PDF ya renderizado. Devuelve None si
+    no se encuentra, para que el llamador pueda usar una firma invisible
+    como respaldo sin romper el flujo de firma.
     """
     with pikepdf.open(ruta_pdf) as pdf:
         outline = pdf.open_outline()
@@ -44,7 +44,8 @@ def localizar_posicion_firma(ruta_pdf, campo_firma):
             if item.title == objetivo and item.destination:
                 dest = item.destination
                 pagina = pdf.pages.index(dest[0])
-                return pagina, float(dest[2]), float(dest[3])
+                ancho_pagina = float(pdf.pages[pagina].MediaBox[2])
+                return pagina, float(dest[2]), float(dest[3]), ancho_pagina
     return None
 
 def generar_documento_paz_salvo(solicitud, ex_funcionario, respuestas_db, ruta_salida):
