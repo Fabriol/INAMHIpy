@@ -90,27 +90,32 @@
         background: #f8fafc;
     }
 
-    /* Badges de Estado Dinámicos */
+    /* Badges de Estado Dinámicos Modificados */
     .status-badge {
         padding: 6px 12px;
         border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 800;
         text-transform: uppercase;
+        display: inline-block;
+        text-align: center;
     }
 
+    /* Recién creados: Azul vibrante para que se diferencie rápido */
     .status-creado {
-        background: #f1f5f9;
-        color: #475569;
-        border: 1px solid #cbd5e1;
+        background: #e0f2fe;
+        color: #0369a1;
+        border: 1px solid #bae6fd;
     }
 
+    /* En proceso: Naranja para advertir que faltan cosas */
     .status-proceso {
         background: #fffbeb;
         color: #b45309;
         border: 1px solid #fef3c7;
     }
 
+    /* Completo: Verde de éxito */
     .status-completo {
         background: #ecfdf5;
         color: #15803d;
@@ -202,21 +207,26 @@
             <tbody>
                 {% for solicitud in solicitudes %}
 
-                <!-- LOGÍCA INTELIGENTE DE ESTADO -->
-                {% set respondidas = solicitud.respuestas|length if solicitud.respuestas else 0 %}
+                <!-- LOGÍCA INTELIGENTE DE ESTADO (Con % de Avance real, en vivo desde BD) -->
+                {% set respondidas = solicitud.campos_respondidos %}
+                {% set porcentaje = solicitud.porcentaje_avance %}
+                {% set estado_actual = solicitud.estado|upper if solicitud.estado else '' %}
 
-                {% if solicitud.estado == 'COMPLETADO' %}
-                {% set txt_estado = 'COMPLETADO' %}
-                {% set clase_estado = 'status-completo' %}
-                {% set icon_estado = 'bi-check2-all' %}
+                {% if estado_actual in ['COMPLETADO', 'APROBADO', 'FINALIZADO', 'CERRADO'] %}
+                    {% set txt_estado = '100% CULMINADO' %}
+                    {% set clase_estado = 'status-completo' %}
+                    {% set icon_estado = 'bi-check-circle-fill' %}
+
                 {% elif respondidas > 0 %}
-                {% set txt_estado = 'EN PROGRESO' %}
-                {% set clase_estado = 'status-proceso' %}
-                {% set icon_estado = 'bi-arrow-repeat' %}
+                    <!-- Aquí está la magia: Te muestra el % real de avance -->
+                    {% set txt_estado = 'EN PROGRESO (' ~ porcentaje ~ '% · ' ~ respondidas ~ '/' ~ solicitud.campos_total ~ ')' %}
+                    {% set clase_estado = 'status-proceso' %}
+                    {% set icon_estado = 'bi-hourglass-split' %}
+
                 {% else %}
-                {% set txt_estado = 'CREADO (VACÍO)' %}
-                {% set clase_estado = 'status-creado' %}
-                {% set icon_estado = 'bi-star' %}
+                    {% set txt_estado = 'RECIÉN CREADO (0% Avance)' %}
+                    {% set clase_estado = 'status-creado' %}
+                    {% set icon_estado = 'bi-file-earmark-plus-fill' %}
                 {% endif %}
 
                 <tr>

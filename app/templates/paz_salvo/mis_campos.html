@@ -166,6 +166,7 @@
                 'tramites_nombre_responsable': ['Nombre Jefe de Área', 'text', 'soloLetras', '100'], 'tramites_jefe':
                 ['Firma PAdES JEFE', 'firma'],
 
+                'admin_es_contrato': ['S/N Es Admin. de Contrato', 'select'],
                 'admin_informe': ['S/N Entrega informe', 'select'], 'admin_nombre_resp1': ['Resp. Informe', 'text',
                 'soloLetras', '100'], 'admin_r1': ['Firma Validación Informe', 'firma'],
                 'admin_bienes': ['S/N Bienes y muebles', 'select'], 'admin_valor_bienes': ['Valor Bienes $', 'text',
@@ -182,7 +183,8 @@
                 PAdES Director/a', 'firma'],
 
                 'tic_verificacion': ['S/N Verificación equipo', 'select'], 'tic_ip_fija': ['S/N Acceso IP', 'select'],
-                'tic_liberacion': ['S/N Liberación IP', 'select'],
+                'tic_liberacion': ['S/N Liberación IP', 'select'], 'tic_obs1': ['Observación Equipo Informático',
+                'text', '', '255'],
                 'tic_nombre_resp1': ['Resp. Equipos', 'text', 'soloLetras', '100'], 'tic_r1': ['Firma Control Hardware',
                 'firma'],
                 'tic_backup': ['S/N Entrega backup', 'select'], 'tic_ruta_backup': ['Ruta Backup', 'text', '', '255'],
@@ -202,16 +204,20 @@
                 TIC', 'firma'],
 
                 'fin_saldos': ['S/N Saldos contables', 'select'], 'fin_saldos_valor': ['Valor Saldos $', 'text',
-                'soloMoneda', '15'], 'fin_nombre_resp1': ['Resp. Saldos', 'text', 'soloLetras', '100'], 'fin_r1':
+                'soloMoneda', '15'], 'fin_obs1': ['Observación Saldos', 'text', '', '255'],
+                'fin_nombre_resp1': ['Resp. Saldos', 'text', 'soloLetras', '100'], 'fin_r1':
                 ['Firma Análisis Contable', 'firma'],
                 'fin_anticipo': ['S/N Anticipo sueldos', 'select'], 'fin_anticipo_valor': ['Valor Anticipo $', 'text',
-                'soloMoneda', '15'], 'fin_nombre_resp2': ['Resp. Anticipos', 'text', 'soloLetras', '100'], 'fin_r2':
+                'soloMoneda', '15'], 'fin_obs2': ['Observación Anticipos', 'text', '', '255'],
+                'fin_nombre_resp2': ['Resp. Anticipos', 'text', 'soloLetras', '100'], 'fin_r2':
                 ['Firma Tesorería', 'firma'],
                 'fin_recuperacion': ['S/N Recup. valores', 'select'], 'fin_recuperacion_valor': ['Valor Recup. $',
-                'text', 'soloMoneda', '15'], 'fin_nombre_resp3': ['Resp. Valores', 'text', 'soloLetras', '100'],
+                'text', 'soloMoneda', '15'], 'fin_obs3': ['Observación Recuperación', 'text', '', '255'],
+                'fin_nombre_resp3': ['Resp. Valores', 'text', 'soloLetras', '100'],
                 'fin_r3': ['Firma Recuperación', 'firma'],
                 'fin_devolucion': ['S/N Dev. muebles', 'select'], 'fin_devolucion_valor': ['Valor Devolución $', 'text',
-                'soloMoneda', '15'], 'fin_nombre_resp4': ['Resp. Muebles', 'text', 'soloLetras', '100'], 'fin_r4':
+                'soloMoneda', '15'], 'fin_obs4': ['Observación Devolución', 'text', '', '255'],
+                'fin_nombre_resp4': ['Resp. Muebles', 'text', 'soloLetras', '100'], 'fin_r4':
                 ['Firma Ajustes Financieros', 'firma'],
                 'fin_director': ['Nombre Director/a Finan.', 'text', 'soloLetras', '100'], 'fin_dir': ['Firma PAdES
                 Director/a', 'firma'],
@@ -241,9 +247,11 @@
                 'rrhh_juramentada': ['S/N Juramentada', 'select'], 'rrhh_num_declaracion': ['N° Declaración', 'text',
                 '', '100'], 'rrhh_resp_juramentada': ['Resp. Juramentada', 'text', 'soloLetras', '100'], 'rrhh_r6':
                 ['Firma Juramentada', 'firma'],
-                'rrhh_credencial': ['S/N Credencial', 'select'], 'rrhh_resp_credencial2': ['Resp. Credencial', 'text',
+                'rrhh_credencial': ['S/N Credencial', 'select'], 'rrhh_respaldo_cd': ['S/N Respaldo CD', 'select'],
+                'rrhh_resp_credencial2': ['Resp. Credencial', 'text',
                 'soloLetras', '100'], 'rrhh_r7': ['Firma Credencial', 'firma'],
-                'rrhh_acta_bienes': ['S/N Acta Bienes', 'select'], 'rrhh_resp_acta': ['Resp. Acta', 'text',
+                'rrhh_acta_bienes': ['S/N Acta Bienes', 'select'], 'rrhh_ropa_trabajo': ['S/N Ropa de Trabajo', 'select'],
+                'rrhh_resp_acta': ['Resp. Acta', 'text',
                 'soloLetras', '100'], 'rrhh_r8': ['Firma Act. Bienes', 'firma'],
                 'rrhh_director': ['Nombre Director/a RRHH', 'text', 'soloLetras', '100'], 'rrhh_dir': ['Firma Dir.
                 RRHH', 'firma'],

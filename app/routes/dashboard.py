@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
-from app.models.base import db, Usuario, SolicitudPazSalvo, LogAuditoria
+from app.models.base import db, Usuario, SolicitudPazSalvo, LogAuditoria, Respuesta
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
@@ -13,8 +13,9 @@ def index():
         'tramites_completados': SolicitudPazSalvo.query.filter_by(estado='COMPLETADO').count(),
         'total_usuarios': Usuario.query.filter_by(activo=True).count(),
         'areas_control': 8,
-        # SOLUCIÓN AQUÍ: Se cambió a pdf_firmado_path
-        'firmas_validadas': SolicitudPazSalvo.query.filter(SolicitudPazSalvo.pdf_firmado_path.isnot(None)).count(),
+        # Cuenta firmas PAdES reales estampadas (campos marcados FIRMADO), no el
+        # campo pdf_firmado_path que solo usa el flujo antiguo de subida manual
+        'firmas_validadas': Respuesta.query.filter_by(valor_respuesta='FIRMADO').count(),
         'logs_auditoria': LogAuditoria.query.count()
     }
     

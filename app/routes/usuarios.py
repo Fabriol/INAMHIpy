@@ -60,7 +60,7 @@ def editar_usuario(id):
     nuevos_apellidos = request.form.get('apellidos')
 
     if nuevos_nombres != u.nombres or nuevos_apellidos != u.apellidos:
-        dominio = u.email.split('@')[-1] if u.email and '@' in u.email else 'inamhi.gob.ec'
+        dominio = u.email.split('@')[-1] if u.email and '@' in u.email else 'inamhi.ec'
         u.email = _generar_usuario_correo(nuevos_nombres, nuevos_apellidos, dominio)
 
     u.nombres = nuevos_nombres

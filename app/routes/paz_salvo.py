@@ -213,13 +213,14 @@ def llenar_formulario(solicitud_id):
 
     campos_asignados_al_usuario = []
     campos_bloqueados = []
-    
+    campos_completados = []
+
     for r in respuestas_db:
         # Usamos str() para que valide correctamente al usuario logueado
         es_su_campo = (str(r.usuario_asignado_id) == str(current_user.id))
         if es_su_campo:
             campos_asignados_al_usuario.append(r.campo_formulario)
-            
+
         # ==========================================
         # MAGIA DE SEGURIDAD: BLOQUEO ABSOLUTO
         # ==========================================
@@ -227,18 +228,23 @@ def llenar_formulario(solicitud_id):
         if r.valor_respuesta and str(r.valor_respuesta).strip() != "":
             if r.campo_formulario not in campos_bloqueados:
                 campos_bloqueados.append(r.campo_formulario)
+            # Lista limpia (sin mezclar con el bloqueo de privacidad de abajo) para que
+            # el Panel de Designación sepa qué campos ya están REALMENTE llenos
+            if r.campo_formulario not in campos_completados:
+                campos_completados.append(r.campo_formulario)
 
         # Bloqueo de privacidad para usuarios que no son Administradores
         if current_user.rol.nombre != 'Administrador' and not es_su_campo:
             if r.campo_formulario not in campos_bloqueados:
                 campos_bloqueados.append(r.campo_formulario)
 
-    return render_template('paz_salvo/llenar_formulario.html', 
-                           solicitud=solicitud, 
+    return render_template('paz_salvo/llenar_formulario.html',
+                           solicitud=solicitud,
                            usuarios_disponibles=usuarios_disponibles,
                            campos_bloqueados=campos_bloqueados,
                            campos_asignados_al_usuario=campos_asignados_al_usuario,
                            asignaciones_dict=asignaciones_dict,
+                           campos_completados=campos_completados,
                            datos=datos_diccionario)
 
 # ====================================================================

@@ -1548,6 +1548,9 @@
 <script id="asignaciones-data" type="application/json">
     {{ asig_dict | default({}) | tojson | safe }}
 </script>
+<script id="completados-data" type="application/json">
+    {{ campos_completados | default([]) | tojson | safe }}
+</script>
 
 <script>
     let divisionPoliticaEcuador = {
@@ -1594,6 +1597,8 @@
         // ==============================================================
         let dataNode = document.getElementById('asignaciones-data');
         let asignacionesPrevias = dataNode ? JSON.parse(dataNode.textContent) : {};
+        let dataCompletados = document.getElementById('completados-data');
+        let camposCompletados = dataCompletados ? JSON.parse(dataCompletados.textContent) : [];
         let checkboxesAdmin = document.querySelectorAll('input[type="checkbox"][name="campos"]');
         let btnToggleAll = document.getElementById('btnToggleAll');
 
@@ -1604,8 +1609,11 @@
             // Damos formato base a todos los contenedores
             contenedor.classList.add("mb-2");
 
-            if (typeof asignacionesPrevias !== 'undefined' && asignacionesPrevias[nombreCampo]) {
-                // ESTADO: ASIGNADO
+            let estaAsignado = typeof asignacionesPrevias !== 'undefined' && asignacionesPrevias[nombreCampo];
+            let estaCompletado = camposCompletados.includes(nombreCampo);
+
+            if (estaAsignado && estaCompletado) {
+                // ESTADO: COMPLETADO (ya tiene valor real guardado, se bloquea de verdad)
                 cb.checked = true;
                 cb.disabled = true;
 
@@ -1615,8 +1623,18 @@
                 contenedor.style.padding = "6px 8px";
                 contenedor.style.opacity = "0.7";
 
-                // Inyectamos un badge con el nombre del usuario
-                let badgeHTML = `<div class="mt-1"><span class="badge bg-success shadow-sm" style="font-size: 9px;"><i class="bi bi-person-check-fill"></i> Asignado a: ${asignacionesPrevias[nombreCampo]}</span></div>`;
+                let badgeHTML = `<div class="mt-1"><span class="badge bg-success shadow-sm" style="font-size: 9px;"><i class="bi bi-check-circle-fill"></i> Completado por: ${asignacionesPrevias[nombreCampo]}</span></div>`;
+                contenedor.insertAdjacentHTML('beforeend', badgeHTML);
+            } else if (estaAsignado) {
+                // ESTADO: ASIGNADO PERO AÚN SIN LLENAR (sigue disponible para Marcar Todo / reasignar)
+                cb.checked = true;
+
+                contenedor.style.backgroundColor = "#eff6ff";
+                contenedor.style.border = "1px dashed #60a5fa";
+                contenedor.style.borderRadius = "8px";
+                contenedor.style.padding = "6px 8px";
+
+                let badgeHTML = `<div class="mt-1"><span class="badge bg-primary shadow-sm" style="font-size: 9px;"><i class="bi bi-hourglass-split"></i> Asignado a: ${asignacionesPrevias[nombreCampo]} (pendiente de llenar)</span></div>`;
                 contenedor.insertAdjacentHTML('beforeend', badgeHTML);
             } else {
                 // ESTADO: LIBRE / PENDIENTE

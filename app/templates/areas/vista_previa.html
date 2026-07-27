@@ -37,12 +37,28 @@
         box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
     }
 
-    /* Ocultar elementos innecesarios al Imprimir */
+    /* Aislamiento de impresión: se oculta TODO por defecto y solo se muestra
+       la hoja del documento, sin importar qué otros elementos tenga la página
+       (sidebar, barra superior, alertas, etc.) */
     @media print {
-        .sidebar, .toolbar-preview, .alert { display: none !important; }
-        .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
-        .desk-background { background: white !important; padding: 0 !important; }
-        .paper-sheet { box-shadow: none !important; padding: 0 !important; }
+        @page { margin: 0; size: A4; }
+
+        body * { visibility: hidden !important; }
+        .paper-sheet, .paper-sheet * { visibility: visible !important; }
+
+        .paper-sheet {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            min-height: auto;
+            margin: 0;
+            padding: 0;
+            box-shadow: none;
+            border-radius: 0;
+        }
+
+        .desk-background { background: white !important; padding: 0 !important; min-height: auto !important; }
     }
 </style>
 

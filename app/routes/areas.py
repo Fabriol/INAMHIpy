@@ -11,6 +11,24 @@ from app.models.base import db, SolicitudPazSalvo, Respuesta, LogAuditoria, Usua
 
 areas_bp = Blueprint('areas', __name__)
 
+# Total oficial de campos del Formulario Paz y Salvo (ver hoja_espejo.html:
+# cada campo_formulario referenciado ahí, sin contar los '_nombre' que se
+# autogeneran al firmar). Única fuente de verdad para el % de avance.
+TOTAL_CAMPOS_PAZ_SALVO = 147
+
+def _calcular_progreso(solicitud_id):
+    """Devuelve (campos_respondidos, total_campos, porcentaje) de una solicitud.
+    Solo cuenta como 'respondido' un campo con valor real guardado, no uno
+    simplemente asignado por el Administrador."""
+    respuestas = Respuesta.query.filter_by(solicitud_id=solicitud_id).all()
+    respondidos = sum(
+        1 for r in respuestas
+        if r.valor_respuesta and str(r.valor_respuesta).strip() != ''
+        and not r.campo_formulario.endswith('_nombre')
+    )
+    porcentaje = min(100, round((respondidos / TOTAL_CAMPOS_PAZ_SALVO) * 100))
+    return respondidos, TOTAL_CAMPOS_PAZ_SALVO, porcentaje
+
 # ====================================================================
 # 1. RUTA: PANEL INTELIGENTE DE TRÁMITES (CORREGIDO SIN BUSQUEDA EN_PROGRESO)
 # ====================================================================
@@ -30,9 +48,18 @@ def mis_tareas():
         solicitudes = SolicitudPazSalvo.query.order_by(SolicitudPazSalvo.fecha_creacion.desc()).all()
         
     elif current_user.rol.nombre == 'Ex Funcionario':
-        # El Ex Funcionario visualiza EXCLUSIVAMENTE su propia solicitud de Paz y Salvo
-        solicitudes = SolicitudPazSalvo.query.filter_by(ex_funcionario_id=current_user.id).all()
-        
+        # El Ex Funcionario ve su propia solicitud de Paz y Salvo, más cualquier
+        # otro trámite donde el Administrador le haya delegado campos puntuales
+        # (ej. como responsable/testigo en el trámite de otro servidor)
+        ids_propios = {s.id for s in SolicitudPazSalvo.query.filter_by(ex_funcionario_id=current_user.id).all()}
+        ids_asignados = {r.solicitud_id for r in Respuesta.query.filter_by(usuario_asignado_id=current_user.id).all()}
+        solicitud_ids = ids_propios | ids_asignados
+
+        if solicitud_ids:
+            solicitudes = SolicitudPazSalvo.query.filter(SolicitudPazSalvo.id.in_(solicitud_ids)).order_by(SolicitudPazSalvo.fecha_creacion.desc()).all()
+        else:
+            solicitudes = []
+
     else:
         # Las áreas técnicas (TICs, Financiera, Seguridad, etc.) ven solo donde el Admin les delegó campos
         asignaciones = Respuesta.query.filter_by(usuario_asignado_id=current_user.id).all()
@@ -48,7 +75,8 @@ def mis_tareas():
     # Inyección forzada de datos de identidad para limpiar el "Dato No Vinculado" en las tablas
     for sol in solicitudes:
         sol.usuario_data = Usuario.query.get(sol.ex_funcionario_id)
-        
+        sol.campos_respondidos, sol.campos_total, sol.porcentaje_avance = _calcular_progreso(sol.id)
+
     return render_template('areas/pendientes.html', solicitudes=solicitudes)
 
 
@@ -64,8 +92,11 @@ def vista_previa(solicitud_id):
     # Extraemos las respuestas asentadas para la previsualización de la Hoja Espejo
     respuestas_db = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
     datos_combinados = {r.campo_formulario: r.valor_respuesta for r in respuestas_db}
-    
-    return render_template('paz_salvo/ver_espejo.html', solicitud=solicitud, datos=datos_combinados)
+
+    respondidos, total_campos, porcentaje = _calcular_progreso(solicitud.id)
+
+    return render_template('paz_salvo/ver_espejo.html', solicitud=solicitud, datos=datos_combinados,
+                           campos_respondidos=respondidos, campos_total=total_campos, porcentaje=porcentaje)
 
 
 # ====================================================================

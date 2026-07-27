@@ -2,11 +2,9 @@
 
 {% block content %}
 
-<!-- Calculamos el progreso para saber si habilitamos la impresión -->
-{% set total_preguntas = 8 %}
-{% set respondidas = datos.keys()|length if datos else 0 %}
-{% set porcentaje = ((respondidas / total_preguntas) * 100) | round(0) | int %}
-{% if porcentaje > 100 %}{% set porcentaje = 100 %}{% endif %}
+<!-- El % de avance (campos_respondidos / campos_total / porcentaje) llega
+     calculado desde areas.vista_previa(), misma fuente que usa pendientes.html,
+     así los dos nunca se desincronizan -->
 
 <div class="container mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4 no-print">
@@ -29,7 +27,7 @@
             <button disabled class="btn btn-light border fw-bold shadow-sm text-muted"
                 style="border-radius: 8px; cursor: not-allowed;"
                 title="El trámite debe completarse para poder imprimir">
-                <i class="bi bi-lock-fill me-1"></i> Impresión Bloqueada ({{ porcentaje }}%)
+                <i class="bi bi-lock-fill me-1"></i> Impresión Bloqueada ({{ porcentaje }}% · {{ campos_respondidos }}/{{ campos_total }})
             </button>
             {% endif %}
 
@@ -51,20 +49,23 @@
 </div>
 
 <style>
+    /* Aislamiento de impresión: se oculta TODO por defecto (sidebar incluido)
+       y solo se muestra la tarjeta con la hoja espejo del documento */
     @media print {
-        body {
-            background: white !important;
-            margin: 0;
-            padding: 0;
-        }
+        @page { margin: 0; size: A4; }
 
-        .no-print {
-            display: none !important;
-        }
+        body * { visibility: hidden !important; }
+        .card, .card * { visibility: visible !important; }
 
         .card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            margin: 0;
             box-shadow: none !important;
             border: none !important;
+            border-radius: 0 !important;
         }
     }
 </style>
