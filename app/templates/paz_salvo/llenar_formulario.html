@@ -260,8 +260,10 @@
         {% endif %}
     </div>
     {% endif %}
-    <input type="{{ type }}" name="{{ name }}" class="doc-input" value="{{ val }}" {% if name in bloqueados %} readonly
-        disabled style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %} {% if max_len
+    <input type="{{ type }}" name="{{ name }}" class="doc-input" value="{{ val }}" {% if name in bloqueados %} {% if
+        name in ['nombres_apellidos', 'cedula', 'cedula_firmante'] %} readonly
+        style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% else %} readonly disabled
+        style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %} {% endif %} {% if max_len
         %}maxlength="{{ max_len }}" {% endif %} oninput="{{ oninput_str }}">
     <span class="error-msg" id="msg_{{ name }}">⚠ Formato incorrecto o campo requerido.</span>
 </div>
@@ -607,8 +609,8 @@
                                                 value="tic_ip_fija" class="form-check-input me-1"> S/N Acceso IP</div>
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="tic_liberacion" class="form-check-input me-1"> S/N Lib. IP</div>
-                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
-                                                value="tic_obs1" class="form-check-input me-1"> Observación Equipo
+                                        <div class="col-md-2 mb-2"><input type="checkbox" name="campos" value="tic_obs1"
+                                                class="form-check-input me-1"> Observación Equipo
                                         </div>
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="tic_nombre_resp1" class="form-check-input me-1"> Resp. Equipos
@@ -693,8 +695,8 @@
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_saldos_valor" class="form-check-input me-1"> Valor Saldos $
                                         </div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
-                                                value="fin_obs1" class="form-check-input me-1"> Observación Saldos</div>
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs1"
+                                                class="form-check-input me-1"> Observación Saldos</div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp1" class="form-check-input me-1"> Resp. Saldos
                                         </div>
@@ -708,8 +710,8 @@
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_anticipo_valor" class="form-check-input me-1"> Valor Anticipo
                                             $</div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
-                                                value="fin_obs2" class="form-check-input me-1"> Observación Anticipos
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs2"
+                                                class="form-check-input me-1"> Observación Anticipos
                                         </div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp2" class="form-check-input me-1"> Resp. Anticipos
@@ -724,8 +726,8 @@
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_recuperacion_valor" class="form-check-input me-1"> Valor
                                             Recup. $</div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
-                                                value="fin_obs3" class="form-check-input me-1"> Observación Recup.</div>
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs3"
+                                                class="form-check-input me-1"> Observación Recup.</div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp3" class="form-check-input me-1"> Resp. Valores
                                         </div>
@@ -739,8 +741,8 @@
                                         <div class="col-md-2 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_devolucion_valor" class="form-check-input me-1"> Valor
                                             Devolución $</div>
-                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
-                                                value="fin_obs4" class="form-check-input me-1"> Observación Devolución
+                                        <div class="col-md-3 mb-2"><input type="checkbox" name="campos" value="fin_obs4"
+                                                class="form-check-input me-1"> Observación Devolución
                                         </div>
                                         <div class="col-md-3 mb-2"><input type="checkbox" name="campos"
                                                 value="fin_nombre_resp4" class="form-check-input me-1"> Resp. Muebles
@@ -1079,7 +1081,7 @@
                     </div>
                     {% endif %}
 
-                    {{ input_text('unidad', 'Dirección Técnica / Unidad', 'text', 'span-2', '100', '',
+                    {{ input_text('unidad', 'Dirección Técnica / Unidad', 'text', 'span-2', '100', 'validarUnidad',
                     datos.get('unidad', '')) }}
                     {{ input_text('cargo', 'Cargo Institucional Desempeñado', 'text', 'span-2', '100', '',
                     datos.get('cargo', '')) }}
@@ -1753,11 +1755,38 @@
 
     window.soloLetras = (el) => { if (/[^a-zA-ZÀ-ÿ\s]/.test(el.value)) { el.value = el.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, ''); window.mostrarError(el, '⚠ Solo letras.'); } else { window.quitarError(el); } };
     window.soloNumeros = (el) => { if (/[^0-9]/.test(el.value)) { el.value = el.value.replace(/[^0-9]/g, ''); window.mostrarError(el, '⚠ Solo números.'); } else { window.quitarError(el); } };
-    window.validarConvencional = (el) => { el.value = el.value.replace(/[^0-9]/g, ''); if (el.value.length > 0 && el.value.length !== 9) { window.mostrarError(el, '⚠ Debe tener 9 dígitos.'); } else { window.quitarError(el); } };
+    window.validarConvencional = (el) => { el.value = el.value.replace(/[^0-9]/g, '').slice(0, 9); if (el.value.length > 0 && (el.value.length !== 9 || !el.value.startsWith('02'))) { window.mostrarError(el, '⚠ Debe iniciar con 02 y tener 9 dígitos en total.'); } else { window.quitarError(el); } };
     window.validarCelular = (el) => { el.value = el.value.replace(/[^0-9]/g, ''); if (el.value.length > 0 && (el.value.length !== 10 || !el.value.startsWith('09'))) { window.mostrarError(el, '⚠ Inicia con 09 y 10 dígitos.'); } else { window.quitarError(el); } };
     window.soloMoneda = (el) => { if (/[^0-9.]/.test(el.value)) { el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); window.mostrarError(el, '⚠ Formato inválido.'); } else { window.quitarError(el); } };
-    window.validarEmail = (el) => { let re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if (el.value && !re.test(el.value)) { window.mostrarError(el, '⚠ Correo inválido.'); } else { window.quitarError(el); } };
+    window.validarEmail = (el) => {
+        let re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (el.value && !re.test(el.value)) { window.mostrarError(el, '⚠ Correo inválido.'); } else { window.quitarError(el); }
+
+        let e1 = document.querySelector('input[name="email1"]');
+        let e2 = document.querySelector('input[name="email2"]');
+        if (e1 && e2) {
+            let iguales = e1.value.trim() !== '' && e1.value.trim().toLowerCase() === e2.value.trim().toLowerCase();
+            [e1, e2].forEach((campo) => {
+                if (iguales) {
+                    window.mostrarError(campo, '⚠ El correo principal y alternativo no pueden ser iguales.');
+                } else if (campo.value === '' || re.test(campo.value)) {
+                    window.quitarError(campo);
+                }
+            });
+        }
+    };
     window.validarFechas = () => { let ing = document.querySelector('input[name="fecha_ingreso"]'); let sal = document.querySelector('input[name="fecha_salida"]'); if (ing && sal && ing.value && sal.value && new Date(sal.value) <= new Date(ing.value)) { window.mostrarError(sal, '⚠ Fecha salida > ingreso.'); } else if (sal) { window.quitarError(sal); } };
+
+    window.validarUnidad = (el) => {
+        if (el.value.includes('/')) {
+            el.value = el.value.split('/').map((p) => p.trim()).filter((p) => p !== '').join(' / ');
+            window.quitarError(el);
+        } else if (el.value.trim() !== '') {
+            window.mostrarError(el, '⚠ Formato de subdivisión requerido: Área / Departamento (Ej: BLOQUE 1 / FINANZAS)');
+        } else {
+            window.quitarError(el);
+        }
+    };
 
     window.validarCedula = (el) => {
         el.value = el.value.replace(/[^0-9]/g, ''); let cedula = el.value;
@@ -1867,7 +1896,7 @@
                 formData.append('password', passInput);
                 formData.append('campo', campoFirma);
 
-                return fetch(`/paz-salvo/subir-firma/{{ solicitud.id }}`, { method: 'POST', body: formData })
+                return fetch(`/paz-salvo/firmar-pades/{{ solicitud.id }}`, { method: 'POST', body: formData })
                     .then((response) => {
                         if (!response.ok) { return response.json().then((err) => { throw new Error(err.mensaje || 'Error al procesar.'); }); }
                         return response.json();
@@ -1889,7 +1918,7 @@
     window.validarYGuardarTodo = (event, btnContext) => {
         // FRENO DE MANO: Esto bloquea de forma absoluta que la página salte o recargue
         if (event) { event.preventDefault(); }
-        
+
         let form = document.getElementById('formularioOficial');
         let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
         let firmas = form.querySelectorAll('input[type="hidden"][id^="input_"]');
@@ -1903,7 +1932,7 @@
             if (el.value !== 'FIRMADO') {
                 valido = false;
                 let cajaFirma = el.closest('div.p-3');
-                if(cajaFirma) {
+                if (cajaFirma) {
                     cajaFirma.style.borderColor = '#ef4444';
                     cajaFirma.style.backgroundColor = '#fef2f2';
                 }
@@ -1915,28 +1944,28 @@
             return;
         }
 
-        Swal.fire({ 
-            title: '¿Sellar Trámite?', 
-            text: 'Se bloquearán los campos y la información quedará guardada de forma irreversible.', 
-            icon: 'warning', 
-            showCancelButton: true, 
-            confirmButtonText: '<i class="bi bi-shield-lock-fill me-2"></i> Sí, Guardar y Sellar', 
+        Swal.fire({
+            title: '¿Sellar Trámite?',
+            text: 'Se bloquearán los campos y la información quedará guardada de forma irreversible.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '<i class="bi bi-shield-lock-fill me-2"></i> Sí, Guardar y Sellar',
             confirmButtonColor: '#16a34a',
             cancelButtonText: 'Cancelar'
         }).then(async (result) => {
             if (result.isConfirmed) {
                 // Bloqueamos el botón visualmente para que no den doble clic
-                if(btnContext) {
+                if (btnContext) {
                     btnContext.disabled = true;
                     btnContext.innerHTML = '<span class="spinner-grow spinner-grow-sm me-2"></span> Sellando información...';
                     btnContext.classList.replace('btn-success', 'btn-secondary');
                 }
-                
+
                 Swal.fire({ title: 'Guardando de forma segura...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-                
+
                 try {
                     let formData = new FormData(form);
-                    
+
                     // Enviamos los datos por detrás de cámaras
                     let response = await fetch(form.action, {
                         method: 'POST',
@@ -1963,14 +1992,14 @@
                     });
 
                     // El botón se queda bloqueado permanentemente
-                    if(btnContext) {
+                    if (btnContext) {
                         btnContext.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Trámite Sellado';
                         btnContext.style.cursor = 'not-allowed';
                     }
 
                 } catch (error) {
                     Swal.fire('Error de conexión', 'Hubo un problema de red al intentar guardar.', 'error');
-                    if(btnContext) {
+                    if (btnContext) {
                         btnContext.disabled = false;
                         btnContext.innerHTML = '<i class="bi bi-cloud-check-fill me-2"></i> Guardar Mis Respuestas';
                         btnContext.classList.replace('btn-secondary', 'btn-success');

@@ -368,7 +368,7 @@ def descargar_pdf(solicitud_id):
 # ====================================================================
 # 7. RUTA: FIRMA CRIPTOGRÁFICA PAdES CON SELLO VISUAL POSICIONADO
 # ====================================================================
-@paz_salvo_bp.route('/paz-salvo/subir-firma/<int:solicitud_id>', methods=['POST'])
+@paz_salvo_bp.route('/paz-salvo/firmar-pades/<int:solicitud_id>', methods=['POST'])
 @login_required
 def subir_firma_pades(solicitud_id):
     if 'pdf_firmado' not in request.files:
@@ -384,10 +384,12 @@ def subir_firma_pades(solicitud_id):
     archivo_p12.save(ruta_temp_p12)
 
     try:
-        # 1. ESCUDO DE CONTRASEÑA: Si escriben mal la clave, avisa y no rompe el servidor
+        # 1. ESCUDO DE CONTRASEÑA: Si escriben mal la clave o el .p12 está dañado, avisa y no rompe el servidor
         try:
             signer = signers.SimpleSigner.load_pkcs12(ruta_temp_p12, passphrase=password.encode('utf-8'))
-        except ValueError:
+            if not signer or not getattr(signer, 'signing_cert', None):
+                raise ValueError('Certificado o contraseña inválidos')
+        except Exception:
             os.remove(ruta_temp_p12)
             return jsonify({'mensaje': 'Contraseña incorrecta o certificado dañado. Intente de nuevo.'}), 401
 

@@ -141,8 +141,8 @@
                 'email2': ['Email Alternativo', 'email', 'validarEmail', '100'], 'provincia': ['Provincia',
                 'select_provincia'],
                 'canton': ['Cantón', 'select_canton'], 'lugar_trabajo': ['Lugar de Trabajo', 'select_lugar'],
-                'grupo_ocupacional': ['Grupo Ocupacional', 'select_grupo'], 'unidad': ['Dirección / Unidad', 'text', '',
-                '100'],
+                'grupo_ocupacional': ['Grupo Ocupacional', 'select_grupo'], 'unidad': ['Dirección / Unidad', 'text',
+                'validarUnidad', '100'],
                 'cargo': ['Cargo', 'text', '', '100'],
 
                 'tramites_informe': ['S/N Informe gestión', 'select'], 'tramites_quipux_cero': ['S/N QUIPUX cero',
@@ -274,8 +274,10 @@
                 <div class="input-group">
                     <label>{{ label }}</label>
                     <input type="{{ tipo }}" name="{{ campo }}" class="doc-input" value="{{ datos.get(campo, '') }}" {%
-                        if max_l %}maxlength="{{ max_l }}" {% endif %} {% if campo in campos_bloqueados %}readonly
-                        disabled style="background:#e2e8f0;" {% endif %} oninput="{{ oninput_str }}">
+                        if max_l %}maxlength="{{ max_l }}" {% endif %} {% if campo in campos_bloqueados %}{% if campo
+                        in ['nombres_apellidos', 'cedula', 'cedula_firmante'] %}readonly style="background:#e2e8f0;"
+                        {% else %}readonly disabled style="background:#e2e8f0;" {% endif %}{% endif %}
+                        oninput="{{ oninput_str }}">
                     <span class="error-msg" style="display:none;">⚠ Formato Incorrecto</span>
                 </div>
                 {% elif tipo == 'select' %}
@@ -390,14 +392,30 @@
 
 <script>
     let divisionPoliticaEcuador = {
-        "PICHINCHA": ["QUITO", "CAYAMBE", "MEJÍA", "PEDRO MONCAYO", "RUMIÑAHUI", "SAN MIGUEL DE LOS BANCOS", "PEDRO VICENTE MALDONADO", "PUERTO QUITO"],
-        "GUAYAS": ["GUAYAQUIL", "DURÁN", "MILAGRO", "DAULE", "SAMBORONDÓN", "NARANJAL", "BALZAR", "EL EMPALME"],
-        "AZUAY": ["CUENCA", "GUALACEO", "PAUTE", "SIGSIG", "CHORDELEG", "SANTA ISABEL", "CAMILO PONCE ENRÍQUEZ"],
-        "CARCHI": ["TULCÁN", "MONTÚFAR", "ESPEJO", "MIRA", "BOLÍVAR", "SAN PEDRO DE HUACA"],
-        "CHIMBORAZO": ["RIOBAMBA", "ALAUSÍ", "GUANO", "COLTA", "GUAMOTE", "CHAMBO", "PENIPE", "CUMANDÁ"],
-        "IMBABURA": ["IBARRA", "OTAVALO", "COTACACHI", "ANTONIO ANTE", "PIMAMPIRO", "URCUQUÍ"],
-        "LOJA": ["LOJA", "CATAMAYO", "MACARÁ", "CALVAS", "PALTAS", "SARAGURO", "ZAPOTILLO"],
-        "TUNGURAHUA": ["AMBATO", "PELILEO", "PÍLLARO", "BAÑOS DE AGUA SANTA", "QUERO", "CEVALLOS", "TISALEO"]
+        "AZUAY": ["CAMILO PONCE ENRÍQUEZ", "CHORDELEG", "CUENCA", "EL PAN", "GIRÓN", "GUACHAPALA", "GUALACEO", "NABÓN", "OÑA", "PAUTE", "PUCARÁ", "SAN FERNANDO", "SANTA ISABEL", "SEVILLA DE ORO", "SIGSIG"],
+        "BOLÍVAR": ["CALUMA", "CHILLANES", "CHIMBO", "ECHEANDÍA", "GUARANDA", "LAS NAVES", "SAN MIGUEL"],
+        "CAÑAR": ["AZOGUES", "BIBLIÁN", "CAÑAR", "DÉLEG", "EL TAMBO", "LA TRONCAL", "SUSCAL"],
+        "CARCHI": ["BOLÍVAR", "ESPEJO", "MIRA", "MONTÚFAR", "SAN PEDRO DE HUACA", "TULCÁN"],
+        "CHIMBORAZO": ["ALAUSÍ", "CHAMBO", "CHUNCHI", "COLTA", "CUMANDÁ", "GUAMOTE", "GUANO", "PALLATANGA", "PENIPE", "RIOBAMBA"],
+        "COTOPAXI": ["LA MANÁ", "LATACUNGA", "PANGUA", "PUJILÍ", "SALCEDO", "SAQUISILÍ", "SIGCHOS"],
+        "EL ORO": ["ARENILLAS", "ATAHUALPA", "BALSAS", "CHILLA", "EL GUABO", "HUAQUILLAS", "LAS LAJAS", "MACHALA", "MARCABELÍ", "PASAJE", "PIÑAS", "PORTOVELO", "SANTA ROSA", "ZARUMA"],
+        "ESMERALDAS": ["ATACAMES", "ELOY ALFARO", "ESMERALDAS", "MUISNE", "QUININDÉ", "RIOVERDE", "SAN LORENZO"],
+        "GALÁPAGOS": ["ISABELA", "SAN CRISTÓBAL", "SANTA CRUZ"],
+        "GUAYAS": ["ALFREDO BAQUERIZO MORENO", "BALAO", "BALZAR", "COLIMES", "CORONEL MARCELINO MARIDUEÑA", "DAULE", "DURÁN", "EL EMPALME", "EL TRIUNFO", "GENERAL ANTONIO ELIZALDE", "GUAYAQUIL", "ISIDRO AYORA", "LOMAS DE SARGENTILLO", "MILAGRO", "NARANJAL", "NARANJITO", "NOBOL", "PALESTINA", "PEDRO CARBO", "PLAYAS", "SALITRE", "SAMBORONDÓN", "SANTA LUCÍA", "SIMÓN BOLÍVAR", "YAGUACHI"],
+        "IMBABURA": ["ANTONIO ANTE", "COTACACHI", "IBARRA", "OTAVALO", "PIMAMPIRO", "URCUQUÍ"],
+        "LOJA": ["CALVAS", "CATAMAYO", "CELICA", "CHAGUARPAMBA", "ESPÍNDOLA", "GONZANAMÁ", "LOJA", "MACARÁ", "OLMEDO", "PALTAS", "PINDAL", "PUYANGO", "QUILANGA", "SARAGURO", "SOZORANGA", "ZAPOTILLO"],
+        "LOS RÍOS": ["BABA", "BABAHOYO", "BUENA FE", "MOCACHE", "MONTALVO", "PALENQUE", "PUEBLOVIEJO", "QUEVEDO", "QUINSALOMA", "URDANETA", "VALENCIA", "VENTANAS", "VINCES"],
+        "MANABÍ": ["24 DE MAYO", "BOLÍVAR", "CHONE", "EL CARMEN", "FLAVIO ALFARO", "JAMA", "JARAMIJÓ", "JIPIJAPA", "JUNÍN", "MANTA", "MONTECRISTI", "OLMEDO", "PAJÁN", "PEDERNALES", "PICHINCHA", "PORTOVIEJO", "PUERTO LÓPEZ", "ROCAFUERTE", "SAN VICENTE", "SANTA ANA", "SUCRE", "TOSAGUA"],
+        "MORONA SANTIAGO": ["GUALAQUIZA", "HUAMBOYA", "LIMÓN INDANZA", "LOGROÑO", "MORONA", "PABLO SEXTO", "PALORA", "SAN JUAN BOSCO", "SANTIAGO", "SEVILLA DON BOSCO", "SUCÚA", "TAISHA", "TIWINTZA"],
+        "NAPO": ["ARCHIDONA", "CARLOS JULIO AROSEMENA TOLA", "EL CHACO", "QUIJOS", "TENA"],
+        "ORELLANA": ["AGUARICO", "FRANCISCO DE ORELLANA", "LA JOYA DE LOS SACHAS", "LORETO"],
+        "PASTAZA": ["ARAJUNO", "MERA", "PASTAZA", "SANTA CLARA"],
+        "PICHINCHA": ["CAYAMBE", "MEJÍA", "PEDRO MONCAYO", "PEDRO VICENTE MALDONADO", "PUERTO QUITO", "QUITO", "RUMIÑAHUI", "SAN MIGUEL DE LOS BANCOS"],
+        "SANTA ELENA": ["LA LIBERTAD", "SALINAS", "SANTA ELENA"],
+        "SANTO DOMINGO DE LOS TSÁCHILAS": ["LA CONCORDIA", "SANTO DOMINGO"],
+        "SUCUMBÍOS": ["CASCALES", "CUYABENO", "GONZALO PIZARRO", "LAGO AGRIO", "PUTUMAYO", "SHUSHUFINDI", "SUCUMBÍOS"],
+        "TUNGURAHUA": ["AMBATO", "BAÑOS DE AGUA SANTA", "CEVALLOS", "MOCHA", "PATATE", "QUERO", "SAN PEDRO DE PELILEO", "SANTIAGO DE PÍLLARO", "TISALEO"],
+        "ZAMORA CHINCHIPE": ["CENTINELA DEL CÓNDOR", "CHINCHIPE", "EL PANGUI", "NANGARITZA", "PALANDA", "PAQUISHA", "YACUAMBI", "YANTZAZA", "ZAMORA"]
     };
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -450,10 +468,26 @@
 
     window.soloLetras = (el) => { if (/[^a-zA-ZÀ-ÿ\s]/.test(el.value)) { el.value = el.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, ''); window.mostrarError(el, '⚠ Solo letras permitidas.'); } else { window.quitarError(el); } };
     window.soloNumeros = (el) => { if (/[^0-9]/.test(el.value)) { el.value = el.value.replace(/[^0-9]/g, ''); window.mostrarError(el, '⚠ Solo números permitidos.'); } else { window.quitarError(el); } };
-    window.validarConvencional = (el) => { el.value = el.value.replace(/[^0-9]/g, ''); if (el.value.length > 0 && el.value.length !== 9) { window.mostrarError(el, '⚠ Debe tener exactamente 9 dígitos.'); } else { window.quitarError(el); } };
+    window.validarConvencional = (el) => { el.value = el.value.replace(/[^0-9]/g, '').slice(0, 9); if (el.value.length > 0 && (el.value.length !== 9 || !el.value.startsWith('02'))) { window.mostrarError(el, '⚠ Debe iniciar con 02 y tener 9 dígitos en total.'); } else { window.quitarError(el); } };
     window.validarCelular = (el) => { el.value = el.value.replace(/[^0-9]/g, ''); if (el.value.length > 0 && (el.value.length !== 10 || !el.value.startsWith('09'))) { window.mostrarError(el, '⚠ Inicia con 09 y tiene 10 dígitos.'); } else { window.quitarError(el); } };
     window.soloMoneda = (el) => { if (/[^0-9.]/.test(el.value)) { el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'); window.mostrarError(el, '⚠ Formato de moneda inválido.'); } else { window.quitarError(el); } };
-    window.validarEmail = (el) => { let re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if (el.value && !re.test(el.value)) { window.mostrarError(el, '⚠ Correo electrónico inválido.'); } else { window.quitarError(el); } };
+    window.validarEmail = (el) => {
+        let re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (el.value && !re.test(el.value)) { window.mostrarError(el, '⚠ Correo electrónico inválido.'); } else { window.quitarError(el); }
+
+        let e1 = document.querySelector('input[name="email1"]');
+        let e2 = document.querySelector('input[name="email2"]');
+        if (e1 && e2) {
+            let iguales = e1.value.trim() !== '' && e1.value.trim().toLowerCase() === e2.value.trim().toLowerCase();
+            [e1, e2].forEach((campo) => {
+                if (iguales) {
+                    window.mostrarError(campo, '⚠ El correo principal y alternativo no pueden ser iguales.');
+                } else if (campo.value === '' || re.test(campo.value)) {
+                    window.quitarError(campo);
+                }
+            });
+        }
+    };
 
     window.validarFechas = () => {
         let ing = document.querySelector('input[name="fecha_ingreso"]');
@@ -461,6 +495,17 @@
         if (ing && sal && ing.value && sal.value && new Date(sal.value) <= new Date(ing.value)) {
             window.mostrarError(sal, '⚠ Fecha salida debe ser mayor a ingreso.');
         } else if (sal) { window.quitarError(sal); }
+    };
+
+    window.validarUnidad = (el) => {
+        if (el.value.includes('/')) {
+            el.value = el.value.split('/').map((p) => p.trim()).filter((p) => p !== '').join(' / ');
+            window.quitarError(el);
+        } else if (el.value.trim() !== '') {
+            window.mostrarError(el, '⚠ Formato de subdivisión requerido: Área / Departamento (Ej: BLOQUE 1 / FINANZAS)');
+        } else {
+            window.quitarError(el);
+        }
     };
 
     window.validarCedula = (el) => {
@@ -571,7 +616,7 @@
                 formData.append('password', passInput);
                 formData.append('campo', campoFirma);
 
-                return fetch(`/paz-salvo/subir-firma/{{ solicitud.id }}`, { method: 'POST', body: formData })
+                return fetch(`/paz-salvo/firmar-pades/{{ solicitud.id }}`, { method: 'POST', body: formData })
                     .then((response) => {
                         if (!response.ok) { return response.json().then((err) => { throw new Error(err.mensaje || 'Error al procesar.'); }); }
                         return response.json();

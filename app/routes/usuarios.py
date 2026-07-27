@@ -1,9 +1,19 @@
+import unicodedata
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 from app.models.base import db, Usuario, Rol
 
 usuarios_bp = Blueprint('usuarios', __name__)
+
+def _quitar_tildes(texto):
+    return ''.join(c for c in unicodedata.normalize('NFD', texto) if unicodedata.category(c) != 'Mn')
+
+def _generar_usuario_correo(nombres, apellidos, dominio):
+    primer_nombre = _quitar_tildes(nombres.strip().split()[0]) if nombres and nombres.strip() else ''
+    primer_apellido = _quitar_tildes(apellidos.strip().split()[0]) if apellidos and apellidos.strip() else ''
+    usuario = (primer_nombre[:1] + primer_apellido).lower()
+    return f"{usuario}@{dominio}"
 
 @usuarios_bp.route('/usuarios', methods=['GET', 'POST'])
 @login_required
@@ -46,8 +56,15 @@ def gestionar_usuarios():
 @login_required
 def editar_usuario(id):
     u = Usuario.query.get_or_404(id)
-    u.nombres = request.form.get('nombres')
-    u.apellidos = request.form.get('apellidos')
+    nuevos_nombres = request.form.get('nombres')
+    nuevos_apellidos = request.form.get('apellidos')
+
+    if nuevos_nombres != u.nombres or nuevos_apellidos != u.apellidos:
+        dominio = u.email.split('@')[-1] if u.email and '@' in u.email else 'inamhi.gob.ec'
+        u.email = _generar_usuario_correo(nuevos_nombres, nuevos_apellidos, dominio)
+
+    u.nombres = nuevos_nombres
+    u.apellidos = nuevos_apellidos
     u.rol_id = request.form.get('rol_id')
     u.activo = True if request.form.get('estado') == 'ACTIVO' else False
     
