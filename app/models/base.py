@@ -1,6 +1,10 @@
 from app import db
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+
+
+def _hora_ecuador():
+    return datetime.now(timezone(timedelta(hours=-5))).replace(tzinfo=None)
 
 # ==========================================
 # 1. TABLA DE AUDITORÍA (Rastreo Total)
@@ -97,5 +101,5 @@ class LogAuditoria(db.Model):
     modulo = db.Column(db.String(100), nullable=False)
     accion = db.Column(db.String(100), nullable=False)
     detalle = db.Column(db.Text, nullable=False)
-    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    fecha = db.Column(db.DateTime, default=_hora_ecuador)
     usuario = db.relationship('Usuario', backref=db.backref('logs', lazy=True))

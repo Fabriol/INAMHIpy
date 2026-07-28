@@ -32,7 +32,12 @@ def obtener_logs_filtrados():
     fecha_fin = request.args.get('fecha_fin', '').strip()
 
     if busqueda:
-        query = query.filter((Usuario.nombres.ilike(f'%{busqueda}%')) | (Usuario.cedula.ilike(f'%{busqueda}%')))
+        query = query.filter(
+            Usuario.nombres.ilike(f'%{busqueda}%') |
+            Usuario.apellidos.ilike(f'%{busqueda}%') |
+            Usuario.cedula.ilike(f'%{busqueda}%') |
+            LogAuditoria.detalle.ilike(f'%{busqueda}%')
+        )
     if fecha_inicio:
         try:
             fecha_ini_obj = datetime.strptime(fecha_inicio, '%Y-%m-%d')
