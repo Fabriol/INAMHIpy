@@ -319,6 +319,10 @@
                 <i class="bi bi-folder-fill"></i><span>Control de Documentos</span>
             </a>
 
+            {% elif current_user.rol.nombre == 'Ex Funcionario' and tramite_negado_actual %}
+            <!-- Su trámite fue Negado: ya no puede seguir usando "Mis Formularios",
+                 solo le queda el Dashboard (con la alerta y el motivo del rechazo) -->
+
             {% else %}
             <a href="/areas/tareas" class="{% if 'areas' in request.path %}active{% endif %}">
                 <i class="bi bi-ui-checks-grid"></i><span>Mis Formularios</span>

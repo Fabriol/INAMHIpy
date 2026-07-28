@@ -19,4 +19,12 @@ def index():
         'logs_auditoria': LogAuditoria.query.count()
     }
     
-    return render_template('dashboard/index.html', stats=stats)
+    # Alerta visible e imposible de pasar por alto para el Ex Funcionario
+    # cuando su trámite fue Negado por RRHH
+    tramite_negado = None
+    if current_user.rol.nombre == 'Ex Funcionario':
+        tramite_negado = SolicitudPazSalvo.query.filter_by(
+            ex_funcionario_id=current_user.id, estado='NEGADO'
+        ).first()
+
+    return render_template('dashboard/index.html', stats=stats, tramite_negado=tramite_negado)

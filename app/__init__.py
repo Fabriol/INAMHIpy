@@ -58,5 +58,19 @@ def create_app():
     @app.route('/')
     def index():
         return redirect(url_for('auth.login'))
-    
+
+    # Disponible en TODAS las plantillas (usan base.html): si el usuario
+    # logueado es Ex Funcionario y su trámite fue Negado, lo señala aquí
+    # una sola vez, sin tener que tocar cada ruta existente.
+    @app.context_processor
+    def inject_tramite_negado():
+        from flask_login import current_user
+        from app.models.base import SolicitudPazSalvo
+        if current_user.is_authenticated and current_user.rol.nombre == 'Ex Funcionario':
+            tramite = SolicitudPazSalvo.query.filter_by(
+                ex_funcionario_id=current_user.id, estado='NEGADO'
+            ).first()
+            return {'tramite_negado_actual': tramite}
+        return {'tramite_negado_actual': None}
+
     return app

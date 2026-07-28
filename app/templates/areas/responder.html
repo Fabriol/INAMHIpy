@@ -102,19 +102,11 @@
     }
 </style>
 
-{% set total_campos_fijos = 70 %}
-{% set respuestas_totales = namespace(count=0) %}
-
-{% if respuestas_db %}
-{% for res in respuestas_db %}
-{% if res.valor_respuesta and res.valor_respuesta|trim != '' %}
-{% set respuestas_totales.count = respuestas_totales.count + 1 %}
-{% endif %}
-{% endfor %}
-{% endif %}
-
-{% set porcentaje = ((respuestas_totales.count / total_campos_fijos) * 100) | round(0) | int %}
-{% if porcentaje > 100 %}{% set porcentaje = 100 %}{% endif %}
+{# El % de avance (campos_respondidos / campos_total / porcentaje) llega ya
+   calculado desde areas.responder_preguntas(), misma fuente que pendientes.html
+   y ver_espejo.html, para que los tres nunca se desincronicen entre sí #}
+{% set total_campos_fijos = campos_total %}
+{% set respuestas_totales = namespace(count=campos_respondidos) %}
 
 <div class="page fade-in">
     <div class="page-header">
@@ -174,7 +166,7 @@
 
     <!-- VEREDICTO FINAL DE RECURSOS HUMANOS / ADMINISTRADOR -->
     {% if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos'] %}
-        {% if porcentaje >= 95 %}
+        {% if porcentaje >= 100 %}
             <form id="formularioValidacion" method="POST" action="/areas/responder/{{ solicitud.id }}">
                 <div class="card border-0 shadow-sm rounded-4 mt-4" style="overflow: hidden; border: 2px solid #8b5cf6 !important;">
                     <div class="card-header text-white" style="background: linear-gradient(135deg, #4c1d95, #7c3aed); padding: 15px 20px;">
@@ -183,21 +175,22 @@
                     <div class="card-body p-4 bg-white">
                         <div class="row align-items-start">
                             
-                            <!-- MAGIA: Variable para detectar si este trámite ya fue sellado en la Base de Datos -->
-                            {% set ya_sellado = solicitud.estado in ['APROBADO', 'NEGADO', 'EN REVISIÓN'] %}
-                            
+                            <!-- MAGIA: Variable para detectar si este trámite ya fue sellado en la Base de Datos.
+                                 'EN REVISIÓN' YA NO cuenta como sellado: es un estado automático que solo
+                                 indica "llegó al 100%, listo para que RRHH decida" - no es un veredicto. -->
+                            {% set ya_sellado = solicitud.estado in ['APROBADO', 'NEGADO'] %}
+
                             <div class="col-md-6">
                                 <label class="form-label-custom text-dark">Estado Final del Trámite Institucional <span class="text-danger">*</span></label>
-                                
+
                                 <!-- VS Code ya no marcará error porque usamos clases en lugar de style="" -->
-                                <select class="doc-input mt-2 {% if ya_sellado %}campo-bloqueado{% endif %}" name="estado_final" id="estadoFinalSelect" 
-                                        onchange="window['toggleObservacionFinal']()" 
-                                        style="border-color: #8b5cf6;" 
+                                <select class="doc-input mt-2 {% if ya_sellado %}campo-bloqueado{% endif %}" name="estado_final" id="estadoFinalSelect"
+                                        onchange="window['toggleObservacionFinal']()"
+                                        style="border-color: #8b5cf6;"
                                         required {% if ya_sellado %}readonly tabindex="-1"{% endif %}>
-                                    
+
                                     <option value="">— Defina el Estado Final —</option>
                                     <option value="Aprobado" {% if solicitud.estado == 'APROBADO' %}selected{% endif %}>✅ Aprobado (Documentación Completa)</option>
-                                    <option value="En revisión" {% if solicitud.estado == 'EN REVISIÓN' %}selected{% endif %}>⏳ En revisión (Validación Interna)</option>
                                     <option value="Negado" {% if solicitud.estado == 'NEGADO' %}selected{% endif %}>❌ Negado (Devuelto al Funcionario)</option>
                                 </select>
                             </div>

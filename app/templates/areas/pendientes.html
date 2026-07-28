@@ -122,6 +122,20 @@
         border: 1px solid #bbf7d0;
     }
 
+    /* Negado: Rojo, para que se note que fue rechazado */
+    .status-negado {
+        background: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+    }
+
+    /* En revisión: Morado, distinto de "en progreso" para que se note que ya está al 100% */
+    .status-revision {
+        background: #f5f3ff;
+        color: #6d28d9;
+        border: 1px solid #ddd6fe;
+    }
+
     /* Botones de Acción Modificados */
     .btn-action {
         border-radius: 8px;
@@ -217,6 +231,17 @@
                     {% set clase_estado = 'status-completo' %}
                     {% set icon_estado = 'bi-check-circle-fill' %}
 
+                {% elif estado_actual == 'NEGADO' %}
+                    {% set txt_estado = 'NEGADO (Devuelto al Funcionario)' %}
+                    {% set clase_estado = 'status-negado' %}
+                    {% set icon_estado = 'bi-x-circle-fill' %}
+
+                {% elif estado_actual == 'EN REVISIÓN' %}
+                    <!-- Automático al llegar a 100%: listo para que RRHH decida, aún no es un veredicto -->
+                    {% set txt_estado = 'EN REVISIÓN (100% · Listo para Dictamen)' %}
+                    {% set clase_estado = 'status-revision' %}
+                    {% set icon_estado = 'bi-eye-fill' %}
+
                 {% elif respondidas > 0 %}
                     <!-- Aquí está la magia: Te muestra el % real de avance -->
                     {% set txt_estado = 'EN PROGRESO (' ~ porcentaje ~ '% · ' ~ respondidas ~ '/' ~ solicitud.campos_total ~ ')' %}
@@ -275,6 +300,24 @@
                                 <i class="bi bi-check-circle-fill fs-5 me-1" style="vertical-align: middle;"></i>
                                 DICTAMEN
                             </a>
+
+                            <!-- Reintentar: solo aparece si el trámite fue Negado Y todavía no se reintentó -->
+                            {% if estado_actual == 'NEGADO' %}
+                                {% if solicitud.ya_reintentado %}
+                                <button type="button" class="btn btn-action" disabled
+                                    style="background-color: #e2e8f0; color: #94a3b8; cursor: not-allowed;"
+                                    title="Ya se generó un trámite nuevo para este ex funcionario">
+                                    <i class="bi bi-check2-circle fs-5 me-1" style="vertical-align: middle;"></i> YA REINTENTADO
+                                </button>
+                                {% else %}
+                                <form method="POST" action="/paz-salvo/reintentar/{{ solicitud.id }}" class="d-inline"
+                                    onsubmit="return confirm('¿Generar un nuevo trámite de Paz y Salvo para este ex funcionario? El trámite negado #{{ solicitud.id }} se conserva como historial.');">
+                                    <button type="submit" class="btn btn-action" style="background-color: #7c3aed; color: white;" title="Generar Nuevo Trámite">
+                                        <i class="bi bi-arrow-repeat fs-5 me-1" style="vertical-align: middle;"></i> REINTENTAR
+                                    </button>
+                                </form>
+                                {% endif %}
+                            {% endif %}
 
                             <!-- BOTÓN ÚNICO PARA LAS DEMÁS ÁREAS (Vista Aislada) -->
                             {% else %}

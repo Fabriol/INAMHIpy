@@ -8,26 +8,9 @@ from flask import send_file, current_app
 
 # Modelos oficiales del sistema institucional
 from app.models.base import db, SolicitudPazSalvo, Respuesta, LogAuditoria, Usuario, Rol
+from app.services.progreso_service import calcular_progreso as _calcular_progreso
 
 areas_bp = Blueprint('areas', __name__)
-
-# Total oficial de campos del Formulario Paz y Salvo (ver hoja_espejo.html:
-# cada campo_formulario referenciado ahí, sin contar los '_nombre' que se
-# autogeneran al firmar). Única fuente de verdad para el % de avance.
-TOTAL_CAMPOS_PAZ_SALVO = 147
-
-def _calcular_progreso(solicitud_id):
-    """Devuelve (campos_respondidos, total_campos, porcentaje) de una solicitud.
-    Solo cuenta como 'respondido' un campo con valor real guardado, no uno
-    simplemente asignado por el Administrador."""
-    respuestas = Respuesta.query.filter_by(solicitud_id=solicitud_id).all()
-    respondidos = sum(
-        1 for r in respuestas
-        if r.valor_respuesta and str(r.valor_respuesta).strip() != ''
-        and not r.campo_formulario.endswith('_nombre')
-    )
-    porcentaje = min(100, round((respondidos / TOTAL_CAMPOS_PAZ_SALVO) * 100))
-    return respondidos, TOTAL_CAMPOS_PAZ_SALVO, porcentaje
 
 # ====================================================================
 # 1. RUTA: PANEL INTELIGENTE DE TRÁMITES (CORREGIDO SIN BUSQUEDA EN_PROGRESO)
@@ -41,6 +24,17 @@ def mis_tareas():
     if current_user.rol.nombre not in roles_areas:
         flash('Acceso denegado. No perteneces a un área de validación.', 'danger')
         return redirect(url_for('dashboard.index'))
+
+    # Si el Ex Funcionario ya recibió un veredicto de Negado en su propio
+    # trámite, ya no puede seguir usando "Mis Formularios" — su trámite
+    # quedó cerrado, solo ve el Dashboard con la alerta y el motivo
+    if current_user.rol.nombre == 'Ex Funcionario':
+        tramite_negado = SolicitudPazSalvo.query.filter_by(
+            ex_funcionario_id=current_user.id, estado='NEGADO'
+        ).first()
+        if tramite_negado:
+            flash('Su trámite de Paz y Salvo fue Negado. Revise el motivo en el Dashboard Principal.', 'danger')
+            return redirect(url_for('dashboard.index'))
 
     # FILTRADO DE BANDEJA SEGÚN EL ROL DE INICIO DE SESIÓN
     if current_user.rol.nombre in ['Administrador', 'Talento Humano - Recepción Documentos']:
@@ -76,6 +70,17 @@ def mis_tareas():
     for sol in solicitudes:
         sol.usuario_data = Usuario.query.get(sol.ex_funcionario_id)
         sol.campos_respondidos, sol.campos_total, sol.porcentaje_avance = _calcular_progreso(sol.id)
+
+        # Si este trámite fue Negado, revisamos si YA existe un trámite más
+        # nuevo para el mismo ex funcionario (creado con "Reintentar" o
+        # manualmente) — de ser así, ocultamos el botón para no duplicar
+        sol.ya_reintentado = False
+        if sol.estado == 'NEGADO':
+            sol.ya_reintentado = SolicitudPazSalvo.query.filter(
+                SolicitudPazSalvo.ex_funcionario_id == sol.ex_funcionario_id,
+                SolicitudPazSalvo.id != sol.id,
+                SolicitudPazSalvo.fecha_creacion > sol.fecha_creacion
+            ).first() is not None
 
     return render_template('areas/pendientes.html', solicitudes=solicitudes)
 
@@ -114,6 +119,7 @@ def responder_preguntas(solicitud_id):
 
     # LA MAGIA: Extraemos las respuestas de la base de datos para pasarlas al HTML y calcular el porcentaje
     respuestas_db = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
+    campos_respondidos, campos_total, porcentaje = _calcular_progreso(solicitud.id)
 
     if request.method == 'POST':
         estado_final = request.form.get('estado_final')
@@ -152,7 +158,8 @@ def responder_preguntas(solicitud_id):
         return redirect(url_for('areas.mis_tareas'))
 
     # ENVIAMOS LAS RESPUESTAS AL HTML PARA LA MATEMÁTICA
-    return render_template('areas/responder.html', solicitud=solicitud, respuestas_db=respuestas_db)
+    return render_template('areas/responder.html', solicitud=solicitud, respuestas_db=respuestas_db,
+                           campos_respondidos=campos_respondidos, campos_total=campos_total, porcentaje=porcentaje)
 
 # ====================================================================
 # 4. RUTA: EXPORTAR BANDEJA DE TRÁMITES A EXCEL (SOLO ADMIN Y RRHH)

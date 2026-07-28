@@ -11,6 +11,7 @@ import qrcode.image.svg
 # Modelos
 from app.models.base import db, Usuario, Rol, SolicitudPazSalvo, Respuesta, LogAuditoria
 from app.services.pdf_service import generar_documento_paz_salvo, localizar_posicion_firma
+from app.services.progreso_service import actualizar_estado_automatico
 
 # Librerías criptográficas para la firma PAdES
 from pyhanko.sign import signers
@@ -146,8 +147,48 @@ def nueva_solicitud():
     solicitudes_db = SolicitudPazSalvo.query.order_by(SolicitudPazSalvo.id.desc()).all()
     for sol in solicitudes_db:
         sol.usuario_data = Usuario.query.get(sol.ex_funcionario_id)
-        
+
     return render_template('paz_salvo/crear.html', solicitudes=solicitudes_db, ex_funcionarios=ex_funcionarios)
+
+# ====================================================================
+# 1.B RUTA: REINTENTAR TRÁMITE NEGADO (GENERA UNO NUEVO PARA EL MISMO EX FUNCIONARIO)
+# ====================================================================
+@paz_salvo_bp.route('/paz-salvo/reintentar/<int:solicitud_negada_id>', methods=['POST'])
+@login_required
+def reintentar_tramite(solicitud_negada_id):
+    if current_user.rol.nombre not in ['Administrador', 'Talento Humano - Recepción Documentos']:
+        flash('Acceso denegado.', 'danger')
+        return redirect(url_for('dashboard.index'))
+
+    solicitud_negada = SolicitudPazSalvo.query.get_or_404(solicitud_negada_id)
+    if solicitud_negada.estado != 'NEGADO':
+        flash('Solo se puede generar un trámite nuevo a partir de uno que fue Negado.', 'warning')
+        return redirect(url_for('areas.mis_tareas'))
+
+    usuario = Usuario.query.get_or_404(solicitud_negada.ex_funcionario_id)
+
+    # Mismo chequeo de duplicados que usa 'Nuevo Paz y Salvo', más EN REVISIÓN
+    # por seguridad (evita crear dos trámites activos para la misma persona)
+    tramite_activo = SolicitudPazSalvo.query.filter(
+        SolicitudPazSalvo.ex_funcionario_id == usuario.id,
+        SolicitudPazSalvo.estado.in_(['CREADO', 'EN_PROGRESO', 'EN REVISIÓN'])
+    ).first()
+    if tramite_activo:
+        flash(f'El ex funcionario {usuario.cedula} ya tiene un trámite activo (#{tramite_activo.id}).', 'warning')
+        return redirect(url_for('areas.mis_tareas'))
+
+    nuevo_tramite = SolicitudPazSalvo(ex_funcionario_id=usuario.id, estado='CREADO')
+    db.session.add(nuevo_tramite)
+
+    log = LogAuditoria(
+        usuario_id=current_user.id, modulo='Formularios', accion='REINTENTO DE TRÁMITE',
+        detalle=f"Generó trámite nuevo para CI: {usuario.cedula}, a partir del trámite Negado #{solicitud_negada.id}"
+    )
+    db.session.add(log)
+    db.session.commit()
+
+    flash('Nuevo trámite generado exitosamente para el ex funcionario.', 'success')
+    return redirect(url_for('paz_salvo.llenar_formulario', solicitud_id=nuevo_tramite.id))
 
 # ====================================================================
 # 2. RUTA: DELEGAR CAMPOS (PANEL ADMINISTRADOR)
@@ -291,7 +332,12 @@ def guardar_formulario(solicitud_id):
         solicitud = SolicitudPazSalvo.query.get(solicitud_id)
         solicitud.ex_funcionario = Usuario.query.get(solicitud.ex_funcionario_id)
         respuestas_db = Respuesta.query.filter_by(solicitud_id=solicitud.id).all()
-        
+
+        # ESTADO AUTOMÁTICO: EN_PROGRESO mientras falten campos, EN REVISIÓN al
+        # llegar al 100% (nunca pisa un veredicto ya emitido por RRHH)
+        actualizar_estado_automatico(solicitud)
+        db.session.commit()
+
         directorio_temp = os.path.join(current_app.root_path, 'static', 'temp')
         os.makedirs(directorio_temp, exist_ok=True)
         ruta_pdf = os.path.join(directorio_temp, f'PazSalvo_{solicitud.id}.pdf')
@@ -429,6 +475,12 @@ def subir_firma_pades(solicitud_id):
         resp_nombre = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma).first()
         if resp_nombre: resp_nombre.valor_respuesta = nombre_firmante.upper()
         else: db.session.add(Respuesta(solicitud_id=solicitud_id, campo_formulario=campo_nombre_firma, usuario_asignado_id=current_user.id, valor_respuesta=nombre_firmante.upper()))
+
+        # ESTADO AUTOMÁTICO: EN_PROGRESO mientras falten campos, EN REVISIÓN al
+        # llegar al 100% (nunca pisa un veredicto ya emitido por RRHH)
+        solicitud_actual = SolicitudPazSalvo.query.get(solicitud_id)
+        actualizar_estado_automatico(solicitud_actual)
+
         db.session.commit()
 
         # D. FIRMA CRIPTOGRÁFICA PARA FIRMAEC, CON SELLO VISUAL (QR + NOMBRE)
