@@ -46,7 +46,7 @@ def gestionar_usuarios():
             
         return redirect(url_for('usuarios.gestionar_usuarios'))
 
-    usuarios = Usuario.query.all()
+    usuarios = Usuario.query.order_by(Usuario.id.asc()).all()
     roles = Rol.query.all()
     return render_template('admin/usuarios.html', usuarios=usuarios, roles=roles)
 
