@@ -117,6 +117,10 @@
         transition: 0.3s;
     }
 
+    .doc-input[type="email"] {
+        text-transform: none;
+    }
+
     .doc-input:focus {
         border-color: var(--blue-600);
         box-shadow: 0 0 0 4px rgba(37, 99, 235, .15);
@@ -237,7 +241,7 @@
 
 {% macro input_text(name, label, type='text', width='', max_len='', js_val='', val='') %}
 {% if admin or name in asignados %}
-{% set oninput_str = "window.convertirMayusculas(this);" %}
+{% set oninput_str = "window.convertirMayusculas(this); window.limpiarObligatorio(this);" %}
 {% if js_val %}
 {% set oninput_str = oninput_str ~ " window." ~ js_val ~ "(this);" %}
 {% endif %}
@@ -1770,6 +1774,7 @@
     };
 
     window.convertirMayusculas = (el) => { if (el.type !== 'email') el.value = el.value.toUpperCase(); };
+    window.limpiarObligatorio = (el) => { if (el.value.trim() !== '') { window.quitarError(el); } };
     window.mostrarError = (el, msg) => { let grp = el.closest('.input-group'); grp.classList.add('has-error'); let span = grp.querySelector('.error-msg'); if (span) { span.innerText = msg; span.style.display = 'block'; } };
     window.quitarError = (el) => { let grp = el.closest('.input-group'); grp.classList.remove('has-error'); let span = grp.querySelector('.error-msg'); if (span) { span.style.display = 'none'; } };
 
@@ -1831,6 +1836,7 @@
         let faltanDatos = false;
 
         requeridos.forEach((el) => {
+            if (el.name === 'email2') { return; }
             if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); faltanDatos = true; }
         });
 
@@ -1949,6 +1955,7 @@
         let valido = true;
 
         requeridos.forEach((el) => {
+            if (el.name === 'email2') { return; }
             if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); valido = false; }
         });
 

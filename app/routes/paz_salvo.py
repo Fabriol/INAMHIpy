@@ -310,16 +310,20 @@ def guardar_formulario(solicitud_id):
             if not valor or valor.strip() == '' or valor == 'FIRMADO':
                 continue 
             
+            # El correo debe guardarse tal cual lo escribe el usuario (mayúsculas y
+            # minúsculas), el resto de campos de texto sí se normaliza a mayúsculas
+            valor_guardado = str(valor) if campo in ('email1', 'email2') else str(valor).upper()
+
             respuesta_existente = Respuesta.query.filter_by(solicitud_id=solicitud_id, campo_formulario=campo).first()
             if respuesta_existente:
                 if respuesta_existente.valor_respuesta != 'FIRMADO':
-                    respuesta_existente.valor_respuesta = str(valor).upper()
+                    respuesta_existente.valor_respuesta = valor_guardado
             else:
                 db.session.add(Respuesta(
-                    solicitud_id=solicitud_id, 
-                    campo_formulario=campo, 
-                    usuario_asignado_id=current_user.id, 
-                    valor_respuesta=str(valor).upper()
+                    solicitud_id=solicitud_id,
+                    campo_formulario=campo,
+                    usuario_asignado_id=current_user.id,
+                    valor_respuesta=valor_guardado
                 ))
 
         # AUDITORÍA EN TIEMPO REAL (HORA EXACTA DE ECUADOR UTC-5)
@@ -388,7 +392,7 @@ def actualizar_espejo():
     
     for k, v in datos_en_vivo.items():
         if v.strip() != "":
-            datos_combinados[k] = str(v).upper()
+            datos_combinados[k] = str(v) if k in ('email1', 'email2') else str(v).upper()
 
     return render_template('paz_salvo/partials/hoja_espejo.html', 
                            solicitud=solicitud, 

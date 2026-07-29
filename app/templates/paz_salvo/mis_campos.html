@@ -63,6 +63,10 @@
         text-transform: uppercase;
     }
 
+    .doc-input[type="email"] {
+        text-transform: none;
+    }
+
     .doc-input:focus {
         border-color: var(--blue-600);
         outline: none;
@@ -274,7 +278,7 @@
                 {% set max_l = dic_etiquetas[campo][3] if dic_etiquetas[campo]|length > 3 else '' %}
 
                 <!-- STRING LIMPIO PARA EVITAR ERROR EN VS CODE -->
-                {% set oninput_str = "window.convertirMayusculas(this);" %}
+                {% set oninput_str = "window.convertirMayusculas(this); window.limpiarObligatorio(this);" %}
                 {% if js_funcion %}
                 {% set oninput_str = oninput_str ~ " window." ~ js_funcion ~ "(this);" %}
                 {% endif %}
@@ -461,6 +465,7 @@
     // MOTOR DE VALIDACIONES INTELIGENTE
     // ==========================================
     window.convertirMayusculas = (el) => { if (el.type !== 'email') el.value = el.value.toUpperCase(); };
+    window.limpiarObligatorio = (el) => { if (el.value.trim() !== '') { window.quitarError(el); } };
 
     window.mostrarError = (el, msg) => {
         let grp = el.closest('.input-group');
@@ -541,6 +546,7 @@
         let faltanDatos = false;
 
         requeridos.forEach((el) => {
+            if (el.name === 'email2') { return; }
             if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); faltanDatos = true; }
         });
 
@@ -659,6 +665,7 @@
         let valido = true;
 
         requeridos.forEach((el) => {
+            if (el.name === 'email2') { return; }
             if (el.value.trim() === '') { window.mostrarError(el, '⚠ Obligatorio.'); valido = false; }
         });
 
