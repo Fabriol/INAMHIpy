@@ -123,10 +123,6 @@
         outline: none;
     }
 
-    .doc-input[type="email"] {
-        text-transform: lowercase;
-    }
-
     .has-error .doc-input {
         border-color: var(--red-500);
         background: #fff5f5 !important;
@@ -264,7 +260,8 @@
         name in ['nombres_apellidos', 'cedula', 'cedula_firmante'] %} readonly
         style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% else %} readonly disabled
         style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %} {% endif %} {% if max_len
-        %}maxlength="{{ max_len }}" {% endif %} oninput="{{ oninput_str }}">
+        %}maxlength="{{ max_len }}" {% endif %} oninput="{{ oninput_str }}" {% if name=='unidad'
+        %}onblur="window.normalizarUnidad(this)" {% endif %}>
     <span class="error-msg" id="msg_{{ name }}">⚠ Formato incorrecto o campo requerido.</span>
 </div>
 {% endif %}
@@ -283,8 +280,8 @@
         {% endif %}
     </div>
     {% endif %}
-    <select name="{{ name }}" class="doc-input" {% if name in bloqueados %} disabled
-        style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}>
+    <select name="{{ name }}" class="doc-input" onchange="window.quitarError(this)" {% if name in bloqueados %}
+        disabled style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}>
         <option value="">—</option>
         <option value="SI" {% if val=='SI' %}selected{% endif %}>SÍ</option>
         <option value="NO" {% if val=='NO' %}selected{% endif %}>NO</option>
@@ -964,7 +961,7 @@
                     'soloLetras', datos.get('nombres_apellidos', solicitud.ex_funcionario.nombres ~ ' ' ~
                     solicitud.ex_funcionario.apellidos)) }}
                     {{ input_text('cedula', 'Cédula de Ciudadanía', 'text', '', '10', 'validarCedula',
-                    datos.get('cedula', solicitud.ex_funcionario.cedula)) }}
+                    solicitud.ex_funcionario.cedula) }}
 
                     {% if admin or 'modalidad' in asignados %}
                     <div class="input-group" id="grp_modalidad">
@@ -974,7 +971,8 @@
                                 asig_dict['modalidad'] }}</span>{% else %}<span class="badge bg-warning text-dark"><i
                                     class="bi bi-exclamation-triangle-fill"></i> Pendiente</span>{% endif %}</div>{%
                         endif %}
-                        <select name="modalidad" class="doc-input" {% if 'modalidad' in bloqueados %} disabled
+                        <select name="modalidad" class="doc-input" onchange="window.quitarError(this)" {% if
+                            'modalidad' in bloqueados %} disabled
                             style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}>
                             <option value="">Seleccione...</option>
                             <option value="PERMANENTE" {% if datos.get('modalidad')=='PERMANENTE' %}selected{% endif %}>
@@ -1016,8 +1014,9 @@
                                     class="bi bi-exclamation-triangle-fill"></i> Pendiente</span>{% endif %}</div>{%
                         endif %}
                         <select name="provincia" id="provinciaSelect" class="doc-input"
-                            data-selected="{{ datos.get('provincia', '') }}" onchange="window.filtrarCantonesEcuador()"
-                            {% if 'provincia' in bloqueados %} disabled
+                            data-selected="{{ datos.get('provincia', '') }}"
+                            onchange="window.filtrarCantonesEcuador(); window.quitarError(this);" {% if 'provincia' in
+                            bloqueados %} disabled
                             style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}></select>
                         <span class="error-msg" id="msg_provincia">⚠ Campo requerido.</span>
                     </div>
@@ -1032,7 +1031,8 @@
                                     class="bi bi-exclamation-triangle-fill"></i> Pendiente</span>{% endif %}</div>{%
                         endif %}
                         <select name="canton" id="cantonSelect" class="doc-input"
-                            data-selected="{{ datos.get('canton', '') }}" {% if 'canton' in bloqueados %} disabled
+                            data-selected="{{ datos.get('canton', '') }}" onchange="window.quitarError(this)" {% if
+                            'canton' in bloqueados %} disabled
                             style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}></select>
                         <span class="error-msg" id="msg_canton">⚠ Campo requerido.</span>
                     </div>
@@ -1046,7 +1046,8 @@
                                 asig_dict['lugar_trabajo'] }}</span>{% else %}<span
                                 class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle-fill"></i>
                                 Pendiente</span>{% endif %}</div>{% endif %}
-                        <select name="lugar_trabajo" class="doc-input" {% if 'lugar_trabajo' in bloqueados %} disabled
+                        <select name="lugar_trabajo" class="doc-input" onchange="window.quitarError(this)" {% if
+                            'lugar_trabajo' in bloqueados %} disabled
                             style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}>
                             <option value="">—</option>
                             <option value="PLANTA CENTRAL" {% if datos.get('lugar_trabajo')=='PLANTA CENTRAL'
@@ -1066,8 +1067,9 @@
                             else %}<span class="badge bg-warning text-dark"><i
                                     class="bi bi-exclamation-triangle-fill"></i> Pendiente</span>{% endif %}</div>{%
                         endif %}
-                        <select name="grupo_ocupacional" class="doc-input" {% if 'grupo_ocupacional' in bloqueados %}
-                            disabled style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}>
+                        <select name="grupo_ocupacional" class="doc-input" onchange="window.quitarError(this)" {% if
+                            'grupo_ocupacional' in bloqueados %} disabled
+                            style="background-color: #e2e8f0 !important; cursor: not-allowed;" {% endif %}>
                             <option value="">—</option>
                             <option value="NJS" {% if datos.get('grupo_ocupacional')=='NJS' %}selected{% endif %}>NJS
                                 (Jerárquico)</option>
@@ -1472,7 +1474,7 @@
                     Declaración Legal Final</div>
                 <div class="doc-fields-grid" style="background: #faf5ff;">
                     {{ input_text('cedula_firmante', 'Cédula Firmante', 'text', '', '10', 'validarCedula',
-                    datos.get('cedula_firmante', solicitud.ex_funcionario.cedula)) }}
+                    solicitud.ex_funcionario.cedula) }}
                     {{ input_text('fecha_firma', 'Fecha Ejecución', 'date', '', '', '', datos.get('fecha_firma', '')) }}
 
                     <div class="input-group span-2 mt-2">
@@ -1797,12 +1799,16 @@
 
     window.validarUnidad = (el) => {
         if (el.value.includes('/')) {
-            el.value = el.value.split('/').map((p) => p.trim()).filter((p) => p !== '').join(' / ');
             window.quitarError(el);
         } else if (el.value.trim() !== '') {
             window.mostrarError(el, '⚠ Formato de subdivisión requerido: Área / Departamento (Ej: BLOQUE 1 / FINANZAS)');
         } else {
             window.quitarError(el);
+        }
+    };
+    window.normalizarUnidad = (el) => {
+        if (el.value.includes('/')) {
+            el.value = el.value.split('/').map((p) => p.trim()).filter((p) => p !== '').join(' / ');
         }
     };
 

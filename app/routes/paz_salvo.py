@@ -279,6 +279,12 @@ def llenar_formulario(solicitud_id):
             if r.campo_formulario not in campos_bloqueados:
                 campos_bloqueados.append(r.campo_formulario)
 
+    # La cédula es un dato de identidad fijo del ex funcionario: nunca debe
+    # ser editable desde el formulario, se guarde o no una respuesta previa
+    for campo_identidad in ('cedula', 'cedula_firmante'):
+        if campo_identidad not in campos_bloqueados:
+            campos_bloqueados.append(campo_identidad)
+
     return render_template('paz_salvo/llenar_formulario.html',
                            solicitud=solicitud,
                            usuarios_disponibles=usuarios_disponibles,
@@ -620,6 +626,12 @@ def mis_campos_asignados(solicitud_id):
             # Si el campo ya tiene texto o está firmado, lo bloqueamos para que no lo altere por error
             if r.valor_respuesta and r.valor_respuesta.strip() != "":
                 mis_campos_bloqueados.append(r.campo_formulario)
+
+    # La cédula es un dato de identidad fijo del ex funcionario: nunca debe
+    # ser editable desde el formulario, se guarde o no una respuesta previa
+    for campo_identidad in ('cedula', 'cedula_firmante'):
+        if campo_identidad not in mis_campos_bloqueados:
+            mis_campos_bloqueados.append(campo_identidad)
 
     # Si no tiene campos, le avisamos
     if not mis_campos_asignados:

@@ -281,18 +281,20 @@
 
                 <div class="input-group">
                     <label>{{ label }}</label>
-                    <input type="{{ tipo }}" name="{{ campo }}" class="doc-input" value="{{ datos.get(campo, '') }}" {%
-                        if max_l %}maxlength="{{ max_l }}" {% endif %} {% if campo in campos_bloqueados %}{% if campo
-                        in ['nombres_apellidos', 'cedula', 'cedula_firmante'] %}readonly style="background:#e2e8f0;"
-                        {% else %}readonly disabled style="background:#e2e8f0;" {% endif %}{% endif %}
+                    <input type="{{ tipo }}" name="{{ campo }}" class="doc-input"
+                        value="{{ solicitud.ex_funcionario.cedula if campo in ['cedula', 'cedula_firmante'] else datos.get(campo, '') }}"
+                        {% if max_l %}maxlength="{{ max_l }}" {% endif %} {% if campo in campos_bloqueados %}{% if
+                        campo in ['nombres_apellidos', 'cedula', 'cedula_firmante'] %}readonly
+                        style="background:#e2e8f0;" {% else %}readonly disabled style="background:#e2e8f0;" {% endif
+                        %}{% endif %} {% if campo=='unidad' %}onblur="window.normalizarUnidad(this)" {% endif %}
                         oninput="{{ oninput_str }}">
                     <span class="error-msg" style="display:none;">⚠ Formato Incorrecto</span>
                 </div>
                 {% elif tipo == 'select' %}
                 <div class="input-group">
                     <label>{{ label }}</label>
-                    <select name="{{ campo }}" class="doc-input" {% if campo in campos_bloqueados %}disabled
-                        style="background:#e2e8f0;" {% endif %}>
+                    <select name="{{ campo }}" class="doc-input" onchange="window.quitarError(this)" {% if campo in
+                        campos_bloqueados %}disabled style="background:#e2e8f0;" {% endif %}>
                         <option value="">—</option>
                         <option value="SI" {% if datos.get(campo)=='SI' %}selected{% endif %}>SÍ</option>
                         <option value="NO" {% if datos.get(campo)=='NO' %}selected{% endif %}>NO</option>
@@ -303,23 +305,23 @@
                 <div class="input-group">
                     <label>{{ label }}</label>
                     <select name="{{ campo }}" id="provinciaSelect" data-selected="{{ datos.get(campo, '') }}"
-                        onchange="window.filtrarCantonesEcuador()" class="doc-input" {% if campo in campos_bloqueados
-                        %}disabled style="background:#e2e8f0;" {% endif %}></select>
+                        onchange="window.filtrarCantonesEcuador(); window.quitarError(this);" class="doc-input" {% if
+                        campo in campos_bloqueados %}disabled style="background:#e2e8f0;" {% endif %}></select>
                     <span class="error-msg">⚠ Obligatorio</span>
                 </div>
                 {% elif tipo == 'select_canton' %}
                 <div class="input-group">
                     <label>{{ label }}</label>
                     <select name="{{ campo }}" id="cantonSelect" data-selected="{{ datos.get(campo, '') }}"
-                        class="doc-input" {% if campo in campos_bloqueados %}disabled style="background:#e2e8f0;" {%
-                        endif %}></select>
+                        onchange="window.quitarError(this)" class="doc-input" {% if campo in campos_bloqueados
+                        %}disabled style="background:#e2e8f0;" {% endif %}></select>
                     <span class="error-msg">⚠ Obligatorio</span>
                 </div>
                 {% elif tipo == 'select_modalidad' %}
                 <div class="input-group">
                     <label>{{ label }}</label>
-                    <select name="{{ campo }}" class="doc-input" {% if campo in campos_bloqueados %}disabled
-                        style="background:#e2e8f0;" {% endif %}>
+                    <select name="{{ campo }}" class="doc-input" onchange="window.quitarError(this)" {% if campo in
+                        campos_bloqueados %}disabled style="background:#e2e8f0;" {% endif %}>
                         <option value="">Seleccione...</option>
                         <option value="PERMANENTE" {% if datos.get(campo)=='PERMANENTE' %}selected{% endif %}>
                             Nombramiento Permanente</option>
@@ -335,8 +337,8 @@
                 {% elif tipo == 'select_lugar' %}
                 <div class="input-group">
                     <label>{{ label }}</label>
-                    <select name="{{ campo }}" class="doc-input" {% if campo in campos_bloqueados %}disabled
-                        style="background:#e2e8f0;" {% endif %}>
+                    <select name="{{ campo }}" class="doc-input" onchange="window.quitarError(this)" {% if campo in
+                        campos_bloqueados %}disabled style="background:#e2e8f0;" {% endif %}>
                         <option value="">—</option>
                         <option value="PLANTA CENTRAL" {% if datos.get(campo)=='PLANTA CENTRAL' %}selected{% endif %}>
                             Planta Central</option>
@@ -348,8 +350,8 @@
                 {% elif tipo == 'select_grupo' %}
                 <div class="input-group">
                     <label>{{ label }}</label>
-                    <select name="{{ campo }}" class="doc-input" {% if campo in campos_bloqueados %}disabled
-                        style="background:#e2e8f0;" {% endif %}>
+                    <select name="{{ campo }}" class="doc-input" onchange="window.quitarError(this)" {% if campo in
+                        campos_bloqueados %}disabled style="background:#e2e8f0;" {% endif %}>
                         <option value="">—</option>
                         <option value="NJS" {% if datos.get(campo)=='NJS' %}selected{% endif %}>NJS (Jerárquico)
                         </option>
@@ -507,12 +509,16 @@
 
     window.validarUnidad = (el) => {
         if (el.value.includes('/')) {
-            el.value = el.value.split('/').map((p) => p.trim()).filter((p) => p !== '').join(' / ');
             window.quitarError(el);
         } else if (el.value.trim() !== '') {
             window.mostrarError(el, '⚠ Formato de subdivisión requerido: Área / Departamento (Ej: BLOQUE 1 / FINANZAS)');
         } else {
             window.quitarError(el);
+        }
+    };
+    window.normalizarUnidad = (el) => {
+        if (el.value.includes('/')) {
+            el.value = el.value.split('/').map((p) => p.trim()).filter((p) => p !== '').join(' / ');
         }
     };
 
