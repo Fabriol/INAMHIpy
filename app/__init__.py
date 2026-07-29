@@ -73,4 +73,11 @@ def create_app():
             return {'tramite_negado_actual': tramite}
         return {'tramite_negado_actual': None}
 
+    # Año actual disponible en todas las plantillas (ej. pie de página),
+    # para no dejar el copyright con un año fijo que quede desactualizado
+    @app.context_processor
+    def inject_anio_actual():
+        from datetime import datetime
+        return {'anio_actual': datetime.now().year}
+
     return app

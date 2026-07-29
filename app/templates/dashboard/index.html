@@ -115,6 +115,19 @@
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
         position: relative;
         overflow: hidden;
+        animation: cardUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .hero-item:nth-child(1) {
+        animation-delay: 0.25s;
+    }
+
+    .hero-item:nth-child(2) {
+        animation-delay: 0.35s;
+    }
+
+    .hero-item:nth-child(3) {
+        animation-delay: 0.45s;
     }
 
     .hero-item::before {
@@ -361,6 +374,10 @@
         border-radius: 10px;
     }
 
+    .live-indicator i {
+        animation: livePulse 1.8s ease-in-out infinite;
+    }
+
     .info-card.blue .card-icon {
         background: #eff6ff;
         color: #2563eb;
@@ -468,6 +485,10 @@
         animation: cardUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
         transition: 0.4s ease;
         animation-delay: 0.5s;
+    }
+
+    .panel-right {
+        animation-delay: 0.65s;
     }
 
     .panel-left:hover,
@@ -763,6 +784,20 @@
         }
     }
 
+    @keyframes livePulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.4;
+            transform: scale(0.8);
+        }
+    }
+
     @keyframes pulseRing {
 
         0%,
@@ -888,7 +923,7 @@
             <i class="bi bi-people-fill watermark-icon"></i>
             <div class="card-icon"><i class="bi bi-people-fill"></i></div>
             <div class="info-content">
-                <p class="metric-value">{{ stats.total_usuarios | default(0) }}</p>
+                <p class="metric-value" data-count-target="{{ stats.total_usuarios | default(0) }}">{{ stats.total_usuarios | default(0) }}</p>
                 <p class="metric-label">Usuarios Activos</p>
                 <span class="live-indicator"><i class="bi bi-broadcast"></i> En línea</span>
             </div>
@@ -898,7 +933,7 @@
             <i class="bi bi-folder-check watermark-icon"></i>
             <div class="card-icon"><i class="bi bi-folder-check"></i></div>
             <div class="info-content">
-                <p class="metric-value">{{ stats.areas_control | default(8) }}</p>
+                <p class="metric-value" data-count-target="{{ stats.areas_control | default(8) }}">{{ stats.areas_control | default(8) }}</p>
                 <p class="metric-label">Áreas de Control</p>
                 <span class="live-indicator"><i class="bi bi-shield-check"></i> Activas</span>
             </div>
@@ -908,7 +943,7 @@
             <i class="bi bi-pen-fill watermark-icon"></i>
             <div class="card-icon"><i class="bi bi-pen-fill"></i></div>
             <div class="info-content">
-                <p class="metric-value">{{ stats.firmas_validadas | default(0) }}</p>
+                <p class="metric-value" data-count-target="{{ stats.firmas_validadas | default(0) }}">{{ stats.firmas_validadas | default(0) }}</p>
                 <p class="metric-label">Firmas PAdES Estampadas</p>
                 <span class="live-indicator"><i class="bi bi-check-circle-fill"></i> Sincronizado</span>
             </div>
@@ -918,7 +953,7 @@
             <i class="bi bi-shield-lock watermark-icon"></i>
             <div class="card-icon"><i class="bi bi-shield-lock"></i></div>
             <div class="info-content">
-                <p class="metric-value">{{ stats.logs_auditoria | default(0) }}</p>
+                <p class="metric-value" data-count-target="{{ stats.logs_auditoria | default(0) }}">{{ stats.logs_auditoria | default(0) }}</p>
                 <p class="metric-label">Registros de Auditoría</p>
                 <span class="live-indicator"><i class="bi bi-database-check"></i> Actualizado</span>
             </div>
@@ -985,7 +1020,7 @@
         </div>
         <div class="footer-bottom">
             <span>
-                © 2026 INAMHI ECUADOR | Sistema de Gestión de Paz y Salvo Institucional
+                © {{ anio_actual }} INAMHI ECUADOR | Sistema de Gestión de Paz y Salvo Institucional
             </span>
             <div style="text-align: right;">
                 <span>Dirección Matriz: Corea N36-14 y Iñaquito, Quito - Ecuador | Tel: +593-2 397-1100</span><br>
@@ -994,4 +1029,34 @@
     </footer>
 
 </div>
+
+<script>
+    (function () {
+        var prefiereMenosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var contadores = document.querySelectorAll('.metric-value[data-count-target]');
+
+        if (prefiereMenosMovimiento || !contadores.length) return;
+
+        contadores.forEach(function (el) {
+            var destino = parseInt(el.getAttribute('data-count-target'), 10) || 0;
+            var duracion = 1100;
+            var inicio = null;
+
+            el.textContent = '0';
+
+            function paso(marca) {
+                if (!inicio) inicio = marca;
+                var avance = Math.min((marca - inicio) / duracion, 1);
+                var facilitado = 1 - Math.pow(1 - avance, 3);
+                el.textContent = Math.round(facilitado * destino);
+                if (avance < 1) {
+                    requestAnimationFrame(paso);
+                } else {
+                    el.textContent = destino;
+                }
+            }
+            requestAnimationFrame(paso);
+        });
+    })();
+</script>
 {% endblock %}

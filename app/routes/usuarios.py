@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 from app.models.base import db, Usuario, Rol
+from sqlalchemy.exc import IntegrityError
 
 usuarios_bp = Blueprint('usuarios', __name__)
 
@@ -90,7 +91,12 @@ def cambiar_estado(id):
 @login_required
 def eliminar_usuario(id):
     u = Usuario.query.get_or_404(id)
-    db.session.delete(u)
-    db.session.commit()
-    flash('Usuario eliminado del sistema.', 'success')
+    try:
+        db.session.delete(u)
+        db.session.commit()
+        flash('Usuario eliminado del sistema.', 'success')
+    except IntegrityError:
+        db.session.rollback()
+        flash('No se puede eliminar a este usuario porque tiene trámites de Paz y Salvo u otros '
+              'registros asociados en el sistema. Si ya no debe tener acceso, inhabilítelo en su lugar.', 'danger')
     return redirect(url_for('usuarios.gestionar_usuarios'))

@@ -1639,8 +1639,11 @@
                 let badgeHTML = `<div class="mt-1"><span class="badge bg-success shadow-sm" style="font-size: 9px;"><i class="bi bi-check-circle-fill"></i> Completado por: ${asignacionesPrevias[nombreCampo]}</span></div>`;
                 contenedor.insertAdjacentHTML('beforeend', badgeHTML);
             } else if (estaAsignado) {
-                // ESTADO: ASIGNADO PERO AÚN SIN LLENAR (sigue disponible para Marcar Todo / reasignar)
+                // ESTADO: ASIGNADO PERO AÚN SIN LLENAR. Se marca para que se note que ya
+                // tiene dueño, pero se excluye de "Marcar Todo" para no reasignarlo por
+                // accidente a otra persona; solo se reasigna si el admin lo clickea aposta
                 cb.checked = true;
+                cb.classList.add('campo-ya-asignado');
 
                 contenedor.style.backgroundColor = "#eff6ff";
                 contenedor.style.border = "1px dashed #60a5fa";
@@ -1725,7 +1728,7 @@
     });
 
     window.toggleSeleccionGlobal = (btn) => {
-        let checkboxes = document.querySelectorAll('input[type="checkbox"][name="campos"]:not([disabled])');
+        let checkboxes = document.querySelectorAll('input[type="checkbox"][name="campos"]:not([disabled]):not(.campo-ya-asignado)');
         if (checkboxes.length === 0) {
             Swal.fire('Información', 'Todos los campos ya han sido delegados, no hay campos libres.', 'info');
             return;

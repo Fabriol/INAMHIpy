@@ -9,8 +9,12 @@ dashboard_bp = Blueprint('dashboard', __name__)
 def index():
     # Calcular métricas reales para las tarjetas informativas
     stats = {
-        'tramites_activos': SolicitudPazSalvo.query.filter(SolicitudPazSalvo.estado != 'COMPLETADO').count(),
-        'tramites_completados': SolicitudPazSalvo.query.filter_by(estado='COMPLETADO').count(),
+        # Trámites que aún no tienen veredicto final de RRHH (siguen "en curso")
+        'tramites_activos': SolicitudPazSalvo.query.filter(
+            SolicitudPazSalvo.estado.notin_(['APROBADO', 'NEGADO'])
+        ).count(),
+        # Solo los Aprobados cuentan como expediente cerrado exitosamente
+        'tramites_completados': SolicitudPazSalvo.query.filter_by(estado='APROBADO').count(),
         'total_usuarios': Usuario.query.filter_by(activo=True).count(),
         'areas_control': 8,
         # Cuenta firmas PAdES reales estampadas (campos marcados FIRMADO), no el
