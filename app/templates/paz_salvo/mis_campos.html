@@ -386,10 +386,17 @@
                 {% endfor %}
             </form>
 
+            {% if mis_campos_completo %}
+            <button type="button" class="btn btn-success fw-bold px-4 py-2" disabled
+                style="opacity: .65; cursor: not-allowed;">
+                <i class="bi bi-check-circle-fill me-2"></i> Ya Guardado
+            </button>
+            {% else %}
             <button type="button" id="btnGuardarPrincipal" class="btn btn-success fw-bold px-4 py-2"
                 onclick="window.validarYGuardarTodo(this)">
                 <i class="bi bi-cloud-check-fill me-2"></i> Guardar Mis Respuestas
             </button>
+            {% endif %}
         </div>
 
         <div class="hoja-espejo-preview">

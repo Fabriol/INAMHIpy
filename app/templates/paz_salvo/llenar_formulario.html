@@ -1528,10 +1528,17 @@
             </form>
 
             <div class="p-3 bg-light border-top text-end mt-3">
+                {% if formulario_completo %}
+                <button type="button" class="btn btn-success fw-bold px-4 py-2" disabled
+                    style="opacity: .65; cursor: not-allowed;">
+                    <i class="bi bi-check-circle-fill me-2"></i> Ya Guardado
+                </button>
+                {% else %}
                 <button type="button" id="btnGuardarPrincipal" class="btn btn-success fw-bold px-4 py-2"
                     onclick="window.validarYGuardarTodo(event, this)">
                     <i class="bi bi-cloud-check-fill me-2"></i> Guardar Mis Respuestas
                 </button>
+                {% endif %}
             </div>
         </div>
 

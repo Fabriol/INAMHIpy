@@ -11,7 +11,7 @@ import qrcode.image.svg
 # Modelos
 from app.models.base import db, Usuario, Rol, SolicitudPazSalvo, Respuesta, LogAuditoria
 from app.services.pdf_service import generar_documento_paz_salvo, localizar_posicion_firma
-from app.services.progreso_service import actualizar_estado_automatico
+from app.services.progreso_service import actualizar_estado_automatico, calcular_progreso, CAMPOS_OPCIONALES
 
 # Librerías criptográficas para la firma PAdES
 from pyhanko.sign import signers
@@ -285,10 +285,23 @@ def llenar_formulario(solicitud_id):
         if campo_identidad not in campos_bloqueados:
             campos_bloqueados.append(campo_identidad)
 
+    # El Administrador ve el trámite completo: se guía por el % global. Cualquier
+    # otro rol que llegue aquí (ej. RRHH) solo tiene delegados algunos campos
+    # puntuales, así que se revisa que ÉL haya llenado/firmado los suyos
+    if current_user.rol.nombre == 'Administrador':
+        _, _, porcentaje_global = calcular_progreso(solicitud.id)
+        formulario_completo = porcentaje_global >= 100
+    else:
+        formulario_completo = bool(campos_asignados_al_usuario) and all(
+            campo in campos_bloqueados or campo in CAMPOS_OPCIONALES
+            for campo in campos_asignados_al_usuario
+        )
+
     return render_template('paz_salvo/llenar_formulario.html',
                            solicitud=solicitud,
                            usuarios_disponibles=usuarios_disponibles,
                            campos_bloqueados=campos_bloqueados,
+                           formulario_completo=formulario_completo,
                            campos_asignados_al_usuario=campos_asignados_al_usuario,
                            asignaciones_dict=asignaciones_dict,
                            campos_completados=campos_completados,
@@ -642,9 +655,18 @@ def mis_campos_asignados(solicitud_id):
         flash('No tiene campos asignados en este trámite actualmente.', 'info')
         return redirect(url_for('areas.mis_tareas'))
 
+    # Si YA llenó/firmó todos sus campos asignados (los opcionales como email2
+    # no cuentan), no tiene sentido que siga viendo el botón de guardado activo:
+    # el guardado silencioso ya corrió automáticamente en cada firma que estampó
+    mis_campos_completo = all(
+        campo in mis_campos_bloqueados or campo in CAMPOS_OPCIONALES
+        for campo in mis_campos_asignados
+    )
+
     # Renderizamos la página NUEVA Y SEPARADA
-    return render_template('paz_salvo/mis_campos.html', 
-                           solicitud=solicitud, 
+    return render_template('paz_salvo/mis_campos.html',
+                           solicitud=solicitud,
                            campos_asignados=mis_campos_asignados,
                            campos_bloqueados=mis_campos_bloqueados,
+                           mis_campos_completo=mis_campos_completo,
                            datos=datos_diccionario)

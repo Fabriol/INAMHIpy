@@ -6,6 +6,10 @@ from app.models.base import Respuesta
 # usada tanto por areas.py como por paz_salvo.py.
 TOTAL_CAMPOS_PAZ_SALVO = 152
 
+# Campos que existen en el formulario pero son opcionales: si quedan vacíos
+# no deben impedir llegar al 100% de avance (ej. email2, correo alternativo)
+CAMPOS_OPCIONALES = {'email2'}
+
 
 def calcular_progreso(solicitud_id):
     """Devuelve (campos_respondidos, total_campos, porcentaje) de una solicitud.
@@ -16,9 +20,11 @@ def calcular_progreso(solicitud_id):
         1 for r in respuestas
         if r.valor_respuesta and str(r.valor_respuesta).strip() != ''
         and not r.campo_formulario.endswith('_nombre')
+        and r.campo_formulario not in CAMPOS_OPCIONALES
     )
-    porcentaje = min(100, round((respondidos / TOTAL_CAMPOS_PAZ_SALVO) * 100))
-    return respondidos, TOTAL_CAMPOS_PAZ_SALVO, porcentaje
+    total = TOTAL_CAMPOS_PAZ_SALVO - len(CAMPOS_OPCIONALES)
+    porcentaje = min(100, round((respondidos / total) * 100))
+    return respondidos, total, porcentaje
 
 
 def actualizar_estado_automatico(solicitud):
