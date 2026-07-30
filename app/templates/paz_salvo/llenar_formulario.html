@@ -1644,10 +1644,11 @@
                 let badgeHTML = `<div class="mt-1"><span class="badge bg-success shadow-sm" style="font-size: 9px;"><i class="bi bi-check-circle-fill"></i> Completado por: ${asignacionesPrevias[nombreCampo]}</span></div>`;
                 contenedor.insertAdjacentHTML('beforeend', badgeHTML);
             } else if (estaAsignado) {
-                // ESTADO: ASIGNADO PERO AÚN SIN LLENAR. Se marca para que se note que ya
-                // tiene dueño, pero se excluye de "Marcar Todo" para no reasignarlo por
-                // accidente a otra persona; solo se reasigna si el admin lo clickea aposta
-                cb.checked = true;
+                // ESTADO: ASIGNADO PERO AÚN SIN LLENAR. Se deja SIN marcar (aunque ya
+                // tenga dueño) para que no viaje en el próximo envío del formulario y
+                // termine reasignándose solo a quien se elija después; solo se marca y
+                // reasigna si el admin lo clickea aposta
+                cb.checked = false;
                 cb.classList.add('campo-ya-asignado');
 
                 contenedor.style.backgroundColor = "#f5f3ff";
