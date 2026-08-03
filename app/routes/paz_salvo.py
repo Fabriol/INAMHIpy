@@ -10,8 +10,11 @@ import qrcode.image.svg
 
 # Modelos
 from app.models.base import db, Usuario, Rol, SolicitudPazSalvo, Respuesta, LogAuditoria
-from app.services.pdf_service import generar_documento_paz_salvo, localizar_posicion_firma
-from app.services.progreso_service import actualizar_estado_automatico, calcular_progreso, CAMPOS_OPCIONALES
+from app.services.pdf_service import (
+    generar_documento_paz_salvo, localizar_posicion_firma,
+    actualizar_campo_pdf_incremental, CAMPOS_EDITABLES_ACROFORM,
+)
+from app.services.progreso_service import actualizar_estado_automatico, calcular_progreso, CAMPOS_OPCIONALES, texto_completo
 
 # Librerías criptográficas para la firma PAdES
 from pyhanko.sign import signers
@@ -297,11 +300,20 @@ def llenar_formulario(solicitud_id):
             for campo in campos_asignados_al_usuario
         )
 
+    # Candado de la primera firma: si el trámite aún no tiene NINGUNA firma
+    # estampada, hay que asegurarse de que todo el texto (de cualquier área)
+    # ya esté lleno antes de dejar firmar, porque esa primera firma congela
+    # el PDF visual para siempre. Una vez que ya existe una firma, esto deja
+    # de aplicar (cada área firma cuando le toca, sin orden fijo).
+    hay_firmas_previas = any(r.valor_respuesta == 'FIRMADO' for r in respuestas_db)
+    puede_iniciar_firmas = hay_firmas_previas or texto_completo(solicitud.id)
+
     return render_template('paz_salvo/llenar_formulario.html',
                            solicitud=solicitud,
                            usuarios_disponibles=usuarios_disponibles,
                            campos_bloqueados=campos_bloqueados,
                            formulario_completo=formulario_completo,
+                           puede_iniciar_firmas=puede_iniciar_firmas,
                            campos_asignados_al_usuario=campos_asignados_al_usuario,
                            asignaciones_dict=asignaciones_dict,
                            campos_completados=campos_completados,
@@ -368,7 +380,17 @@ def guardar_formulario(solicitud_id):
         tiene_firmas = any(r.valor_respuesta == 'FIRMADO' for r in respuestas_db)
         if not tiene_firmas:
             generar_documento_paz_salvo(solicitud, solicitud.ex_funcionario, respuestas_db, ruta_pdf)
-        
+        else:
+            # El documento ya tiene al menos una firma real: NO se regenera
+            # completo (eso borraría las firmas), pero los campos que ya
+            # están migrados a casillas de formulario PDF (Etapa 1, ver
+            # CAMPOS_EDITABLES_ACROFORM) sí se pueden seguir actualizando de
+            # forma incremental, sin tocar ninguna firma ya estampada.
+            for campo, valor in datos_formulario.items():
+                if campo in CAMPOS_EDITABLES_ACROFORM and valor and valor.strip() != '':
+                    valor_guardado = str(valor) if campo in ('email1', 'email2') else str(valor).upper()
+                    actualizar_campo_pdf_incremental(ruta_pdf, campo, valor_guardado)
+
         # LA MAGIA PARA QUE NO SALTE LA PÁGINA: Si es una petición silenciosa (AJAX), devuelve JSON.
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'status': 'success', 'mensaje': 'Datos guardados exitosamente.'})
@@ -482,8 +504,17 @@ def subir_firma_pades(solicitud_id):
         # estampar a continuación en el mismo lugar)
         ruta_pdf_original = os.path.join(directorio_temp, f'PazSalvo_{solicitud_id}.pdf')
 
+        # AVISO (no bloqueo): si este PDF todavía no existe, esta es la PRIMERA
+        # firma de todo el trámite. A partir de aquí el PDF visual queda
+        # congelado para siempre (regenerarlo después borraría las firmas ya
+        # estampadas). No se obliga a esperar a que todo esté lleno — el
+        # usuario ya fue advertido de esto en pantalla antes de llegar aquí y
+        # decidió firmar de todos modos; el candado de verdad es no volver a
+        # tocar el PDF una vez que existe, eso no cambia.
+        es_primera_firma_del_tramite = not os.path.exists(ruta_pdf_original)
+
         # EL CANDADO: Solo genera el PDF visual si NO existe
-        if not os.path.exists(ruta_pdf_original):
+        if es_primera_firma_del_tramite:
             solicitud_temp = SolicitudPazSalvo.query.get(solicitud_id)
             solicitud_temp.ex_funcionario = Usuario.query.get(solicitud_temp.ex_funcionario_id)
             resp_temp = Respuesta.query.filter_by(solicitud_id=solicitud_id).all()
@@ -663,10 +694,19 @@ def mis_campos_asignados(solicitud_id):
         for campo in mis_campos_asignados
     )
 
+    # Candado de la primera firma: si el trámite aún no tiene NINGUNA firma
+    # estampada, hay que asegurarse de que todo el texto (de cualquier área)
+    # ya esté lleno antes de dejar firmar, porque esa primera firma congela
+    # el PDF visual para siempre. Una vez que ya existe una firma, esto deja
+    # de aplicar (cada área firma cuando le toca, sin orden fijo).
+    hay_firmas_previas = any(r.valor_respuesta == 'FIRMADO' for r in todas_las_respuestas)
+    puede_iniciar_firmas = hay_firmas_previas or texto_completo(solicitud.id)
+
     # Renderizamos la página NUEVA Y SEPARADA
     return render_template('paz_salvo/mis_campos.html',
                            solicitud=solicitud,
                            campos_asignados=mis_campos_asignados,
                            campos_bloqueados=mis_campos_bloqueados,
                            mis_campos_completo=mis_campos_completo,
+                           puede_iniciar_firmas=puede_iniciar_firmas,
                            datos=datos_diccionario)

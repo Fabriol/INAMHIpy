@@ -1566,6 +1566,9 @@
 <script id="asignaciones-data" type="application/json">
     {{ asig_dict | default({}) | tojson | safe }}
 </script>
+<script id="puede-firmar-data" type="application/json">
+    {{ puede_iniciar_firmas | default(true) | tojson | safe }}
+</script>
 <script id="completados-data" type="application/json">
     {{ campos_completados | default([]) | tojson | safe }}
 </script>
@@ -1644,18 +1647,20 @@
                 let badgeHTML = `<div class="mt-1"><span class="badge bg-success shadow-sm" style="font-size: 9px;"><i class="bi bi-check-circle-fill"></i> Completado por: ${asignacionesPrevias[nombreCampo]}</span></div>`;
                 contenedor.insertAdjacentHTML('beforeend', badgeHTML);
             } else if (estaAsignado) {
-                // ESTADO: ASIGNADO PERO AÚN SIN LLENAR. Se deja SIN marcar (aunque ya
-                // tenga dueño) para que no viaje en el próximo envío del formulario y
-                // termine reasignándose solo a quien se elija después; solo se marca y
-                // reasigna si el admin lo clickea aposta
+                // ESTADO: ASIGNADO PERO AÚN SIN LLENAR. Se bloquea por completo (igual
+                // que un campo completado) para que ya no se pueda tocar ni reasignar
+                // por accidente desde este panel una vez que tiene dueño
                 cb.checked = false;
                 cb.indeterminate = true;
+                cb.disabled = true;
                 cb.classList.add('campo-ya-asignado');
 
                 contenedor.style.backgroundColor = "#f5f3ff";
                 contenedor.style.border = "1px dashed #a78bfa";
                 contenedor.style.borderRadius = "8px";
                 contenedor.style.padding = "6px 8px";
+                contenedor.style.opacity = "0.75";
+                contenedor.style.cursor = "not-allowed";
 
                 let badgeHTML = `<div class="mt-1"><span class="badge badge-ya-asignado shadow-sm" style="font-size: 9px;"><i class="bi bi-hourglass-split"></i> Asignado a: ${asignacionesPrevias[nombreCampo]} (pendiente de llenar)</span></div>`;
                 contenedor.insertAdjacentHTML('beforeend', badgeHTML);
@@ -1861,6 +1866,29 @@
     // SISTEMA DE FIRMA PAdES (AUTO-FOCUS + ENTER + DISEÑO PREMIUM)
     // ==========================================
     window.abrirModalFirmaEC = (campoFirma, labelFirma = 'Firma Institucional') => {
+        let dataPuedeFirmar = document.getElementById('puede-firmar-data');
+        let puedeIniciarFirmas = dataPuedeFirmar ? JSON.parse(dataPuedeFirmar.textContent) : true;
+
+        if (!puedeIniciarFirmas) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Aún faltan otras secciones',
+                html: 'Todavía hay campos de texto sin completar en <b>otras áreas</b> del trámite. Si firma ahora, esta será la primera firma del documento y quedará "congelado" desde este momento: lo que se llene después en esas secciones <b>no aparecerá en el PDF descargado</b> (aunque sí se guarda bien en el sistema).<br><br>¿Desea firmar de todos modos?',
+                showCancelButton: true,
+                confirmButtonText: 'Firmar de todos modos',
+                cancelButtonText: 'Esperar',
+                confirmButtonColor: '#d97706',
+                cancelButtonColor: '#64748b'
+            }).then((result) => {
+                if (result.isConfirmed) { window._continuarFirmaPAdES(campoFirma, labelFirma); }
+            });
+            return;
+        }
+
+        window._continuarFirmaPAdES(campoFirma, labelFirma);
+    };
+
+    window._continuarFirmaPAdES = (campoFirma, labelFirma = 'Firma Institucional') => {
         let form = document.getElementById('formularioOficial');
         let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
         let faltanDatos = false;
