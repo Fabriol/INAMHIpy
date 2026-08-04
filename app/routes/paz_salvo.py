@@ -14,7 +14,7 @@ from app.services.pdf_service import (
     generar_documento_paz_salvo, localizar_posicion_firma,
     actualizar_campo_pdf_incremental, CAMPOS_EDITABLES_ACROFORM,
 )
-from app.services.progreso_service import actualizar_estado_automatico, calcular_progreso, CAMPOS_OPCIONALES, texto_completo
+from app.services.progreso_service import actualizar_estado_automatico, calcular_progreso, CAMPOS_OPCIONALES
 
 # Librerías criptográficas para la firma PAdES
 from pyhanko.sign import signers
@@ -300,20 +300,11 @@ def llenar_formulario(solicitud_id):
             for campo in campos_asignados_al_usuario
         )
 
-    # Candado de la primera firma: si el trámite aún no tiene NINGUNA firma
-    # estampada, hay que asegurarse de que todo el texto (de cualquier área)
-    # ya esté lleno antes de dejar firmar, porque esa primera firma congela
-    # el PDF visual para siempre. Una vez que ya existe una firma, esto deja
-    # de aplicar (cada área firma cuando le toca, sin orden fijo).
-    hay_firmas_previas = any(r.valor_respuesta == 'FIRMADO' for r in respuestas_db)
-    puede_iniciar_firmas = hay_firmas_previas or texto_completo(solicitud.id)
-
     return render_template('paz_salvo/llenar_formulario.html',
                            solicitud=solicitud,
                            usuarios_disponibles=usuarios_disponibles,
                            campos_bloqueados=campos_bloqueados,
                            formulario_completo=formulario_completo,
-                           puede_iniciar_firmas=puede_iniciar_firmas,
                            campos_asignados_al_usuario=campos_asignados_al_usuario,
                            asignaciones_dict=asignaciones_dict,
                            campos_completados=campos_completados,
@@ -694,19 +685,10 @@ def mis_campos_asignados(solicitud_id):
         for campo in mis_campos_asignados
     )
 
-    # Candado de la primera firma: si el trámite aún no tiene NINGUNA firma
-    # estampada, hay que asegurarse de que todo el texto (de cualquier área)
-    # ya esté lleno antes de dejar firmar, porque esa primera firma congela
-    # el PDF visual para siempre. Una vez que ya existe una firma, esto deja
-    # de aplicar (cada área firma cuando le toca, sin orden fijo).
-    hay_firmas_previas = any(r.valor_respuesta == 'FIRMADO' for r in todas_las_respuestas)
-    puede_iniciar_firmas = hay_firmas_previas or texto_completo(solicitud.id)
-
     # Renderizamos la página NUEVA Y SEPARADA
     return render_template('paz_salvo/mis_campos.html',
                            solicitud=solicitud,
                            campos_asignados=mis_campos_asignados,
                            campos_bloqueados=mis_campos_bloqueados,
                            mis_campos_completo=mis_campos_completo,
-                           puede_iniciar_firmas=puede_iniciar_firmas,
                            datos=datos_diccionario)

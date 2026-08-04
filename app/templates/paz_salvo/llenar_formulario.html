@@ -1566,9 +1566,6 @@
 <script id="asignaciones-data" type="application/json">
     {{ asig_dict | default({}) | tojson | safe }}
 </script>
-<script id="puede-firmar-data" type="application/json">
-    {{ puede_iniciar_firmas | default(true) | tojson | safe }}
-</script>
 <script id="completados-data" type="application/json">
     {{ campos_completados | default([]) | tojson | safe }}
 </script>
@@ -1866,29 +1863,6 @@
     // SISTEMA DE FIRMA PAdES (AUTO-FOCUS + ENTER + DISEÑO PREMIUM)
     // ==========================================
     window.abrirModalFirmaEC = (campoFirma, labelFirma = 'Firma Institucional') => {
-        let dataPuedeFirmar = document.getElementById('puede-firmar-data');
-        let puedeIniciarFirmas = dataPuedeFirmar ? JSON.parse(dataPuedeFirmar.textContent) : true;
-
-        if (!puedeIniciarFirmas) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Aún faltan otras secciones',
-                html: 'Todavía hay campos de texto sin completar en <b>otras áreas</b> del trámite. Si firma ahora, esta será la primera firma del documento y quedará "congelado" desde este momento: lo que se llene después en esas secciones <b>no aparecerá en el PDF descargado</b> (aunque sí se guarda bien en el sistema).<br><br>¿Desea firmar de todos modos?',
-                showCancelButton: true,
-                confirmButtonText: 'Firmar de todos modos',
-                cancelButtonText: 'Esperar',
-                confirmButtonColor: '#d97706',
-                cancelButtonColor: '#64748b'
-            }).then((result) => {
-                if (result.isConfirmed) { window._continuarFirmaPAdES(campoFirma, labelFirma); }
-            });
-            return;
-        }
-
-        window._continuarFirmaPAdES(campoFirma, labelFirma);
-    };
-
-    window._continuarFirmaPAdES = (campoFirma, labelFirma = 'Firma Institucional') => {
         let form = document.getElementById('formularioOficial');
         let requeridos = form.querySelectorAll('.doc-input:not([disabled]):not([readonly])');
         let faltanDatos = false;

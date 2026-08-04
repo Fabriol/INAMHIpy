@@ -8,15 +8,21 @@ from pyhanko.pdf_utils import generic
 _MARGEN_PDF_PT = 24
 _ALTO_CAMPO_EDITABLE_PT = 10
 
-# Etapa 1 de la migración a "casillas de formulario PDF reales": estos campos
-# ya se pueden llenar antes O después de cualquier firma, sin romper firmas
-# ya estampadas, porque se actualizan con una revisión incremental (nunca se
-# regenera el PDF completo). Ver hoja_espejo.html: cada uno tiene su propio
-# marcador id="espejo_campo_<nombre>". Quedan pendientes de migrar los ~27
-# campos Sí/No con color (badge verde/rojo), que necesitan un tratamiento
-# especial para no perder ese estilo visual — ver Etapa 3.
-CAMPOS_EDITABLES_ACROFORM = {
-    # Etapa 1 — datos personales y "responsables" de cada sección
+# Migración a "casillas de formulario PDF reales": estos campos ya se pueden
+# llenar antes O después de cualquier firma, sin romper firmas ya estampadas,
+# porque se actualizan con una revisión incremental (nunca se regenera el PDF
+# completo). Ver hoja_espejo.html: cada uno tiene su propio marcador
+# id="espejo_campo_<nombre>".
+#
+# Alcance final: solo los campos que tienen TODA una celda de tabla para
+# ellos solos (datos personales, "responsable" de cada sección) y los
+# badges Sí/No de color (ancho fijo, siempre "SI" o "NO"). Se probaron
+# también los campos de celdas combinadas ("Val: $X | Acta: Y", "IP: X |
+# Liberó: Y"), pero el espacio real entre esos textos es de apenas ~20pt en
+# el diseño original — no alcanza para una casilla de ancho fijo sin tapar
+# la etiqueta vecina. Esos se quedan con el comportamiento anterior (se
+# pueden llenar libremente hasta la primera firma del trámite).
+CAMPOS_ANCHO_COMPLETO = {
     'nombres_apellidos', 'cedula', 'modalidad', 'fecha_ingreso', 'fecha_salida', 'email1', 'email2',
     'lugar_trabajo', 'grupo_ocupacional', 'unidad', 'cargo',
     'tramites_nombre_resp1', 'tramites_nombre_resp2', 'tramites_nombre_resp3', 'tramites_nombre_responsable',
@@ -26,27 +32,11 @@ CAMPOS_EDITABLES_ACROFORM = {
     'seg_nombre_resp1', 'seg_nombre_resp2', 'seg_responsable',
     'rrhh_resp_capacitacion', 'rrhh_resp_evaluacion', 'rrhh_resp_viajes', 'rrhh_resp_siith',
     'rrhh_resp_vacaciones', 'rrhh_resp_juramentada', 'rrhh_resp_credencial2', 'rrhh_resp_acta', 'rrhh_director',
-    # Etapa 2 — texto simple y celdas combinadas (sin estilo de color)
-    'direccion', 'numero_domicilio', 'provincia', 'canton', 'celular', 'emergencia',
-    'tramites_admin_contrato', 'tramites_desc_contrato', 'tramites_memo',
-    'tramites_jefe_inmediato', 'tramites_servidor_recibe', 'tramites_obs',
-    'admin_es_contrato', 'admin_valor_bienes', 'admin_acta_bienes', 'admin_deducibles_valor', 'admin_pasajes_valor',
-    'tic_ip_fija', 'tic_liberacion', 'tic_obs1', 'tic_ruta_backup',
-    'tic_cierre_correo', 'tic_quipux', 'tic_esigef', 'tic_spryn', 'tic_esbye', 'tic_obs',
-    'fin_saldos_valor', 'fin_obs1', 'fin_anticipo_valor', 'fin_obs2',
-    'fin_recuperacion_valor', 'fin_obs3', 'fin_devolucion_valor', 'fin_obs4',
-    'seg_entrega_copia', 'seg_verificacion_info', 'seg_oficial',
-    'rrhh_cursos_eval', 'rrhh_vacaciones', 'rrhh_num_certificado', 'rrhh_num_declaracion',
-    'rrhh_respaldo_cd', 'rrhh_ropa_trabajo',
-    'recepcion_fecha', 'recepcion_hojas', 'recepcion_servidor', 'recepcion_cargo',
-    'cedula_firmante', 'fecha_firma',
 }
 
-# Etapa 3 — campos Sí/No que deben conservar el badge de color (ver .ep-yn /
-# .ep-yn--s / .ep-yn--n en hoja_espejo.html). Es un subconjunto de
-# CAMPOS_EDITABLES_ACROFORM: además de ser editables de forma incremental,
-# su apariencia se dibuja a mano (ver _contenido_apariencia_campo) para que
-# se sigan viendo con fondo verde/rojo igual que el resto del documento.
+# Badges Sí/No que deben conservar el color (ver .ep-yn / .ep-yn--s /
+# .ep-yn--n en hoja_espejo.html). Ancho fijo (34pt): su contenido siempre es
+# "SI" o "NO", nunca varía de longitud, así que nunca chocan con nada.
 CAMPOS_SI_NO_COLOR = {
     'tramites_informe', 'tramites_quipux_cero', 'tramites_fe_presentacion',
     'tramites_claves_asignadas', 'tramites_losep', 'tramites_acta_claves',
@@ -57,7 +47,8 @@ CAMPOS_SI_NO_COLOR = {
     'rrhh_capacitacion', 'rrhh_evaluacion', 'rrhh_viajes', 'rrhh_siith',
     'rrhh_juramentada', 'rrhh_credencial', 'rrhh_acta_bienes',
 }
-CAMPOS_EDITABLES_ACROFORM |= CAMPOS_SI_NO_COLOR
+
+CAMPOS_EDITABLES_ACROFORM = CAMPOS_ANCHO_COMPLETO | CAMPOS_SI_NO_COLOR
 
 # Colores exactos de .ep-yn--s / .ep-yn--n en hoja_espejo.html, convertidos a RGB 0-1
 _COLOR_BADGE_SI = ((0.863, 0.988, 0.906), (0.133, 0.773, 0.369), (0.086, 0.396, 0.204))
@@ -115,6 +106,18 @@ def _contenido_apariencia_campo(ancho, alto, texto, es_badge):
     return '\n'.join(lineas).encode('latin-1', errors='replace')
 
 
+def _ancho_campo(nombre_campo, x, ancho_pagina):
+    """
+    Ancho de la casilla: los badges Sí/No usan un ancho fijo pequeño (su
+    contenido siempre es "SI" o "NO"); los campos de celda completa se
+    extienden casi hasta el margen de la página, ya que no comparten su
+    celda con ningún otro dato ni etiqueta.
+    """
+    if nombre_campo in CAMPOS_SI_NO_COLOR:
+        return 34
+    return max(60, (ancho_pagina - _MARGEN_PDF_PT) - x - 2)
+
+
 def _inyectar_campos_editables(ruta_pdf, datos_diccionario):
     """
     Convierte cada celda marcada con id="espejo_campo_<nombre>" (ver CSS
@@ -135,11 +138,19 @@ def _inyectar_campos_editables(ruta_pdf, datos_diccionario):
 
         posiciones = {}
         for item in recorrer(outline.root):
-            if item.title and item.title.startswith('espejo_campo_') and item.destination:
-                nombre_campo = item.title[len('espejo_campo_'):]
-                dest = item.destination
-                pagina = pdf.pages.index(dest[0])
-                posiciones[nombre_campo] = (pagina, float(dest[2]), float(dest[3]))
+            if not item.title or not item.destination:
+                continue
+            if not item.title.startswith('espejo_campo_'):
+                continue
+            nombre_campo = item.title[len('espejo_campo_'):]
+            # Solo se inyecta casilla para los campos migrados (ver
+            # CAMPOS_EDITABLES_ACROFORM); el resto de marcadores en
+            # hoja_espejo.html quedan como texto normal, sin tocar
+            if nombre_campo not in CAMPOS_EDITABLES_ACROFORM:
+                continue
+            dest = item.destination
+            pagina = pdf.pages.index(dest[0])
+            posiciones[nombre_campo] = (pagina, float(dest[2]), float(dest[3]))
 
         if not posiciones:
             return
@@ -158,7 +169,7 @@ def _inyectar_campos_editables(ruta_pdf, datos_diccionario):
             pagina_obj = pdf.pages[pagina]
             ancho_pagina = float(pagina_obj.MediaBox[2])
             es_badge = nombre_campo in CAMPOS_SI_NO_COLOR
-            ancho_campo = 34 if es_badge else max(60, (ancho_pagina - _MARGEN_PDF_PT) - x - 2)
+            ancho_campo = _ancho_campo(nombre_campo, x, ancho_pagina)
             alto_campo = _ALTO_CAMPO_EDITABLE_PT
             rect = pikepdf.Array([x, y - alto_campo, x + ancho_campo, y])
 
@@ -349,18 +360,26 @@ def generar_documento_paz_salvo(solicitud, ex_funcionario, respuestas_db, ruta_s
     </html>
     """
 
-    # 4. Estilos en línea obligatorios para la impresión perfecta en A4
-    estilos_base = CSS(string='''
-        @page { size: A4 portrait; margin: 8mm; }
-        body { font-family: Arial, sans-serif; background: #fff; margin: 0; padding: 0; }
-        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        .ep-tabla tr { page-break-inside: avoid; }
-        .ep-bloque__head { page-break-after: avoid; }
-        .ep-firma-box, .firmaec-sello { page-break-inside: avoid; }
+    # 4. Estilos en línea obligatorios para la impresión perfecta en A4.
+    # El texto/badge original de cada campo YA MIGRADO (ver CAMPOS_EDITABLES_ACROFORM)
+    # se dibuja invisible SOLO en este PDF (nunca en la pantalla web, esta hoja de
+    # estilos no se usa ahí): la casilla de formulario que se inyecta después dibuja
+    # su propio valor encima. Los campos NO migrados (celdas combinadas) se dejan
+    # con su texto normal, visible, como siempre.
+    selectores_ocultar = ', '.join(f'#espejo_campo_{c}' for c in CAMPOS_EDITABLES_ACROFORM)
+    estilos_base = CSS(string=f'''
+        @page {{ size: A4 portrait; margin: 8mm; }}
+        body {{ font-family: Arial, sans-serif; background: #fff; margin: 0; padding: 0; }}
+        * {{ -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }}
+        .ep-tabla tr {{ page-break-inside: avoid; }}
+        .ep-bloque__head {{ page-break-after: avoid; }}
+        .ep-firma-box, .firmaec-sello {{ page-break-inside: avoid; }}
         /* Marcadores internos (invisibles) para ubicar cada celda de firma al momento de firmar,
            y cada celda de dato editable (espejo_campo_) para convertirla en casilla de
            formulario PDF real que se puede seguir llenando aunque el documento ya tenga firmas */
-        [id^="espejo_firma_"], [id^="espejo_campo_"] { bookmark-level: 1; bookmark-label: attr(id); }
+        [id^="espejo_firma_"], [id^="espejo_campo_"] {{ bookmark-level: 1; bookmark-label: attr(id); }}
+        span[id^="espejo_campo_"] {{ display: inline-block; }}
+        {selectores_ocultar} {{ color: transparent !important; background: transparent !important; border-color: transparent !important; }}
     ''')
 
     # 5. Generar el PDF final vectorizado
