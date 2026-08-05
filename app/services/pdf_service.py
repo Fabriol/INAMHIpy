@@ -1,4 +1,5 @@
 import os
+import unicodedata
 import pikepdf
 from flask import render_template
 from weasyprint import HTML, CSS
@@ -7,6 +8,7 @@ from pyhanko.pdf_utils import generic
 
 _MARGEN_PDF_PT = 24
 _ALTO_CAMPO_EDITABLE_PT = 10
+_TAM_FUENTE_MIN_PT = 4.5
 
 # Migración a "casillas de formulario PDF reales": estos campos ya se pueden
 # llenar antes O después de cualquier firma, sin romper firmas ya estampadas,
@@ -14,24 +16,37 @@ _ALTO_CAMPO_EDITABLE_PT = 10
 # completo). Ver hoja_espejo.html: cada uno tiene su propio marcador
 # id="espejo_campo_<nombre>".
 #
-# Alcance final: solo los campos que tienen TODA una celda de tabla para
-# ellos solos (datos personales, "responsable" de cada sección) y los
-# badges Sí/No de color (ancho fijo, siempre "SI" o "NO"). Se probaron
-# también los campos de celdas combinadas ("Val: $X | Acta: Y", "IP: X |
-# Liberó: Y"), pero el espacio real entre esos textos es de apenas ~20pt en
-# el diseño original — no alcanza para una casilla de ancho fijo sin tapar
-# la etiqueta vecina. Esos se quedan con el comportamiento anterior (se
-# pueden llenar libremente hasta la primera firma del trámite).
+# Etapa 2 (ampliación): originalmente solo se migraron los campos con una
+# celda de tabla completa para ellos solos. Se probó extender esto a los
+# campos de celdas combinadas ("Val: $X | Acta: Y"), pero WeasyPrint solo
+# reporta una posición confiable para bookmark-label/bookmark-level del
+# ÚNICO marcador dentro de cada celda/bloque: en cuanto hay un SEGUNDO
+# marcador compartiendo esa celda (misma línea, o incluso otra línea tras un
+# <br> pero dentro de la misma celda), su posición reportada queda mal —
+# a veces apenas desplazada (el campo se ve truncado de más) y a veces tan
+# mal que ni siquiera es mayor que la posición del campo anterior, lo que
+# hace fallar la detección de límite y termina extendiendo esa casilla casi
+# hasta el margen de la página, tapando por completo columnas vecinas
+# (incluida la de FIRMA ELECTRÓNICA — probado con admin_valor_bienes). Por
+# eso la ampliación se limita estrictamente a campos que son el ÚNICO
+# marcador dentro de toda su celda; el resto de campos de celdas combinadas
+# se queda con el comportamiento anterior (editable libremente hasta la
+# primera firma del trámite).
 CAMPOS_ANCHO_COMPLETO = {
     'nombres_apellidos', 'cedula', 'modalidad', 'fecha_ingreso', 'fecha_salida', 'email1', 'email2',
     'lugar_trabajo', 'grupo_ocupacional', 'unidad', 'cargo',
     'tramites_nombre_resp1', 'tramites_nombre_resp2', 'tramites_nombre_resp3', 'tramites_nombre_responsable',
     'admin_nombre_resp1', 'admin_nombre_resp2', 'admin_nombre_resp3', 'admin_nombre_resp4', 'admin_responsable',
+    'admin_es_contrato', 'admin_deducibles_valor', 'admin_pasajes_valor',
     'tic_nombre_resp1', 'tic_nombre_resp2', 'tic_nombre_resp3', 'tic_nombre_resp4', 'tic_responsable',
+    'tic_ruta_backup', 'tic_obs',
     'fin_nombre_resp1', 'fin_nombre_resp2', 'fin_nombre_resp3', 'fin_nombre_resp4', 'fin_director',
-    'seg_nombre_resp1', 'seg_nombre_resp2', 'seg_responsable',
+    'seg_nombre_resp1', 'seg_nombre_resp2', 'seg_responsable', 'seg_entrega_copia', 'seg_verificacion_info', 'seg_oficial',
     'rrhh_resp_capacitacion', 'rrhh_resp_evaluacion', 'rrhh_resp_viajes', 'rrhh_resp_siith',
     'rrhh_resp_vacaciones', 'rrhh_resp_juramentada', 'rrhh_resp_credencial2', 'rrhh_resp_acta', 'rrhh_director',
+    'rrhh_cursos_eval', 'rrhh_num_certificado', 'rrhh_vacaciones', 'rrhh_num_declaracion',
+    'rrhh_respaldo_cd', 'rrhh_ropa_trabajo',
+    'recepcion_fecha', 'recepcion_hojas',
 }
 
 # Badges Sí/No que deben conservar el color (ver .ep-yn / .ep-yn--s /
@@ -48,12 +63,99 @@ CAMPOS_SI_NO_COLOR = {
     'rrhh_juramentada', 'rrhh_credencial', 'rrhh_acta_bienes',
 }
 
-CAMPOS_EDITABLES_ACROFORM = CAMPOS_ANCHO_COMPLETO | CAMPOS_SI_NO_COLOR
+# Campos de ancho fijo corto (no son Sí/No, pero su valor siempre es un
+# número pequeño — ej. días de vacaciones). 'rrhh_vacaciones' ocupa la
+# posición de la columna S/N pero con un dato real; el siguiente marcador
+# de su fila (rrhh_num_certificado) queda DESPUÉS de la etiqueta "Cert:",
+# así que acotar contra él (como se hace para el resto de campos de ancho
+# completo) deja esa etiqueta dentro de la casilla. Con ancho fijo chico,
+# alcanza de sobra para 1-3 dígitos y nunca necesita ese límite.
+CAMPOS_ANCHO_FIJO_CORTO = {'rrhh_vacaciones'}
+
+CAMPOS_EDITABLES_ACROFORM = CAMPOS_ANCHO_COMPLETO | CAMPOS_SI_NO_COLOR | CAMPOS_ANCHO_FIJO_CORTO
+
+
+def _valor_o_defecto(valor):
+    """Replica el 'default(...)' que usa hoja_espejo.html para cada campo
+    (ver partials/hoja_espejo.html): si no hay valor, se muestra '-'. Sin
+    esto, un campo vacío se dibuja como una casilla en blanco invisible en
+    vez del guion que el usuario espera ver. Se usa '-' (no '—') porque la
+    apariencia se codifica en latin-1 y el guion largo no es representable."""
+    valor = (valor or '').strip() if valor else ''
+    return valor if valor else '-'
 
 # Colores exactos de .ep-yn--s / .ep-yn--n en hoja_espejo.html, convertidos a RGB 0-1
 _COLOR_BADGE_SI = ((0.863, 0.988, 0.906), (0.133, 0.773, 0.369), (0.086, 0.396, 0.204))
 _COLOR_BADGE_NO = ((0.996, 0.886, 0.886), (0.937, 0.267, 0.267), (0.6, 0.106, 0.106))
 _COLOR_BADGE_NEUTRO = ((1, 1, 1), (0.792, 0.835, 0.882), (0, 0, 0))
+
+# Anchos aproximados de Helvetica (tabla AFM estándar, en 1/1000 em) para poder
+# calcular cuánto mide un texto ANTES de dibujarlo: el BBox del Form XObject
+# de cada casilla recorta (clip) cualquier trazo que se pase de su ancho, así
+# que sin esta tabla un nombre largo en una columna angosta (ej. RESPONSABLE)
+# se dibuja igual pero la mitad queda invisible fuera del recorte.
+_ANCHO_HELV_1000 = {
+    ' ': 278, '!': 278, '"': 333, '#': 556, '$': 556, '%': 889, '&': 722, "'": 191,
+    '(': 333, ')': 333, '*': 389, '+': 584, ',': 278, '-': 333, '.': 278, '/': 278,
+    '0': 556, '1': 556, '2': 556, '3': 556, '4': 556, '5': 556, '6': 556, '7': 556,
+    '8': 556, '9': 556, ':': 333, ';': 278, '<': 584, '=': 584, '>': 584, '?': 556,
+    '@': 1015,
+    'A': 667, 'B': 667, 'C': 722, 'D': 722, 'E': 667, 'F': 611, 'G': 778, 'H': 722,
+    'I': 278, 'J': 500, 'K': 667, 'L': 556, 'M': 833, 'N': 722, 'O': 778, 'P': 667,
+    'Q': 778, 'R': 722, 'S': 667, 'T': 611, 'U': 722, 'V': 667, 'W': 944, 'X': 667,
+    'Y': 667, 'Z': 611,
+    '[': 278, '\\': 278, ']': 278, '^': 469, '_': 556,
+    'a': 556, 'b': 556, 'c': 500, 'd': 556, 'e': 556, 'f': 278, 'g': 556, 'h': 556,
+    'i': 222, 'j': 222, 'k': 500, 'l': 222, 'm': 833, 'n': 556, 'o': 556, 'p': 556,
+    'q': 556, 'r': 333, 's': 500, 't': 278, 'u': 556, 'v': 500, 'w': 722, 'x': 500,
+    'y': 500, 'z': 500,
+}
+_ANCHO_HELV_DEFECTO = 600
+
+
+def _ancho_texto_1000(texto):
+    """Ancho aproximado de 'texto' en Helvetica, en unidades de 1/1000 em. Los
+    caracteres acentuados (á, ñ, ü...) no están en la tabla: se normalizan a
+    su letra base (NFKD) porque el ancho real difiere en menos de un 5%,
+    suficiente para decidir cuánto encoger la fuente."""
+    total = 0
+    for ch in texto:
+        ancho = _ANCHO_HELV_1000.get(ch)
+        if ancho is None:
+            base = unicodedata.normalize('NFKD', ch)[:1]
+            ancho = _ANCHO_HELV_1000.get(base, _ANCHO_HELV_DEFECTO)
+        total += ancho
+    return total
+
+
+def _ancho_texto_pt(texto, tam_fuente):
+    return _ancho_texto_1000(texto) * tam_fuente / 1000.0
+
+
+# CMap /ToUnicode para la fuente Helvetica/WinAnsiEncoding de las casillas:
+# sin esto, el texto dibujado a mano en cada apariencia se ve bien pero no es
+# "texto real" para un lector de PDF — copiar/buscar/verificar accesibilidad
+# no recupera los caracteres (equivale a una imagen para esas herramientas).
+# Mapeo identidad 0x20-0xFF: WinAnsiEncoding coincide con Latin-1/Unicode en
+# todo el rango que esta app realmente usa (letras, números, puntuación,
+# vocales acentuadas y ñ/Ñ del español), así que no hace falta una tabla más
+# fina. No cambia el aspecto del PDF ni toca nada relacionado con la firma.
+_CMAP_TOUNICODE_LATIN1 = b'''/CIDInit /ProcSet findresource begin
+12 dict begin
+begincmap
+/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def
+/CMapName /Adobe-Identity-UCS def
+/CMapType 2 def
+1 begincodespacerange
+<20><FF>
+endcodespacerange
+1 beginbfrange
+<20><FF> <0020>
+endbfrange
+endcmap
+CMapName currentdict /CMap defineresource pop
+end
+end'''
 
 
 def _contenido_apariencia_campo(ancho, alto, texto, es_badge):
@@ -89,11 +191,40 @@ def _contenido_apariencia_campo(ancho, alto, texto, es_badge):
     lineas.append('Q')
 
     if texto_norm:
-        texto_escapado = texto_norm.replace('\\', r'\\').replace('(', r'\(').replace(')', r'\)')
-        tam_fuente = round(alto * 0.62, 2)
+        tam_fuente_max = round(alto * 0.62, 2)
+        texto_dibujar = texto_norm
+
+        if es_badge:
+            # Los badges siempre son "SI"/"NO": nunca necesitan encogerse.
+            tam_fuente = tam_fuente_max
+        else:
+            # El BBox del Form XObject recorta cualquier trazo que se pase de
+            # 'ancho' (es el comportamiento normal de un PDF, no un bug del
+            # visor), así que un valor largo en una casilla angosta (ej. el
+            # responsable de una fila) se dibujaba a tamaño fijo y quedaba
+            # cortado a la mitad sin avisar. Primero se encoge la fuente
+            # hasta que quepa completo; si ni al tamaño mínimo legible entra,
+            # recién ahí se trunca con "..." (mejor un recorte visible que
+            # texto invisible perdido).
+            ancho_util = max(ancho - 4.0, 4.0)  # 2pt de aire a cada lado
+            ancho_1000 = _ancho_texto_1000(texto_dibujar)
+            tam_fuente = tam_fuente_max
+            if ancho_1000 and (ancho_1000 * tam_fuente_max / 1000.0) > ancho_util:
+                tam_fuente = max(_TAM_FUENTE_MIN_PT, min(
+                    tam_fuente_max, round(ancho_util * 1000.0 / ancho_1000, 2)
+                ))
+            if _ancho_texto_pt(texto_dibujar, tam_fuente) > ancho_util:
+                elipsis = '...'
+                ancho_elipsis = _ancho_texto_pt(elipsis, tam_fuente)
+                recorte = texto_dibujar
+                while recorte and _ancho_texto_pt(recorte, tam_fuente) + ancho_elipsis > ancho_util:
+                    recorte = recorte[:-1]
+                texto_dibujar = (recorte.rstrip() + elipsis) if recorte else texto_dibujar[:1]
+
+        texto_escapado = texto_dibujar.replace('\\', r'\\').replace('(', r'\(').replace(')', r'\)')
         y_texto = max(1.0, (alto - tam_fuente) / 2 + tam_fuente * 0.14)
         if es_badge:
-            ancho_texto_aprox = len(texto_norm) * tam_fuente * 0.6
+            ancho_texto_aprox = _ancho_texto_pt(texto_dibujar, tam_fuente)
             x_texto = max(1.0, (ancho - ancho_texto_aprox) / 2)
         else:
             x_texto = 2.0
@@ -106,15 +237,23 @@ def _contenido_apariencia_campo(ancho, alto, texto, es_badge):
     return '\n'.join(lineas).encode('latin-1', errors='replace')
 
 
-def _ancho_campo(nombre_campo, x, ancho_pagina):
+def _ancho_campo(nombre_campo, x, ancho_pagina, limite_derecho=None):
     """
-    Ancho de la casilla: los badges Sí/No usan un ancho fijo pequeño (su
-    contenido siempre es "SI" o "NO"); los campos de celda completa se
-    extienden casi hasta el margen de la página, ya que no comparten su
-    celda con ningún otro dato ni etiqueta.
+    Ancho de la casilla: los badges Sí/No y los campos de ancho fijo corto
+    (ver CAMPOS_SI_NO_COLOR / CAMPOS_ANCHO_FIJO_CORTO) usan un ancho fijo
+    pequeño, ignorando cualquier límite calculado. Los campos de celda
+    completa usan el borde izquierdo del siguiente elemento de su misma fila
+    (otra celda de datos o la columna FIRMA ELECTRÓNICA) como límite (ver
+    limites_derecho en _inyectar_campos_editables) cuando existe; si son la
+    última celda de su fila (ej. UNIDAD, CARGO), se extienden casi hasta el
+    margen de la página.
     """
     if nombre_campo in CAMPOS_SI_NO_COLOR:
         return 34
+    if nombre_campo in CAMPOS_ANCHO_FIJO_CORTO:
+        return 20
+    if limite_derecho is not None:
+        return max(30, limite_derecho - x - 4)
     return max(60, (ancho_pagina - _MARGEN_PDF_PT) - x - 2)
 
 
@@ -136,21 +275,64 @@ def _inyectar_campos_editables(ruta_pdf, datos_diccionario):
                 yield item
                 yield from recorrer(item.children)
 
-        posiciones = {}
+        # Se recorren TODOS los marcadores (espejo_campo_ Y espejo_firma_) en
+        # el orden en que aparecen en el documento: cada celda de datos va
+        # seguida, en la misma fila, de otra celda o de la columna FIRMA
+        # ELECTRÓNICA (ver firma_espejo() macro). Así se puede acotar el
+        # ancho de la casilla al límite real de su columna en vez de
+        # extenderla hasta el margen de la página, que termina pintando su
+        # fondo blanco encima del contenido vecino.
+        marcadores = []
         for item in recorrer(outline.root):
             if not item.title or not item.destination:
                 continue
-            if not item.title.startswith('espejo_campo_'):
+            if not (item.title.startswith('espejo_campo_') or item.title.startswith('espejo_firma_')):
                 continue
-            nombre_campo = item.title[len('espejo_campo_'):]
+            dest = item.destination
+            pagina = pdf.pages.index(dest[0])
+            marcadores.append((item.title, pagina, float(dest[2]), float(dest[3])))
+
+        # Umbral para decidir si dos celdas de DATOS (no firma) están en la
+        # misma fila: se calibró con las filas reales de hoja_espejo.html,
+        # donde el desfase Y entre celdas vecinas de una misma fila es de
+        # ~0-6pt (variación de fuente/peso), mientras que entre una fila y
+        # la siguiente hay al menos ~12pt. Para el caso "campo seguido de su
+        # columna FIRMA ELECTRÓNICA" no se aplica este umbral (ver abajo):
+        # la caja de firma mide 60px de alto y puede desplazar su marcador
+        # bastante más que eso dentro de la misma fila.
+        TOLERANCIA_MISMA_FILA_PT = 6
+
+        posiciones = {}
+        limites_derecho = {}
+        for i, (titulo, pagina, x, y) in enumerate(marcadores):
+            if not titulo.startswith('espejo_campo_'):
+                continue
+            nombre_campo = titulo[len('espejo_campo_'):]
             # Solo se inyecta casilla para los campos migrados (ver
             # CAMPOS_EDITABLES_ACROFORM); el resto de marcadores en
             # hoja_espejo.html quedan como texto normal, sin tocar
             if nombre_campo not in CAMPOS_EDITABLES_ACROFORM:
                 continue
-            dest = item.destination
-            pagina = pdf.pages.index(dest[0])
-            posiciones[nombre_campo] = (pagina, float(dest[2]), float(dest[3]))
+            posiciones[nombre_campo] = (pagina, x, y)
+
+            if i + 1 < len(marcadores):
+                sig_titulo, sig_pagina, sig_x, sig_y = marcadores[i + 1]
+                es_firma = sig_titulo.startswith('espejo_firma_')
+                # El siguiente marcador acota el ancho de la casilla si está
+                # en la misma fila, a su derecha — sea la columna de FIRMA
+                # ELECTRÓNICA (comportamiento original, sin chequeo de Y: la
+                # caja de firma es alta y su marcador se desplaza dentro de
+                # la fila) o la siguiente celda de datos (ej. CÉDULA seguida
+                # de MODALIDAD, o LUGAR TRABAJO seguida de GRUPO OCUPACIONAL,
+                # acotadas con TOLERANCIA_MISMA_FILA_PT). Antes solo se
+                # consideraba una firma como límite, así que esos otros
+                # campos se extendían de más y su fondo blanco terminaba
+                # pisando la celda vecina.
+                misma_fila = sig_pagina == pagina and sig_x > x and (
+                    es_firma or abs(sig_y - y) <= TOLERANCIA_MISMA_FILA_PT
+                )
+                if misma_fila:
+                    limites_derecho[nombre_campo] = sig_x
 
         if not posiciones:
             return
@@ -160,20 +342,22 @@ def _inyectar_campos_editables(ruta_pdf, datos_diccionario):
             root.AcroForm = pdf.make_indirect(pikepdf.Dictionary(Fields=pikepdf.Array([]), SigFlags=3))
         root.AcroForm.NeedAppearances = False  # la apariencia se dibuja a mano, no se delega al visor
 
+        tounicode = pikepdf.Stream(pdf, _CMAP_TOUNICODE_LATIN1)
         fuente_helv = pdf.make_indirect(pikepdf.Dictionary(
             Type=pikepdf.Name('/Font'), Subtype=pikepdf.Name('/Type1'),
             BaseFont=pikepdf.Name('/Helvetica'), Encoding=pikepdf.Name('/WinAnsiEncoding'),
+            ToUnicode=pdf.make_indirect(tounicode),
         ))
 
         for nombre_campo, (pagina, x, y) in posiciones.items():
             pagina_obj = pdf.pages[pagina]
             ancho_pagina = float(pagina_obj.MediaBox[2])
             es_badge = nombre_campo in CAMPOS_SI_NO_COLOR
-            ancho_campo = _ancho_campo(nombre_campo, x, ancho_pagina)
+            ancho_campo = _ancho_campo(nombre_campo, x, ancho_pagina, limites_derecho.get(nombre_campo))
             alto_campo = _ALTO_CAMPO_EDITABLE_PT
             rect = pikepdf.Array([x, y - alto_campo, x + ancho_campo, y])
 
-            valor_actual = datos_diccionario.get(nombre_campo) or ''
+            valor_actual = _valor_o_defecto(datos_diccionario.get(nombre_campo))
 
             contenido = _contenido_apariencia_campo(ancho_campo, alto_campo, valor_actual, es_badge)
             apariencia = pikepdf.Stream(pdf, contenido)
@@ -231,7 +415,7 @@ def actualizar_campo_pdf_incremental(ruta_pdf, campo_formulario, valor):
         for campo_ref in campos:
             campo_obj = campo_ref.get_object()
             if campo_obj.get('/T') == campo_formulario:
-                valor_texto = str(valor) if valor is not None else ''
+                valor_texto = _valor_o_defecto(str(valor) if valor is not None else '')
                 campo_obj['/V'] = generic.TextStringObject(valor_texto)
 
                 rect = campo_obj.get('/Rect')
@@ -240,11 +424,15 @@ def actualizar_campo_pdf_incremental(ruta_pdf, campo_formulario, valor):
                 es_badge = campo_formulario in CAMPOS_SI_NO_COLOR
 
                 contenido = _contenido_apariencia_campo(ancho_campo, alto_campo, valor_texto, es_badge)
+                tounicode_ref = w.add_object(generic.StreamObject(
+                    dict_data={}, stream_data=_CMAP_TOUNICODE_LATIN1,
+                ))
                 fuente_ref = w.add_object(generic.DictionaryObject({
                     generic.NameObject('/Type'): generic.NameObject('/Font'),
                     generic.NameObject('/Subtype'): generic.NameObject('/Type1'),
                     generic.NameObject('/BaseFont'): generic.NameObject('/Helvetica'),
                     generic.NameObject('/Encoding'): generic.NameObject('/WinAnsiEncoding'),
+                    generic.NameObject('/ToUnicode'): tounicode_ref,
                 }))
                 apariencia_ref = w.add_object(generic.StreamObject(
                     dict_data={
@@ -379,7 +567,14 @@ def generar_documento_paz_salvo(solicitud, ex_funcionario, respuestas_db, ruta_s
            formulario PDF real que se puede seguir llenando aunque el documento ya tenga firmas */
         [id^="espejo_firma_"], [id^="espejo_campo_"] {{ bookmark-level: 1; bookmark-label: attr(id); }}
         span[id^="espejo_campo_"] {{ display: inline-block; }}
-        {selectores_ocultar} {{ color: transparent !important; background: transparent !important; border-color: transparent !important; }}
+        /* white-space:nowrap: un valor largo NO debe envolver a 2 líneas aquí:
+           aunque sea invisible, seguiría ocupando espacio y haría crecer el
+           alto de toda la fila, empujando verticalmente (vertical-align:middle)
+           a la celda vecina hasta la altura de esta casilla de 1 sola línea,
+           quedando tapada por su fondo blanco. Como el valor real lo dibuja la
+           casilla PDF (que ya se autoajusta a su ancho), este texto oculto no
+           necesita envolver nunca. */
+        {selectores_ocultar} {{ color: transparent !important; background: transparent !important; border-color: transparent !important; white-space: nowrap !important; overflow: hidden !important; }}
     ''')
 
     # 5. Generar el PDF final vectorizado

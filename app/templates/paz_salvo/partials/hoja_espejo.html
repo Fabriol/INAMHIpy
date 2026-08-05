@@ -289,20 +289,20 @@
 <table class="ep-tabla">
     <tr>
         <th class="ep-th" width="18%">NOMBRES</th>
-        <td class="ep-td" colspan="3" id="espejo_campo_nombres_apellidos">{{ dat.get('nombres_apellidos') | default(ex.nombres ~ ' ' ~ ex.apellidos, true)
-            }}</td>
+        <td class="ep-td" colspan="3"><span id="espejo_campo_nombres_apellidos">{{ dat.get('nombres_apellidos') | default(ex.nombres ~ ' ' ~ ex.apellidos, true)
+            }}</span></td>
     </tr>
     <tr>
         <th class="ep-th">CÉDULA</th>
-        <td class="ep-td" id="espejo_campo_cedula">{{ dat.get('cedula') | default(ex.cedula, true) }}</td>
-        <th class="ep-th" width="18%">MODALIDAD</th>
-        <td class="ep-td" id="espejo_campo_modalidad">{{ dat.get('modalidad') | default('—', true) }}</td>
+        <td class="ep-td"><span id="espejo_campo_cedula">{{ dat.get('cedula') | default(ex.cedula, true) }}</span></td>
+        <th class="ep-th" width="18%"><span id="espejo_campo_modalidad_th"></span>MODALIDAD</th>
+        <td class="ep-td"><span id="espejo_campo_modalidad">{{ dat.get('modalidad') | default('—', true) }}</span></td>
     </tr>
     <tr>
         <th class="ep-th">INGRESO</th>
-        <td class="ep-td" id="espejo_campo_fecha_ingreso">{{ dat.get('fecha_ingreso') | default('—', true) }}</td>
-        <th class="ep-th">SALIDA</th>
-        <td class="ep-td" id="espejo_campo_fecha_salida">{{ dat.get('fecha_salida') | default('—', true) }}</td>
+        <td class="ep-td"><span id="espejo_campo_fecha_ingreso">{{ dat.get('fecha_ingreso') | default('—', true) }}</span></td>
+        <th class="ep-th"><span id="espejo_campo_fecha_salida_th"></span>SALIDA</th>
+        <td class="ep-td"><span id="espejo_campo_fecha_salida">{{ dat.get('fecha_salida') | default('—', true) }}</span></td>
     </tr>
     <tr>
         <th class="ep-th">DIRECCIÓN</th>
@@ -318,9 +318,9 @@
     </tr>
     <tr>
         <th class="ep-th">EMAIL 1</th>
-        <td class="ep-td" id="espejo_campo_email1">{{ dat.get('email1') | default('—', true) }}</td>
-        <th class="ep-th">EMAIL 2</th>
-        <td class="ep-td" id="espejo_campo_email2">{{ dat.get('email2') | default('—', true) }}</td>
+        <td class="ep-td"><span id="espejo_campo_email1">{{ dat.get('email1') | default('—', true) }}</span></td>
+        <th class="ep-th"><span id="espejo_campo_email2_th"></span>EMAIL 2</th>
+        <td class="ep-td"><span id="espejo_campo_email2">{{ dat.get('email2') | default('—', true) }}</span></td>
     </tr>
 </table>
 
@@ -329,17 +329,17 @@
 <table class="ep-tabla">
     <tr>
         <th class="ep-th" width="18%">LUGAR TRABAJO</th>
-        <td class="ep-td" id="espejo_campo_lugar_trabajo">{{ dat.get('lugar_trabajo') | default('—', true) }}</td>
-        <th class="ep-th" width="18%">GRUPO OCUP.</th>
-        <td class="ep-td" id="espejo_campo_grupo_ocupacional">{{ dat.get('grupo_ocupacional') | default('—', true) }}</td>
+        <td class="ep-td"><span id="espejo_campo_lugar_trabajo">{{ dat.get('lugar_trabajo') | default('—', true) }}</span></td>
+        <th class="ep-th" width="18%"><span id="espejo_campo_grupo_ocupacional_th"></span>GRUPO OCUP.</th>
+        <td class="ep-td"><span id="espejo_campo_grupo_ocupacional">{{ dat.get('grupo_ocupacional') | default('—', true) }}</span></td>
     </tr>
     <tr>
         <th class="ep-th">UNIDAD</th>
-        <td class="ep-td" colspan="3" id="espejo_campo_unidad">{{ dat.get('unidad') | default('—', true) }}</td>
+        <td class="ep-td" colspan="3"><span id="espejo_campo_unidad">{{ dat.get('unidad') | default('—', true) }}</span></td>
     </tr>
     <tr>
         <th class="ep-th">CARGO</th>
-        <td class="ep-td" colspan="3" id="espejo_campo_cargo">{{ dat.get('cargo') | default('—', true) }}</td>
+        <td class="ep-td" colspan="3"><span id="espejo_campo_cargo">{{ dat.get('cargo') | default('—', true) }}</span></td>
     </tr>
 </table>
 
@@ -363,7 +363,7 @@
         <td align="center"><span id="espejo_campo_tramites_quipux_cero"
                 class="ep-yn {% if dat.get('tramites_quipux_cero')=='SI' %}ep-yn--s{% elif dat.get('tramites_quipux_cero')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('tramites_quipux_cero') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_tramites_nombre_resp1">{{ dat.get('tramites_nombre_resp1') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_tramites_nombre_resp1">{{ dat.get('tramites_nombre_resp1') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('tramites_r1') }}</td>
     </tr>
     <tr>
@@ -375,7 +375,7 @@
         <td align="center"><span id="espejo_campo_tramites_claves_asignadas"
                 class="ep-yn {% if dat.get('tramites_claves_asignadas')=='SI' %}ep-yn--s{% elif dat.get('tramites_claves_asignadas')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('tramites_claves_asignadas') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_tramites_nombre_resp2">{{ dat.get('tramites_nombre_resp2') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_tramites_nombre_resp2">{{ dat.get('tramites_nombre_resp2') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('tramites_r2') }}</td>
     </tr>
     <tr>
@@ -387,7 +387,7 @@
         <td align="center"><span id="espejo_campo_tramites_acta_claves"
                 class="ep-yn {% if dat.get('tramites_acta_claves')=='SI' %}ep-yn--s{% elif dat.get('tramites_acta_claves')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('tramites_acta_claves') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_tramites_nombre_resp3">{{ dat.get('tramites_nombre_resp3') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_tramites_nombre_resp3">{{ dat.get('tramites_nombre_resp3') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('tramites_r3') }}</td>
     </tr>
     <tr style="background: #f8fafc;">
@@ -398,7 +398,7 @@
             <strong>Recibe:</strong> <span id="espejo_campo_tramites_servidor_recibe">{{ dat.get('tramites_servidor_recibe') | default('-', true) }}</span> |
             <strong>Obs:</strong> <span id="espejo_campo_tramites_obs">{{ dat.get('tramites_obs') | default('-', true) }}</span>
         </td>
-        <td class="ep-td" align="center" id="espejo_campo_tramites_nombre_responsable">{{ dat.get('tramites_nombre_responsable') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_tramites_nombre_responsable">{{ dat.get('tramites_nombre_responsable') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('tramites_jefe') }}</td>
     </tr>
 </table>
@@ -419,7 +419,7 @@
                 class="ep-yn {% if dat.get('admin_informe')=='SI' %}ep-yn--s{% elif dat.get('admin_informe')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('admin_informe') | default('-', true) }}</span></td>
         <td align="center">Admin. Contrato: <span id="espejo_campo_admin_es_contrato">{{ dat.get('admin_es_contrato') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_admin_nombre_resp1">{{ dat.get('admin_nombre_resp1') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_admin_nombre_resp1">{{ dat.get('admin_nombre_resp1') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('admin_r1') }}</td>
     </tr>
     <tr>
@@ -429,7 +429,7 @@
                 dat.get('admin_bienes') | default('-', true) }}</span></td>
         <td align="center">Val: $<span id="espejo_campo_admin_valor_bienes">{{ dat.get('admin_valor_bienes') | default('0', true) }}</span> | Acta: <span id="espejo_campo_admin_acta_bienes">{{
             dat.get('admin_acta_bienes') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_admin_nombre_resp2">{{ dat.get('admin_nombre_resp2') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_admin_nombre_resp2">{{ dat.get('admin_nombre_resp2') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('admin_r2') }}</td>
     </tr>
     <tr>
@@ -438,7 +438,7 @@
                 class="ep-yn {% if dat.get('admin_deducibles')=='SI' %}ep-yn--s{% elif dat.get('admin_deducibles')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('admin_deducibles') | default('-', true) }}</span></td>
         <td align="center">Valor: $<span id="espejo_campo_admin_deducibles_valor">{{ dat.get('admin_deducibles_valor') | default('0', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_admin_nombre_resp3">{{ dat.get('admin_nombre_resp3') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_admin_nombre_resp3">{{ dat.get('admin_nombre_resp3') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('admin_r3') }}</td>
     </tr>
     <tr>
@@ -447,12 +447,12 @@
                 class="ep-yn {% if dat.get('admin_pasajes')=='SI' %}ep-yn--s{% elif dat.get('admin_pasajes')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('admin_pasajes') | default('-', true) }}</span></td>
         <td align="center">Valor: $<span id="espejo_campo_admin_pasajes_valor">{{ dat.get('admin_pasajes_valor') | default('0', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_admin_nombre_resp4">{{ dat.get('admin_nombre_resp4') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_admin_nombre_resp4">{{ dat.get('admin_nombre_resp4') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('admin_r4') }}</td>
     </tr>
     <tr style="background: #f8fafc;">
         <td colspan="3" align="right"><strong>DIRECTOR/A ADMINISTRATIVO FINANCIERO:</strong></td>
-        <td class="ep-td" align="center" id="espejo_campo_admin_responsable">{{ dat.get('admin_responsable') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_admin_responsable">{{ dat.get('admin_responsable') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('admin_dir') }}</td>
     </tr>
 </table>
@@ -473,7 +473,7 @@
                 dat.get('tic_verificacion') | default('-', true) }}</span></td>
         <td align="center">IP: <span id="espejo_campo_tic_ip_fija">{{ dat.get('tic_ip_fija') | default('-', true) }}</span> | Liberó: <span id="espejo_campo_tic_liberacion">{{ dat.get('tic_liberacion')
             | default('-', true) }}</span><br>Obs: <span id="espejo_campo_tic_obs1">{{ dat.get('tic_obs1') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_tic_nombre_resp1">{{ dat.get('tic_nombre_resp1') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_tic_nombre_resp1">{{ dat.get('tic_nombre_resp1') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('tic_r1') }}</td>
     </tr>
     <tr>
@@ -482,7 +482,7 @@
                 class="ep-yn {% if dat.get('tic_backup')=='SI' %}ep-yn--s{% elif dat.get('tic_backup')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('tic_backup') | default('-', true) }}</span></td>
         <td align="center">Ruta: <span id="espejo_campo_tic_ruta_backup">{{ dat.get('tic_ruta_backup') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_tic_nombre_resp2">{{ dat.get('tic_nombre_resp2') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_tic_nombre_resp2">{{ dat.get('tic_nombre_resp2') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('tic_r2') }}</td>
     </tr>
     <tr>
@@ -493,7 +493,7 @@
         <td align="center">C: <span id="espejo_campo_tic_cierre_correo">{{ dat.get('tic_cierre_correo') | default('-', true) }}</span> | Q: <span id="espejo_campo_tic_quipux">{{ dat.get('tic_quipux') |
             default('-', true) }}</span><br>S: <span id="espejo_campo_tic_esigef">{{ dat.get('tic_esigef') | default('-', true) }}</span> | SP: <span id="espejo_campo_tic_spryn">{{
             dat.get('tic_spryn') | default('-', true) }}</span><br>eB: <span id="espejo_campo_tic_esbye">{{ dat.get('tic_esbye') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_tic_nombre_resp3">{{ dat.get('tic_nombre_resp3') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_tic_nombre_resp3">{{ dat.get('tic_nombre_resp3') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('tic_r3') }}</td>
     </tr>
     <tr>
@@ -502,12 +502,12 @@
                 class="ep-yn {% if dat.get('tic_tarjeta_cuentas')=='SI' %}ep-yn--s{% elif dat.get('tic_tarjeta_cuentas')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('tic_tarjeta_cuentas') | default('-', true) }}</span></td>
         <td align="center">Obs: <span id="espejo_campo_tic_obs">{{ dat.get('tic_obs') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_tic_nombre_resp4">{{ dat.get('tic_nombre_resp4') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_tic_nombre_resp4">{{ dat.get('tic_nombre_resp4') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('tic_r4') }}</td>
     </tr>
     <tr style="background: #f8fafc;">
         <td colspan="3" align="right"><strong>RESPONSABLE TIC GENERAL:</strong></td>
-        <td class="ep-td" align="center" id="espejo_campo_tic_responsable">{{ dat.get('tic_responsable') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_tic_responsable">{{ dat.get('tic_responsable') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('tic_r5') }}</td>
     </tr>
 </table>
@@ -529,7 +529,7 @@
                 dat.get('fin_saldos') | default('-', true) }}</span></td>
         <td align="center">Valor: $<span id="espejo_campo_fin_saldos_valor">{{ dat.get('fin_saldos_valor') | default('0', true) }}</span> | Obs: <span id="espejo_campo_fin_obs1">{{
             dat.get('fin_obs1') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_fin_nombre_resp1">{{ dat.get('fin_nombre_resp1') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_fin_nombre_resp1">{{ dat.get('fin_nombre_resp1') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('fin_r1') }}</td>
     </tr>
     <tr>
@@ -539,7 +539,7 @@
                 dat.get('fin_anticipo') | default('-', true) }}</span></td>
         <td align="center">Valor: $<span id="espejo_campo_fin_anticipo_valor">{{ dat.get('fin_anticipo_valor') | default('0', true) }}</span> | Obs: <span id="espejo_campo_fin_obs2">{{
             dat.get('fin_obs2') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_fin_nombre_resp2">{{ dat.get('fin_nombre_resp2') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_fin_nombre_resp2">{{ dat.get('fin_nombre_resp2') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('fin_r2') }}</td>
     </tr>
     <tr>
@@ -549,7 +549,7 @@
                 dat.get('fin_recuperacion') | default('-', true) }}</span></td>
         <td align="center">Valor: $<span id="espejo_campo_fin_recuperacion_valor">{{ dat.get('fin_recuperacion_valor') | default('0', true) }}</span> | Obs: <span id="espejo_campo_fin_obs3">{{
             dat.get('fin_obs3') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_fin_nombre_resp3">{{ dat.get('fin_nombre_resp3') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_fin_nombre_resp3">{{ dat.get('fin_nombre_resp3') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('fin_r3') }}</td>
     </tr>
     <tr>
@@ -559,12 +559,12 @@
                 dat.get('fin_devolucion') | default('-', true) }}</span></td>
         <td align="center">Valor: $<span id="espejo_campo_fin_devolucion_valor">{{ dat.get('fin_devolucion_valor') | default('0', true) }}</span> | Obs: <span id="espejo_campo_fin_obs4">{{
             dat.get('fin_obs4') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_fin_nombre_resp4">{{ dat.get('fin_nombre_resp4') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_fin_nombre_resp4">{{ dat.get('fin_nombre_resp4') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('fin_r4') }}</td>
     </tr>
     <tr style="background: #f8fafc;">
         <td colspan="3" align="right"><strong>DIRECTOR/A FINANCIERO:</strong></td>
-        <td class="ep-td" align="center" id="espejo_campo_fin_director">{{ dat.get('fin_director') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_fin_director">{{ dat.get('fin_director') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('fin_dir') }}</td>
     </tr>
 </table>
@@ -578,7 +578,7 @@
                 class="ep-yn {% if dat.get('seg_archivos')=='SI' %}ep-yn--s{% elif dat.get('seg_archivos')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('seg_archivos') | default('-', true) }}</span></td>
         <td width="20%" align="center">Copia: <span id="espejo_campo_seg_entrega_copia">{{ dat.get('seg_entrega_copia') | default('-', true) }}</span></td>
-        <td class="ep-td" width="20%" align="center" id="espejo_campo_seg_nombre_resp1">{{ dat.get('seg_nombre_resp1') | default('—', true) }}</td>
+        <td class="ep-td" width="20%" align="center"><span id="espejo_campo_seg_nombre_resp1">{{ dat.get('seg_nombre_resp1') | default('—', true) }}</span></td>
         <td width="24%" style="padding: 1px;">{{ firma_espejo('seg_r1') }}</td>
     </tr>
     <tr>
@@ -587,13 +587,13 @@
                 class="ep-yn {% if dat.get('seg_archivos_fisicos')=='SI' %}ep-yn--s{% elif dat.get('seg_archivos_fisicos')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('seg_archivos_fisicos') | default('-', true) }}</span></td>
         <td align="center">Info: <span id="espejo_campo_seg_verificacion_info">{{ dat.get('seg_verificacion_info') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_seg_nombre_resp2">{{ dat.get('seg_nombre_resp2') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_seg_nombre_resp2">{{ dat.get('seg_nombre_resp2') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('seg_r2') }}</td>
     </tr>
     <tr style="background: #f8fafc;">
         <td colspan="3" align="right"><strong>OFICIAL SEGURIDAD:</strong> <span id="espejo_campo_seg_oficial">{{ dat.get('seg_oficial') | default('-', true)
             }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_seg_responsable">{{ dat.get('seg_responsable') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_seg_responsable">{{ dat.get('seg_responsable') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('seg_oficial_sig') }}</td>
     </tr>
 </table>
@@ -607,7 +607,7 @@
                 class="ep-yn {% if dat.get('rrhh_capacitacion')=='SI' %}ep-yn--s{% elif dat.get('rrhh_capacitacion')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('rrhh_capacitacion') | default('-', true) }}</span></td>
         <td width="20%" align="center">Cursos: <span id="espejo_campo_rrhh_cursos_eval">{{ dat.get('rrhh_cursos_eval') | default('-', true) }}</span></td>
-        <td class="ep-td" width="20%" align="center" id="espejo_campo_rrhh_resp_capacitacion">{{ dat.get('rrhh_resp_capacitacion') | default('—', true) }}</td>
+        <td class="ep-td" width="20%" align="center"><span id="espejo_campo_rrhh_resp_capacitacion">{{ dat.get('rrhh_resp_capacitacion') | default('—', true) }}</span></td>
         <td width="24%" style="padding: 1px;">{{ firma_espejo('rrhh_r1') }}</td>
     </tr>
     <tr>
@@ -616,7 +616,7 @@
                 class="ep-yn {% if dat.get('rrhh_evaluacion')=='SI' %}ep-yn--s{% elif dat.get('rrhh_evaluacion')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('rrhh_evaluacion') | default('-', true) }}</span></td>
         <td align="center">—</td>
-        <td class="ep-td" align="center" id="espejo_campo_rrhh_resp_evaluacion">{{ dat.get('rrhh_resp_evaluacion') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_rrhh_resp_evaluacion">{{ dat.get('rrhh_resp_evaluacion') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('rrhh_r2') }}</td>
     </tr>
     <tr>
@@ -625,7 +625,7 @@
                 class="ep-yn {% if dat.get('rrhh_viajes')=='SI' %}ep-yn--s{% elif dat.get('rrhh_viajes')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('rrhh_viajes') | default('-', true) }}</span></td>
         <td align="center">—</td>
-        <td class="ep-td" align="center" id="espejo_campo_rrhh_resp_viajes">{{ dat.get('rrhh_resp_viajes') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_rrhh_resp_viajes">{{ dat.get('rrhh_resp_viajes') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('rrhh_r3') }}</td>
     </tr>
     <tr>
@@ -634,14 +634,14 @@
                 class="ep-yn {% if dat.get('rrhh_siith')=='SI' %}ep-yn--s{% elif dat.get('rrhh_siith')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('rrhh_siith') | default('-', true) }}</span></td>
         <td align="center">—</td>
-        <td class="ep-td" align="center" id="espejo_campo_rrhh_resp_siith">{{ dat.get('rrhh_resp_siith') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_rrhh_resp_siith">{{ dat.get('rrhh_resp_siith') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('rrhh_r4') }}</td>
     </tr>
     <tr>
         <td>Vacaciones</td>
         <td align="center"><span class="ep-yn" id="espejo_campo_rrhh_vacaciones">{{ dat.get('rrhh_vacaciones') | default('0', true) }}</span></td>
         <td align="center">Cert: <span id="espejo_campo_rrhh_num_certificado">{{ dat.get('rrhh_num_certificado') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_rrhh_resp_vacaciones">{{ dat.get('rrhh_resp_vacaciones') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_rrhh_resp_vacaciones">{{ dat.get('rrhh_resp_vacaciones') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('rrhh_r5') }}</td>
     </tr>
     <tr>
@@ -650,7 +650,7 @@
                 class="ep-yn {% if dat.get('rrhh_juramentada')=='SI' %}ep-yn--s{% elif dat.get('rrhh_juramentada')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('rrhh_juramentada') | default('-', true) }}</span></td>
         <td align="center">N°: <span id="espejo_campo_rrhh_num_declaracion">{{ dat.get('rrhh_num_declaracion') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_rrhh_resp_juramentada">{{ dat.get('rrhh_resp_juramentada') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_rrhh_resp_juramentada">{{ dat.get('rrhh_resp_juramentada') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('rrhh_r6') }}</td>
     </tr>
     <tr>
@@ -659,7 +659,7 @@
                 class="ep-yn {% if dat.get('rrhh_credencial')=='SI' %}ep-yn--s{% elif dat.get('rrhh_credencial')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('rrhh_credencial') | default('-', true) }}</span></td>
         <td align="center">Respaldo CD: <span id="espejo_campo_rrhh_respaldo_cd">{{ dat.get('rrhh_respaldo_cd') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_rrhh_resp_credencial2">{{ dat.get('rrhh_resp_credencial2') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_rrhh_resp_credencial2">{{ dat.get('rrhh_resp_credencial2') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('rrhh_r7') }}</td>
     </tr>
     <tr>
@@ -668,12 +668,12 @@
                 class="ep-yn {% if dat.get('rrhh_acta_bienes')=='SI' %}ep-yn--s{% elif dat.get('rrhh_acta_bienes')=='NO' %}ep-yn--n{% endif %}">{{
                 dat.get('rrhh_acta_bienes') | default('-', true) }}</span></td>
         <td align="center">Ropa Trabajo: <span id="espejo_campo_rrhh_ropa_trabajo">{{ dat.get('rrhh_ropa_trabajo') | default('-', true) }}</span></td>
-        <td class="ep-td" align="center" id="espejo_campo_rrhh_resp_acta">{{ dat.get('rrhh_resp_acta') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_rrhh_resp_acta">{{ dat.get('rrhh_resp_acta') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('rrhh_r8') }}</td>
     </tr>
     <tr style="background: #f8fafc;">
         <td colspan="3" align="right"><strong>DIRECTOR/A RRHH:</strong></td>
-        <td class="ep-td" align="center" id="espejo_campo_rrhh_director">{{ dat.get('rrhh_director') | default('—', true) }}</td>
+        <td class="ep-td" align="center"><span id="espejo_campo_rrhh_director">{{ dat.get('rrhh_director') | default('—', true) }}</span></td>
         <td style="padding: 1px;">{{ firma_espejo('rrhh_dir') }}</td>
     </tr>
 </table>
@@ -684,7 +684,7 @@
     <tr>
         <td width="30%">Fecha Recepción</td>
         <td width="15%" align="center" id="espejo_campo_recepcion_fecha">{{ dat.get('recepcion_fecha') | default('-', true) }}</td>
-        <td width="11%" align="right"><strong>Hojas:</strong></td>
+        <td width="11%" align="right"><span id="espejo_campo_recepcion_hojas_b"></span><strong>Hojas:</strong></td>
         <td class="ep-td" width="20%" align="center" id="espejo_campo_recepcion_hojas">{{ dat.get('recepcion_hojas') | default('-', true) }}</td>
         <td width="24%" rowspan="2" style="padding: 1px;">{{ firma_espejo('recepcion_r1') }}</td>
     </tr>
