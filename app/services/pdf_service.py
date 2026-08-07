@@ -1,4 +1,5 @@
 import os
+import math
 import unicodedata
 import pikepdf
 from flask import render_template
@@ -17,36 +18,47 @@ _TAM_FUENTE_MIN_PT = 4.5
 # id="espejo_campo_<nombre>".
 #
 # Etapa 2 (ampliación): originalmente solo se migraron los campos con una
-# celda de tabla completa para ellos solos. Se probó extender esto a los
-# campos de celdas combinadas ("Val: $X | Acta: Y"), pero WeasyPrint solo
-# reporta una posición confiable para bookmark-label/bookmark-level del
-# ÚNICO marcador dentro de cada celda/bloque: en cuanto hay un SEGUNDO
-# marcador compartiendo esa celda (misma línea, o incluso otra línea tras un
-# <br> pero dentro de la misma celda), su posición reportada queda mal —
-# a veces apenas desplazada (el campo se ve truncado de más) y a veces tan
-# mal que ni siquiera es mayor que la posición del campo anterior, lo que
-# hace fallar la detección de límite y termina extendiendo esa casilla casi
-# hasta el margen de la página, tapando por completo columnas vecinas
-# (incluida la de FIRMA ELECTRÓNICA — probado con admin_valor_bienes). Por
-# eso la ampliación se limita estrictamente a campos que son el ÚNICO
-# marcador dentro de toda su celda; el resto de campos de celdas combinadas
-# se queda con el comportamiento anterior (editable libremente hasta la
-# primera firma del trámite).
+# celda de tabla completa para ellos solos, porque WeasyPrint solo reporta
+# una posición confiable para bookmark-label/bookmark-level del ÚNICO
+# marcador dentro de cada celda/bloque: en cuanto hay un SEGUNDO marcador
+# compartiendo esa celda (misma línea, o incluso otra línea tras un <br>
+# pero dentro de la misma celda), su posición reportada queda mal — a veces
+# apenas desplazada (el campo se ve truncado de más) y a veces tan mal que
+# ni siquiera es mayor que la posición del campo anterior, lo que hace
+# fallar la detección de límite y termina extendiendo esa casilla casi
+# hasta el margen de la página, tapando columnas vecinas (incluida la de
+# FIRMA ELECTRÓNICA — probado con admin_valor_bienes).
+#
+# Etapa 3: en vez de resignarse a dejar esos campos sin migrar, se separó
+# cada "Etiqueta: <span>" de una celda combinada en su propio contenedor
+# inline-block (clase .ep-inl en hoja_espejo.html). Con eso cada campo
+# vuelve a ser el ÚNICO marcador dentro de SU bloque (aunque varios bloques
+# convivan uno al lado del otro en la misma celda/línea visual), así que su
+# posición vuelve a ser confiable — verificado comparando la posición
+# reportada por el marcador contra la posición real del texto renderizado.
+# Con esto se migró el 100% de los campos de hoja_espejo.html.
 CAMPOS_ANCHO_COMPLETO = {
     'nombres_apellidos', 'cedula', 'modalidad', 'fecha_ingreso', 'fecha_salida', 'email1', 'email2',
+    'direccion', 'numero_domicilio', 'provincia', 'canton', 'celular', 'emergencia',
     'lugar_trabajo', 'grupo_ocupacional', 'unidad', 'cargo',
     'tramites_nombre_resp1', 'tramites_nombre_resp2', 'tramites_nombre_resp3', 'tramites_nombre_responsable',
+    'tramites_admin_contrato', 'tramites_desc_contrato', 'tramites_memo',
+    'tramites_jefe_inmediato', 'tramites_servidor_recibe', 'tramites_obs',
     'admin_nombre_resp1', 'admin_nombre_resp2', 'admin_nombre_resp3', 'admin_nombre_resp4', 'admin_responsable',
-    'admin_es_contrato', 'admin_deducibles_valor', 'admin_pasajes_valor',
+    'admin_es_contrato', 'admin_valor_bienes', 'admin_acta_bienes', 'admin_deducibles_valor', 'admin_pasajes_valor',
     'tic_nombre_resp1', 'tic_nombre_resp2', 'tic_nombre_resp3', 'tic_nombre_resp4', 'tic_responsable',
-    'tic_ruta_backup', 'tic_obs',
+    'tic_ip_fija', 'tic_liberacion', 'tic_obs1', 'tic_ruta_backup',
+    'tic_cierre_correo', 'tic_quipux', 'tic_esigef', 'tic_spryn', 'tic_esbye', 'tic_obs',
     'fin_nombre_resp1', 'fin_nombre_resp2', 'fin_nombre_resp3', 'fin_nombre_resp4', 'fin_director',
+    'fin_saldos_valor', 'fin_obs1', 'fin_anticipo_valor', 'fin_obs2',
+    'fin_recuperacion_valor', 'fin_obs3', 'fin_devolucion_valor', 'fin_obs4',
     'seg_nombre_resp1', 'seg_nombre_resp2', 'seg_responsable', 'seg_entrega_copia', 'seg_verificacion_info', 'seg_oficial',
     'rrhh_resp_capacitacion', 'rrhh_resp_evaluacion', 'rrhh_resp_viajes', 'rrhh_resp_siith',
     'rrhh_resp_vacaciones', 'rrhh_resp_juramentada', 'rrhh_resp_credencial2', 'rrhh_resp_acta', 'rrhh_director',
-    'rrhh_cursos_eval', 'rrhh_num_certificado', 'rrhh_vacaciones', 'rrhh_num_declaracion',
+    'rrhh_cursos_eval', 'rrhh_num_certificado', 'rrhh_num_declaracion',
     'rrhh_respaldo_cd', 'rrhh_ropa_trabajo',
-    'recepcion_fecha', 'recepcion_hojas',
+    'recepcion_fecha', 'recepcion_hojas', 'recepcion_servidor', 'recepcion_cargo',
+    'cedula_firmante', 'fecha_firma',
 }
 
 # Badges Sí/No que deben conservar el color (ver .ep-yn / .ep-yn--s /
@@ -71,6 +83,29 @@ CAMPOS_SI_NO_COLOR = {
 # completo) deja esa etiqueta dentro de la casilla. Con ancho fijo chico,
 # alcanza de sobra para 1-3 dígitos y nunca necesita ese límite.
 CAMPOS_ANCHO_FIJO_CORTO = {'rrhh_vacaciones'}
+
+# Límite derecho manual para campos que cierran la ÚLTIMA línea de su celda
+# antes de un <br> (ej. "...Memo: X<br>Jefe Inmediato: ..."): el siguiente
+# marcador en el documento queda en la línea de ABAJO (Y distinto), así que
+# _inyectar_campos_editables no lo acepta como límite de la misma fila y esa
+# casilla cae al modo "extender casi hasta el margen", invadiendo la columna
+# RESPONSABLE de su fila. Acá se indica explícitamente contra qué campo
+# RESPONSABLE (siempre confiable: único marcador de su celda) debe acotarse
+# cada uno de estos campos, sin depender de que su Y coincida con el de nadie.
+LIMITE_DERECHO_MANUAL = {
+    'tramites_memo': 'tramites_nombre_responsable',
+    'tramites_obs': 'tramites_nombre_responsable',
+    'tic_liberacion': 'tic_nombre_resp1',
+    'tic_obs1': 'tic_nombre_resp1',
+    'tic_quipux': 'tic_nombre_resp3',
+    'tic_spryn': 'tic_nombre_resp3',
+    'tic_esbye': 'tic_nombre_resp3',
+    # 'cedula_firmante' -> marcador-guía 'fecha_firma_b': en esta línea (fuera
+    # de una tabla, a font-size:8px) el span vacío reporta un Y ~8pt distinto
+    # al de sus vecinos — por encima de TOLERANCIA_MISMA_FILA_PT — así que la
+    # detección automática lo descarta aunque su X sí sea confiable.
+    'cedula_firmante': 'fecha_firma_b',
+}
 
 CAMPOS_EDITABLES_ACROFORM = CAMPOS_ANCHO_COMPLETO | CAMPOS_SI_NO_COLOR | CAMPOS_ANCHO_FIJO_CORTO
 
@@ -210,9 +245,12 @@ def _contenido_apariencia_campo(ancho, alto, texto, es_badge):
             ancho_1000 = _ancho_texto_1000(texto_dibujar)
             tam_fuente = tam_fuente_max
             if ancho_1000 and (ancho_1000 * tam_fuente_max / 1000.0) > ancho_util:
-                tam_fuente = max(_TAM_FUENTE_MIN_PT, min(
-                    tam_fuente_max, round(ancho_util * 1000.0 / ancho_1000, 2)
-                ))
+                # floor (no round) a 2 decimales: redondear al más cercano
+                # puede pasarse por una centésima de punto del ancho real
+                # disponible y disparar el truncado de más abajo con texto
+                # que en realidad SÍ cabía completo.
+                tam_ideal = math.floor(ancho_util * 1000.0 / ancho_1000 * 100) / 100
+                tam_fuente = max(_TAM_FUENTE_MIN_PT, min(tam_fuente_max, tam_ideal))
             if _ancho_texto_pt(texto_dibujar, tam_fuente) > ancho_util:
                 elipsis = '...'
                 ancho_elipsis = _ancho_texto_pt(elipsis, tam_fuente)
@@ -303,11 +341,17 @@ def _inyectar_campos_editables(ruta_pdf, datos_diccionario):
         TOLERANCIA_MISMA_FILA_PT = 6
 
         posiciones = {}
+        # Todas las posiciones espejo_campo_* (migradas o no, incluidos los
+        # marcadores-guía "_th"/"_b" sin dato propio): LIMITE_DERECHO_MANUAL
+        # necesita poder referenciar un marcador-guía, que nunca aparece en
+        # 'posiciones' porque no tiene casilla propia.
+        todas_posiciones = {}
         limites_derecho = {}
         for i, (titulo, pagina, x, y) in enumerate(marcadores):
             if not titulo.startswith('espejo_campo_'):
                 continue
             nombre_campo = titulo[len('espejo_campo_'):]
+            todas_posiciones[nombre_campo] = (pagina, x, y)
             # Solo se inyecta casilla para los campos migrados (ver
             # CAMPOS_EDITABLES_ACROFORM); el resto de marcadores en
             # hoja_espejo.html quedan como texto normal, sin tocar
@@ -333,6 +377,16 @@ def _inyectar_campos_editables(ruta_pdf, datos_diccionario):
                 )
                 if misma_fila:
                     limites_derecho[nombre_campo] = sig_x
+
+        # Ver LIMITE_DERECHO_MANUAL: casos conocidos donde el límite
+        # automático (arriba) no aplica, sea porque el siguiente marcador
+        # queda en otra línea dentro de la misma celda, o porque un
+        # marcador-guía vacío quedó fuera de TOLERANCIA_MISMA_FILA_PT.
+        for nombre_campo, campo_referencia in LIMITE_DERECHO_MANUAL.items():
+            ref = todas_posiciones.get(campo_referencia)
+            propio = posiciones.get(nombre_campo)
+            if ref is not None and propio is not None and ref[0] == propio[0]:
+                limites_derecho[nombre_campo] = ref[1]
 
         if not posiciones:
             return
